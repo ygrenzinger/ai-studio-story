@@ -1,18 +1,13 @@
 [project]
-name = "gemini-tts"
+name = "ai-studio-story"
 version = "1.0.0"
-description = "A CLI tool to convert text to speech using Google's Gemini 2.5 TTS API"
+description = "A set of Python tool to help generate stories for Lunii device"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "google-genai>=1.0.0",
-    "click>=8.1.0",
-    "pydub>=0.25.1",
     "Pillow>=10.0.0",
 ]
-
-[project.scripts]
-gemini-tts = "gemini_tts.cli:main"
 
 [build-system]
 requires = ["hatchling"]
