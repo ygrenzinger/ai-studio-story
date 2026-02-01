@@ -244,15 +244,15 @@ Ages 9-10: Advanced vocabulary allowed
 
 ---
 
-### RULE: Segment Duration
+### RULE: Chapter Duration
 - **Severity:** WARNING
-- **Check:** Audio segment estimated duration within limits
-- **Fix:** Split long segments or expand short ones
+- **Check:** Audio chapter estimated duration within limits
+- **Fix:** Adjust chapter content to match target duration
 
 ```
-Ages 5-6: 30-45 seconds per segment
-Ages 7-8: 45-60 seconds per segment  
-Ages 9-10: 60-90 seconds per segment
+Ages 5-6: 3-5 minutes per chapter
+Ages 7-8: 5-7 minutes per chapter
+Ages 9-10: 7-10 minutes per chapter
 ```
 
 ---

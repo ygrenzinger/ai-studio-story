@@ -28,9 +28,9 @@ Conduct a **conversational interview** - adapt your questions based on answers. 
 Start by greeting the user warmly, then gather:
 
 1. **Target Age** (critical - affects everything)
-   - Ages 5-6: Simple vocabulary, short segments, minimal choices
-   - Ages 7-8: Moderate complexity, medium segments, some choices
-   - Ages 9-10: Richer vocabulary, longer segments, complex branching
+   - Ages 5-6: Simple vocabulary, 3-5 min chapters, minimal choices
+   - Ages 7-8: Moderate complexity, 5-7 min chapters, some choices
+   - Ages 9-10: Richer vocabulary, 7-10 min chapters, complex branching
 
 2. **Language**
    - Supported: English (US/India), French, German, Spanish, Italian, Japanese, Korean, Portuguese, Hindi, Bengali, Tamil, Telugu, and more
@@ -57,9 +57,9 @@ Based on the basics, ask about:
    - Random: "Surprise elements that change each time"
 
 6. **Story Length** (suggest based on age)
-   - Ages 5-6: 3-5 chapters (~10-15 minutes)
-   - Ages 7-8: 5-8 chapters (~15-25 minutes)
-   - Ages 9-10: 8-12 chapters (~25-40 minutes)
+   - Ages 5-6: 2-3 chapters (5-10 min total, 3-5 min per chapter)
+   - Ages 7-8: 2-3 chapters (10-15 min total, 5-7 min per chapter)
+   - Ages 9-10: 2-3 chapters (15-20 min total, 7-10 min per chapter)
 
 7. **Bedtime Mode?**
    - If yes: Enable autoplay, calmer pacing, soothing tone

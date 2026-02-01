@@ -672,7 +672,10 @@ magic-forest-adventure.zip
 
 ### Audio Script Guidelines
 
-1. **Keep it short:** 30-90 seconds per audio segment
+1. **Chapter length by age:**
+   - Ages 5-6: 3-5 minutes per chapter (story total: 5-10 min)
+   - Ages 7-8: 5-7 minutes per chapter (story total: 10-15 min)
+   - Ages 9-10: 7-10 minutes per chapter (story total: 15-20 min)
 2. **Use clear language:** Simple vocabulary for target age group
 3. **Engaging voice:** Enthusiastic, warm, varied tone
 4. **Sound effects:** Add background sounds (birds, wind, magic sparkles)
@@ -693,7 +696,7 @@ magic-forest-adventure.zip
 
 1. **Clear progression:** Beginning → Middle → End
 2. **Positive messages:** Friendship, courage, kindness, curiosity
-3. **Appropriate length:** 5-15 stages for young children, up to 30+ for older kids
+3. **Appropriate length:** 2-3 chapters per story (see age-specific durations below)
 4. **Meaningful choices:** Make choices matter (different outcomes)
 5. **Happy endings:** Or at least positive, hopeful conclusions
 6. **Replayability:** Multiple paths encourage replay
@@ -701,26 +704,32 @@ magic-forest-adventure.zip
 
 ### Age-Appropriate Content
 
-**Ages 3-5:**
-- Very simple stories (3-7 stages)
-- Clear, obvious choices
+**Ages 5-6:**
+- 2-3 chapters (5-10 min total, 3-5 min per chapter)
+- Simple stories with clear structure
+- Clear, obvious choices (2 max)
 - Repetitive elements (predictable)
 - Familiar themes (animals, family, daily routines)
 - Autoplay option for non-readers
+- Simple vocabulary, short sentences
 
-**Ages 6-8:**
-- Longer stories (8-15 stages)
-- More complex branching
+**Ages 7-8:**
+- 2-3 chapters (10-15 min total, 5-7 min per chapter)
+- Moderate complexity stories
+- More branching options (up to 4 choices)
 - Simple puzzles or challenges
 - Fantasy elements (magic, adventure)
 - Cause and effect
+- Moderate vocabulary, compound sentences
 
-**Ages 9-12:**
-- Complex narratives (15-30+ stages)
+**Ages 9-10:**
+- 2-3 chapters (15-20 min total, 7-10 min per chapter)
+- Complex narratives
 - Multiple endings
 - Character development
 - Mystery, sci-fi, or adventure genres
 - Consequences matter
+- Advanced vocabulary allowed
 
 ## Advanced Techniques
 

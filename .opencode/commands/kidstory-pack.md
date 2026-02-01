@@ -38,18 +38,18 @@ Start by greeting the user warmly, then gather:
    - Offer suggestions if user needs inspiration based on age
 
 2. **Target Age** (applies to all stories)
-   - Ages 5-6: Simple vocabulary, short segments, minimal choices
-   - Ages 7-8: Moderate complexity, medium segments, some choices
-   - Ages 9-10: Richer vocabulary, longer segments, complex branching
+   - Ages 5-6: Simple vocabulary, 3-5 min chapters, minimal choices
+   - Ages 7-8: Moderate complexity, 5-7 min chapters, some choices
+   - Ages 9-10: Richer vocabulary, 7-10 min chapters, complex branching
 
 3. **Language**
    - Supported: English (US/India), French, German, Spanish, Italian, Japanese, Korean, Portuguese, Hindi, and more
    - Default to English (US) if not specified
 
-4. **Number of Stories**
-   - 3 stories (compact pack, ~30-45 min total)
-   - 4 stories (balanced pack, ~45-60 min total)
-   - 5 stories (full pack, ~60-75 min total)
+4. **Number of Stories** (varies by age)
+   - Ages 5-6: 5-7 stories (45 min - 1h total)
+   - Ages 7-8: 5-6 stories (1h - 1h30 total)
+   - Ages 9-10: 6-8 stories (1h30 - 2h30 total)
 
 ### 1.2 Educational & Tone
 
@@ -124,10 +124,10 @@ For each story in the pack (3-5 stories), conduct a **brief customization interv
    - Which shared pack characters appear?
    - Any story-specific characters? (brief description)
 
-4. **Story Length**
-   - Short: 2-3 chapters (~8-12 min)
-   - Medium: 3-5 chapters (~12-18 min)
-   - Long: 5-7 chapters (~18-25 min)
+4. **Story Length** (based on age)
+   - Ages 5-6: 2-3 chapters (5-10 min, 3-5 min per chapter)
+   - Ages 7-8: 2-3 chapters (10-15 min, 5-7 min per chapter)
+   - Ages 9-10: 2-3 chapters (15-20 min, 7-10 min per chapter)
 
 5. **Special Elements** (optional)
    - Educational moment (counting, colors, emotions, etc.)
@@ -516,18 +516,21 @@ Follow the same guidelines as single stories:
 - Clear cause and effect
 - Gentle conflicts, always resolved
 - Maximum 2 characters active at once per story
+- **Chapter duration: 3-5 min | Story duration: 5-10 min | Pack: 45 min - 1h**
 
 **Ages 7-8:**
 - Moderate vocabulary
 - Light mystery or challenge
 - Choices with clear outcomes
 - Up to 3-4 characters per story
+- **Chapter duration: 5-7 min | Story duration: 10-15 min | Pack: 1h - 1h30**
 
 **Ages 9-10:**
 - Richer vocabulary
 - Complex plots allowed
 - Meaningful choices with consequences
 - Multiple characters
+- **Chapter duration: 7-10 min | Story duration: 15-20 min | Pack: 1h30 - 2h30**
 
 ### Pack-Specific Guidelines
 

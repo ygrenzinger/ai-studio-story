@@ -117,8 +117,11 @@ The interview is **conversational** and **adaptive**. Core questions are asked, 
 
 | Setting | Ages 5-6 | Ages 7-8 | Ages 9-10 |
 |---------|----------|----------|-----------|
-| Story length | 3-5 chapters | 5-8 chapters | 8-12 chapters |
-| Segment duration | 30-45 sec | 45-60 sec | 60-90 sec |
+| Story duration | 5-10 min | 10-15 min | 15-20 min |
+| Chapter duration | 3-5 min | 5-7 min | 7-10 min |
+| Chapters per story | 2-3 | 2-3 | 2-3 |
+| Pack duration | 45 min - 1h | 1h - 1h30 | 1h30 - 2h30 |
+| Stories per pack | 5-7 | 5-6 | 6-8 |
 | Branching complexity | 2 choices max | 4 choices | Unlimited |
 | Vocabulary | Simple | Moderate | Advanced |
 | TTS pace | 0.75x-0.85x | 0.9x-1.0x | 1.0x-1.1x |
