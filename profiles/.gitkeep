@@ -1,0 +1,5 @@
+# Profiles Directory
+
+This directory stores user preference profiles for story creation.
+
+Profile files are JSON format: `{profile-name}.json`

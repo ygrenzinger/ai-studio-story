@@ -1,0 +1,5 @@
+# Stories Directory
+
+This directory stores generated stories.
+
+Each story has its own subdirectory: `{story-slug}/`
