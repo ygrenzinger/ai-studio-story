@@ -46,6 +46,7 @@ STRICT REQUIREMENTS:
 - Color: STRICTLY BLACK AND WHITE / GRAYSCALE ONLY - no colors whatsoever
 - Composition: Simple, iconic imagery suitable for a small 320x240 pixel display
 - Theme: Create an evocative scene that captures the essence of the chapter description
+- NO TEXT: NEVER include any text, titles, labels, captions, or written words in the image - the image must be purely visual artwork
 
 PIXEL ART BEST PRACTICES TO FOLLOW:
 - Use deliberate, hand-placed pixel aesthetic with visible individual pixels
@@ -56,7 +57,7 @@ PIXEL ART BEST PRACTICES TO FOLLOW:
 - Use limited shading - think Game Boy or early Macintosh style
 - Prioritize clarity and recognizability over detail
 
-OUTPUT: A striking black and white pixel art illustration."""
+OUTPUT: A striking black and white pixel art illustration with NO text or titles."""
 
 
 def setup_logging(debug: bool) -> None:
@@ -486,11 +487,6 @@ Output Format:
         # Generate image with Gemini via Vertex AI
         logging.info(f"Generating cover for: {args.description[:50]}...")
         raw_image = generate_image_with_gemini(args.description, project, location)
-
-        # Save original image as JPG before conversion
-        jpg_path = output_path.with_suffix(".jpg")
-        raw_image.save(jpg_path, "JPEG", quality=95)
-        logging.info(f"Original image saved to: {jpg_path}")
 
         # Process image (resize, grayscale, quantize)
         processed_image = process_image(raw_image)
