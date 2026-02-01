@@ -1,39 +1,64 @@
 ---
-description: Export story to Lunii archive format
+description: Export story or pack to Lunii archive format
 ---
 
 # Export KidStory
 
-Generate the final Lunii-compatible archive for a story.
+Generate the final Lunii-compatible archive for a story or story pack.
 
-## Story Name
+## Story/Pack Name
 
 $ARGUMENTS
 
 ## Prerequisites
 
 Before export, verify:
+
+### For Single Stories:
 1. Story exists and is complete (`status: "complete"`)
 2. All chapters are generated
 3. All audio scripts exist
 4. Validation passes
 
+### For Story Packs:
+1. Pack exists and is complete (`status: "complete"`)
+2. Hub is complete (cover, menu, welcome-back, goodbye)
+3. All stories in pack are complete
+4. All audio scripts exist for hub and all stories
+5. Pack-wide validation passes
+
 ## Workflow
 
-1. **Locate and Validate Story**
-   - Find story in `./stories/{story-name}/`
-   - Run full validation
+1. **Locate and Detect Type**
+   - Find content in `./stories/{name}/`
+   - Read `metadata.json` to check `type` field
+   - If `type: "story"`: Use single story export
+   - If `type: "pack"`: Use pack export workflow
+
+2. **Validate Content**
+   - Run full validation (story or pack-specific)
    - If errors exist, prompt for fixes before export
 
-2. **Check Asset Status**
+3. **Check Asset Status**
    
    Display asset summary:
+
+   **For Single Stories:**
    - Image prompts ready: X files
    - Audio scripts ready: X files
    - Actual images generated: X files (may be 0)
    - Actual audio generated: X files (may be 0)
 
-3. **Export Options**
+   **For Story Packs:**
+   - Hub assets: X image prompts, X audio scripts
+   - Per-story breakdown:
+     - Story 1: X images, X audio files
+     - Story 2: X images, X audio files
+     - ...
+   - Total: X image prompts, X audio scripts
+   - Generated: X images, X audio files
+
+4. **Export Options**
 
    Ask user what to export:
 
@@ -56,13 +81,13 @@ Before export, verify:
    ```json
    {
      "format": "v1",
-     "title": "{story title}",
-     "description": "{story description}",
+     "title": "{story/pack title}",
+     "description": "{story/pack description}",
      "version": {metadata.version},
      "nightModeAvailable": true,
      
      "stageNodes": [
-       // Generated from chapters
+       // Generated from chapters (story) or hub + all stories (pack)
      ],
      
      "actionNodes": [
@@ -109,6 +134,106 @@ Before export, verify:
    }
    ```
 
+---
+
+## Pack-Specific Export
+
+### Pack story.json Structure
+
+For story packs, generate a hub-based structure:
+
+```json
+{
+  "format": "v1",
+  "title": "Pack Title",
+  "description": "Pack description",
+  "version": 1,
+  "nightModeAvailable": true,
+
+  "stageNodes": [
+    // Hub nodes (4 stages)
+    {"uuid": "hub-cover", "squareOne": true, ...},
+    {"uuid": "hub-menu", "type": "menu.questionstage", ...},
+    {"uuid": "hub-welcome-back", ...},
+    {"uuid": "hub-goodbye", ...},
+    
+    // Story 1 nodes
+    {"uuid": "story1-ch1", ...},
+    {"uuid": "story1-ch2", ...},
+    {"uuid": "story1-ending", ...},
+    
+    // Story 2 nodes
+    {"uuid": "story2-ch1", ...},
+    // ... etc
+  ],
+
+  "actionNodes": [
+    // Hub navigation
+    {"id": "action-to-menu", "options": ["hub-menu"]},
+    {"id": "action-choose-story", "type": "menu.optionsaction", 
+     "options": ["story1-ch1", "story2-ch1", "story3-ch1", "hub-goodbye"]},
+    {"id": "action-return-menu", "options": ["hub-menu"]},
+    {"id": "action-return-welcome", "options": ["hub-welcome-back"]},
+    
+    // Story 1 navigation
+    {"id": "action-story1-ch2", "options": ["story1-ch2"]},
+    // ... etc
+  ]
+}
+```
+
+### Hub Stage Generation
+
+Generate hub-specific stages:
+
+1. **Hub Cover** (`hub-cover`)
+   - `squareOne: true` - Entry point
+   - `type: "cover"`
+   - Wheel disabled, OK to continue
+   - `okTransition` → `action-to-menu`
+
+2. **Hub Menu** (`hub-menu`)
+   - `type: "menu.questionstage"`
+   - **Wheel enabled** for story selection
+   - `okTransition` → `action-choose-story`
+   - Options include all story entry points + goodbye
+
+3. **Welcome Back** (`hub-welcome-back`)
+   - Shown after completing a story
+   - Encourages exploring more stories
+   - `okTransition` → `action-to-menu`
+
+4. **Goodbye** (`hub-goodbye`)
+   - Exit message
+   - `okTransition: null` (ends pack)
+
+### Per-Story Stage Generation
+
+For each story in the pack:
+
+1. **Story Entry** (first chapter)
+   - `homeTransition` → `action-return-menu` (returns to hub)
+   - `okTransition` → next chapter
+
+2. **Story Chapters**
+   - `homeTransition` → `action-return-menu`
+   - `okTransition` → next chapter or ending
+
+3. **Story Ending** (last chapter)
+   - `okTransition` → `action-return-welcome` (go to welcome-back)
+   - `homeTransition` → `action-return-menu`
+
+### Pack Action Nodes
+
+Generate navigation actions:
+
+1. **`action-to-menu`**: Routes to hub-menu
+2. **`action-choose-story`**: Menu selection (type: `menu.optionsaction`)
+   - Options: [story1-ch1, story2-ch1, story3-ch1, ..., hub-goodbye]
+3. **`action-return-menu`**: Direct return to hub-menu
+4. **`action-return-welcome`**: Return via welcome-back message
+5. **`action-storyX-chY`**: Per-story chapter transitions
+
 7. **Asset Preparation**
 
    **For images (placeholders):**
@@ -123,9 +248,16 @@ Before export, verify:
    - Convert to required format (mono, 32kHz, 16-bit)
    - Store in `assets/audio/`
 
+   **For Packs:**
+   - Generate hub assets first (cover, menu, welcome-back, goodbye)
+   - Generate per-story assets in order
+   - Use consistent visual style across all assets
+
 8. **Create Archive**
 
    Generate the final ZIP:
+
+   **For Single Stories:**
    ```
    {story-slug}.zip
    ├── story.json
@@ -137,23 +269,61 @@ Before export, verify:
        └── ...
    ```
 
+   **For Story Packs:**
+   ```
+   {pack-slug}.zip
+   ├── story.json
+   ├── thumbnail.png (from hub cover)
+   └── assets/
+       ├── hub-cover.png
+       ├── hub-menu.png
+       ├── hub-welcome-back.png
+       ├── hub-goodbye.png
+       ├── hub-cover.mp3
+       ├── hub-menu.mp3
+       ├── story1-ch1.png
+       ├── story1-ch1.mp3
+       ├── story1-ch2.png
+       ├── story1-ch2.mp3
+       └── ... (all story assets)
+   ```
+
 9. **Final Validation**
 
    Before finalizing:
+
+   **Common validations:**
    - Verify all asset references resolve
    - Check squareOne is first node
    - Validate all transitions
    - Confirm no orphaned nodes
 
+   **Pack-specific validations:**
+   - Hub cover is squareOne
+   - Hub menu has wheel enabled
+   - All stories accessible from menu action node
+   - All story endings return to hub
+   - Home button on all story stages returns to menu
+
 10. **Output**
 
-    Save archive to: `./stories/{story-slug}/{story-slug}.zip`
+    Save archive to: `./stories/{slug}/{slug}.zip`
     
-    Report:
+    **Report for Single Stories:**
     - Archive location
     - File size
-    - Node count
+    - Node count (stages + actions)
     - Asset count
+    - Ready for Lunii STUdio import
+
+    **Report for Story Packs:**
+    - Archive location
+    - File size
+    - Hub nodes: 4
+    - Story nodes: X stages, Y actions
+    - Total nodes: Z stages, W actions
+    - Stories included: N
+    - Asset count: X images, Y audio files
     - Ready for Lunii STUdio import
 
 ## Asset Generation (Optional)

@@ -6,12 +6,16 @@ Pre-built story templates to help you create stories quickly. These templates pr
 
 ## Template Categories
 
+### Single Story Templates
 1. [Adventure Templates](#adventure-templates)
 2. [Bedtime Templates](#bedtime-templates)
 3. [Educational Templates](#educational-templates)
 4. [Friendship Templates](#friendship-templates)
 5. [Fantasy Templates](#fantasy-templates)
 6. [Animal Templates](#animal-templates)
+
+### Story Pack Templates
+7. [Pack Templates](#pack-templates) - Collections of 3-5 related stories with hub menu
 
 ---
 
@@ -343,7 +347,195 @@ Cover -> Little Fish's Home -> Starting the Journey
 
 ---
 
+---
+
+## Pack Templates
+
+Pre-built story pack templates for creating collections of related stories. Packs include a hub menu where children can choose which story to listen to.
+
+### Forest Friends Pack
+
+**Ages:** 5-7
+**Stories:** 4
+**Pattern:** Hub with individual linear stories
+**Duration:** ~45 minutes total (~10-12 min per story)
+**Theme:** Forest animals and nature
+**Educational themes:** Animals, cooperation, nature appreciation
+
+**Included Stories:**
+1. **Owl's Night Adventure** - Nocturnal animals, nighttime sounds, counting stars
+2. **Beaver's Big Dam** - Teamwork, building, water and rivers
+3. **Squirrel's Acorn Hunt** - Seasons, preparation, sharing with friends
+4. **Deer's Meadow Visit** - Nature appreciation, calm observation, friendship
+
+**Shared Characters:**
+- Forest Narrator (warm, gentle voice)
+- Oliver the Wise Owl (appears in all stories as guide)
+- Various forest animals per story
+
+**Structure:**
+```
+Hub Menu (Forest Clearing)
+  ├── Owl's Night Adventure → [4 chapters] → Return to Hub
+  ├── Beaver's Big Dam → [5 chapters] → Return to Hub
+  ├── Squirrel's Acorn Hunt → [3 chapters] → Return to Hub
+  ├── Deer's Meadow Visit → [4 chapters] → Return to Hub
+  └── Goodbye (Time to leave the forest)
+```
+
+---
+
+### Space Explorers Pack
+
+**Ages:** 6-9
+**Stories:** 4
+**Pattern:** Hub with branching stories
+**Duration:** ~60 minutes total (~12-15 min per story)
+**Theme:** Space exploration and planets
+**Educational themes:** Solar system, curiosity, science, problem-solving
+
+**Included Stories:**
+1. **Moon Mission** - First trip to space, gravity, teamwork
+2. **Mars Adventure** - Red planet exploration, overcoming challenges
+3. **Asteroid Belt Challenge** - Navigation, quick thinking, courage
+4. **Jupiter's Moons** - Size comparison, wonder, discovery
+
+**Shared Characters:**
+- Mission Control Narrator (informative, encouraging)
+- Captain Stella (brave astronaut, appears in all missions)
+- Robot companion BEEP (helpful, provides facts)
+
+**Structure:**
+```
+Space Station Hub
+  ├── Moon Mission → [5 chapters, 1 choice point] → Return to Station
+  ├── Mars Adventure → [6 chapters, 1 choice point] → Return to Station
+  ├── Asteroid Belt Challenge → [4 chapters] → Return to Station
+  ├── Jupiter's Moons → [5 chapters] → Return to Station
+  └── Return to Earth (Mission Complete!)
+```
+
+**Special notes:**
+- Each story has one choice point for replayability
+- BEEP shares fun science facts in each story
+- Stories can reference previous missions for cohesion
+
+---
+
+### Bedtime Dreams Pack
+
+**Ages:** 5-7
+**Stories:** 3
+**Pattern:** Hub with autoplay linear stories
+**Duration:** ~35 minutes total (~10-12 min per story)
+**Theme:** Calming bedtime content
+**Educational themes:** Relaxation, imagination, gratitude, peaceful feelings
+
+**Included Stories:**
+1. **Cloud Journey** - Floating on soft clouds, gentle adventure, calm
+2. **Star Counting** - Counting stars 1-10, peaceful night sky, sleepy
+3. **Moon Lullaby** - Soft music themes, gentle rhythms, ready for sleep
+
+**Shared Characters:**
+- Sleepy Narrator (soft, slow, soothing voice)
+- Little Dream Sprite (gentle guide through dreamland)
+
+**Structure:**
+```
+Dreamland Gate (Hub)
+  ├── Cloud Journey → [3 chapters, autoplay] → Return to Gate
+  ├── Star Counting → [3 chapters, autoplay] → Return to Gate
+  ├── Moon Lullaby → [3 chapters, autoplay] → Return to Gate
+  └── Sweet Dreams (Gentle goodbye)
+```
+
+**Special notes:**
+- All stories have **autoplay enabled** - no button presses needed
+- Slower narration pace (0.75x-0.85x)
+- Calming sound descriptions throughout
+- Repetitive, soothing phrases
+- Designed to help children fall asleep
+
+---
+
+### Kindness Academy Pack
+
+**Ages:** 6-8
+**Stories:** 4
+**Pattern:** Hub with interactive stories
+**Duration:** ~50 minutes total (~12-15 min per story)
+**Theme:** Social-emotional learning
+**Educational themes:** Empathy, sharing, kindness, inclusion, emotions
+
+**Included Stories:**
+1. **Sharing Day** - Learning the joy of sharing, generosity
+2. **Helping Hands** - Cooperation, community, working together
+3. **Being Brave** - Courage to try new things, overcoming fear
+4. **Making Friends** - Inclusion, welcoming newcomers, kindness
+
+**Shared Characters:**
+- Professor Heartsworth (warm, encouraging narrator)
+- Kiki the Kind Koala (main character, learning kindness lessons)
+- Various classmates (different in each story)
+
+**Structure:**
+```
+Kindness Academy Entrance (Hub)
+  ├── Sharing Day → [4 chapters] → Return to Academy
+  ├── Helping Hands → [4 chapters] → Return to Academy
+  ├── Being Brave → [5 chapters] → Return to Academy
+  ├── Making Friends → [4 chapters] → Return to Academy
+  └── Graduation Day (Celebrate kindness!)
+```
+
+**Special notes:**
+- Each story explores one core social-emotional skill
+- Kiki models learning and growth
+- Gentle discussion prompts for parents
+- Positive reinforcement throughout
+
+---
+
+### Ocean Wonders Pack
+
+**Ages:** 5-8
+**Stories:** 4
+**Pattern:** Hub with linear stories + random encounters
+**Duration:** ~50 minutes total
+**Theme:** Ocean life and underwater exploration
+**Educational themes:** Marine animals, environment, diversity, curiosity
+
+**Included Stories:**
+1. **Coral Reef Colors** - Colors, coral reef ecosystem, visual beauty
+2. **Whale's Song** - Communication, size, migration
+3. **Octopus's Garden** - Problem-solving, creativity, adaptation
+4. **Seahorse Secrets** - Unique animals, patience, observation
+
+**Shared Characters:**
+- Ocean Narrator (flowing, calming voice)
+- Splash the Dolphin (friendly guide, appears in all stories)
+- Various sea creatures per story
+
+**Structure:**
+```
+Ocean Surface (Hub)
+  ├── Coral Reef Colors → [4 chapters] → Return to Surface
+  ├── Whale's Song → [4 chapters, random whale call] → Return to Surface
+  ├── Octopus's Garden → [5 chapters] → Return to Surface
+  ├── Seahorse Secrets → [3 chapters] → Return to Surface
+  └── Swim Home (Return to shore)
+```
+
+**Special notes:**
+- Whale's Song includes random whale sounds each playthrough
+- Beautiful underwater imagery descriptions
+- Teaches ocean conservation gently
+
+---
+
 ## Using Templates
+
+### For Single Stories
 
 When you start `/kidstory new`, you can:
 
@@ -352,9 +544,26 @@ When you start `/kidstory new`, you can:
 3. **Mix templates:** "Combine Forest Friends with educational counting"
 4. **Start fresh:** "I have my own idea" for full custom creation
 
-Templates provide:
+### For Story Packs
+
+When you start `/kidstory pack`, you can:
+
+1. **Choose a pack template:** Say "Use the Forest Friends Pack template"
+2. **Modify a template:** "Use Space Explorers but make it about ocean exploration"
+3. **Mix templates:** "Use Kindness Academy theme with animal characters"
+4. **Adjust story count:** "Use Bedtime Dreams but with 4 stories instead of 3"
+5. **Start fresh:** "I have my own pack idea" for full custom creation
+
+### Templates provide:
 - Proven story structures
 - Age-appropriate pacing
 - Character archetypes
 - Educational tie-ins
 - Flexible customization points
+
+### Pack templates additionally provide:
+- Hub menu structure
+- Shared character definitions
+- Cross-story consistency
+- Balanced educational theme distribution
+- Cohesive visual and audio style
