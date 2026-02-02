@@ -44,6 +44,10 @@ TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
 DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 
+# Chunking constants (for long transcripts)
+MAX_CHUNK_SIZE = 6000  # Characters - safety margin below 8000 Gemini limit
+CHUNK_PAUSE_MS = 300  # Milliseconds of silence between chunks
+
 # Available voices (from voice-guide.md)
 AVAILABLE_VOICES = {
     # Female voices
@@ -103,6 +107,19 @@ class AudioScript:
     transcript: str = ""  # Only the ## TRANSCRIPTION content (to be read aloud)
     style_context: str = ""  # Scene + Director's notes (style guidance, not read)
     full_prompt: str = ""  # Built from above fields
+
+
+@dataclass
+class ChunkInfo:
+    """Metadata for a transcript chunk, used for tracking and retry."""
+
+    index: int  # 0-based index
+    total: int  # Total number of chunks
+    text: str  # The chunk content
+    char_count: int  # Length of text
+    markdown_path: Path  # Path to saved .md file
+    audio_path: Path  # Path to output .mp3 file
+    status: str = "pending"  # "pending", "generated", "failed"
 
 
 def setup_logging(debug: bool) -> None:
@@ -332,6 +349,160 @@ def build_tts_prompt(script: AudioScript, include_context: bool = True) -> str:
         return script.transcript
 
 
+def chunk_transcript(transcript: str, max_size: int = MAX_CHUNK_SIZE) -> list[str]:
+    """Split transcript into chunks at paragraph boundaries.
+
+    Splits long transcripts into smaller chunks that fit within the Gemini TTS
+    character limit. Prioritizes splitting at paragraph boundaries for natural
+    audio breaks.
+
+    Args:
+        transcript: The full transcript text to split
+        max_size: Maximum characters per chunk (default: 6000)
+
+    Returns:
+        List of transcript chunks, each within max_size limit
+    """
+    # If transcript fits in one chunk, return as-is
+    if len(transcript) <= max_size:
+        return [transcript]
+
+    chunks: list[str] = []
+
+    # Split by paragraphs (double newline)
+    paragraphs = transcript.split("\n\n")
+
+    current_chunk: list[str] = []
+    current_size = 0
+
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+
+        # Calculate size including separator
+        para_size = len(paragraph)
+        separator_size = 2 if current_chunk else 0  # "\n\n" between paragraphs
+
+        # If single paragraph exceeds max_size, split by sentences
+        if para_size > max_size:
+            # First, save current chunk if any
+            if current_chunk:
+                chunks.append("\n\n".join(current_chunk))
+                current_chunk = []
+                current_size = 0
+
+            # Split paragraph by sentences
+            sentence_chunks = _split_by_sentences(paragraph, max_size)
+            chunks.extend(sentence_chunks)
+            continue
+
+        # If adding this paragraph would exceed limit, start new chunk
+        if current_size + separator_size + para_size > max_size:
+            if current_chunk:
+                chunks.append("\n\n".join(current_chunk))
+            current_chunk = [paragraph]
+            current_size = para_size
+        else:
+            current_chunk.append(paragraph)
+            current_size += separator_size + para_size
+
+    # Don't forget the last chunk
+    if current_chunk:
+        chunks.append("\n\n".join(current_chunk))
+
+    return chunks
+
+
+def _split_by_sentences(text: str, max_size: int) -> list[str]:
+    """Split text by sentence boundaries when paragraphs are too long.
+
+    Args:
+        text: Text to split (typically a long paragraph)
+        max_size: Maximum characters per chunk
+
+    Returns:
+        List of text chunks split at sentence boundaries
+    """
+    import re
+
+    # Split by sentence endings (. ! ?) followed by space or newline
+    sentence_pattern = r"(?<=[.!?])\s+"
+    sentences = re.split(sentence_pattern, text)
+
+    chunks: list[str] = []
+    current_chunk: list[str] = []
+    current_size = 0
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+
+        sent_size = len(sentence)
+        separator_size = 1 if current_chunk else 0  # space between sentences
+
+        # If single sentence exceeds max_size, split by words (last resort)
+        if sent_size > max_size:
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = []
+                current_size = 0
+
+            word_chunks = _split_by_words(sentence, max_size)
+            chunks.extend(word_chunks)
+            continue
+
+        # If adding this sentence would exceed limit, start new chunk
+        if current_size + separator_size + sent_size > max_size:
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+            current_chunk = [sentence]
+            current_size = sent_size
+        else:
+            current_chunk.append(sentence)
+            current_size += separator_size + sent_size
+
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
+
+
+def _split_by_words(text: str, max_size: int) -> list[str]:
+    """Split text by word boundaries as last resort.
+
+    Args:
+        text: Text to split (typically a very long sentence)
+        max_size: Maximum characters per chunk
+
+    Returns:
+        List of text chunks split at word boundaries
+    """
+    words = text.split()
+    chunks: list[str] = []
+    current_chunk: list[str] = []
+    current_size = 0
+
+    for word in words:
+        word_size = len(word)
+        separator_size = 1 if current_chunk else 0
+
+        if current_size + separator_size + word_size > max_size:
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+            current_chunk = [word]
+            current_size = word_size
+        else:
+            current_chunk.append(word)
+            current_size += separator_size + word_size
+
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
+
+
 def generate_tts_audio(
     client: genai.Client,
     script: AudioScript,
@@ -381,6 +552,231 @@ def generate_tts_audio(
             return part.inline_data.data
 
     raise RuntimeError("No audio data in TTS response")
+
+
+def save_chunk_markdown(
+    chunk_info: ChunkInfo,
+    script: AudioScript,
+    output_dir: Path,
+) -> Path:
+    """Save a transcript chunk as a standalone markdown file for debugging/retry.
+
+    Creates a markdown file with the same format as the original audio script,
+    but containing only the chunk's portion of the transcript. Includes full
+    style context for voice consistency.
+
+    Args:
+        chunk_info: Metadata for the chunk
+        script: Original AudioScript with full context
+        output_dir: Directory to save the markdown file
+
+    Returns:
+        Path to the saved markdown file
+    """
+    import json
+
+    # Build frontmatter
+    frontmatter = {
+        "stageUuid": script.stage_uuid,
+        "chapterRef": script.chapter_ref,
+        "chunkIndex": chunk_info.index + 1,  # 1-based for human readability
+        "totalChunks": chunk_info.total,
+        "speakers": script.speakers,
+    }
+
+    # Build TTS configuration JSON
+    tts_config = {
+        "speakerConfigs": [
+            {"speaker": cfg.speaker, "voiceName": cfg.voice_name}
+            for cfg in script.speaker_configs
+        ]
+    }
+
+    # Construct markdown content
+    content_parts = [
+        "---",
+        yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip(),
+        "---",
+        "",
+        script.style_context if script.style_context else "",
+        "",
+        "## TRANSCRIPT",
+        "",
+        chunk_info.text,
+        "",
+        "---",
+        "",
+        "## TTS CONFIGURATION",
+        "",
+        "```json",
+        json.dumps(tts_config, indent=2),
+        "```",
+    ]
+
+    markdown_content = "\n".join(content_parts)
+
+    # Save to file
+    output_dir.mkdir(parents=True, exist_ok=True)
+    chunk_info.markdown_path.write_text(markdown_content, encoding="utf-8")
+
+    return chunk_info.markdown_path
+
+
+def generate_chunked_audio(
+    client: genai.Client,
+    script: AudioScript,
+    speech_config: types.SpeechConfig,
+    output_dir: Path,
+    include_context: bool = True,
+) -> list[ChunkInfo]:
+    """Generate audio for long transcripts by chunking.
+
+    Splits the transcript into chunks, saves each as a markdown file,
+    generates audio for each chunk, and tracks progress for retry capability.
+
+    Args:
+        client: Gemini API client
+        script: Parsed audio script with full transcript
+        speech_config: TTS configuration
+        output_dir: Directory for chunk files (markdown and audio)
+        include_context: Whether to include style context in prompts
+
+    Returns:
+        List of ChunkInfo objects with status for each chunk
+    """
+    # Split transcript into chunks
+    chunks = chunk_transcript(script.transcript)
+    total_chunks = len(chunks)
+
+    logging.info(f"Splitting transcript into {total_chunks} chunks")
+
+    # Create ChunkInfo for each chunk and save markdown
+    chunk_infos: list[ChunkInfo] = []
+
+    for i, chunk_text in enumerate(chunks):
+        chunk_num = str(i + 1).zfill(3)  # Zero-padded: 001, 002, etc.
+
+        markdown_path = output_dir / f"{script.stage_uuid}_chunk_{chunk_num}.md"
+        audio_path = output_dir / f"{script.stage_uuid}_chunk_{chunk_num}.mp3"
+
+        chunk_info = ChunkInfo(
+            index=i,
+            total=total_chunks,
+            text=chunk_text,
+            char_count=len(chunk_text),
+            markdown_path=markdown_path,
+            audio_path=audio_path,
+            status="pending",
+        )
+
+        # Save markdown file
+        save_chunk_markdown(chunk_info, script, output_dir)
+        logging.info(
+            f"Chunk {i + 1}/{total_chunks}: {chunk_info.char_count} chars -> "
+            f"{markdown_path.name}"
+        )
+
+        chunk_infos.append(chunk_info)
+
+    # Generate audio for each chunk
+    for chunk_info in chunk_infos:
+        logging.info(f"Generating audio {chunk_info.index + 1}/{chunk_info.total}...")
+
+        try:
+            # Create a temporary AudioScript for this chunk
+            chunk_script = AudioScript(
+                stage_uuid=script.stage_uuid,
+                chapter_ref=script.chapter_ref,
+                speakers=script.speakers,
+                tts_model=script.tts_model,
+                speaker_configs=script.speaker_configs,
+                transcript=chunk_info.text,
+                style_context=script.style_context,
+            )
+
+            # Generate TTS audio
+            pcm_data = generate_tts_audio(
+                client, chunk_script, speech_config, include_context=include_context
+            )
+
+            # Convert to MP3
+            mp3_data = convert_to_mp3(pcm_data)
+
+            # Save chunk audio
+            chunk_info.audio_path.write_bytes(mp3_data)
+            chunk_info.status = "generated"
+
+            logging.info(
+                f"Chunk {chunk_info.index + 1}/{chunk_info.total} complete: "
+                f"{chunk_info.audio_path.name}"
+            )
+
+        except Exception as e:
+            chunk_info.status = "failed"
+            logging.error(
+                f"Chunk {chunk_info.index + 1}/{chunk_info.total} failed: {e}"
+            )
+            # Continue to next chunk, don't abort
+
+    return chunk_infos
+
+
+def concatenate_audio_files(
+    chunk_paths: list[Path],
+    output_path: Path,
+    pause_ms: int = CHUNK_PAUSE_MS,
+) -> None:
+    """Concatenate multiple MP3 files into a single output file.
+
+    Joins audio chunks with optional silence between them for natural pauses.
+    Output meets required specifications: mono, 44100Hz, no ID3 tags.
+
+    Args:
+        chunk_paths: List of paths to MP3 chunk files (in order)
+        output_path: Path for the final concatenated MP3
+        pause_ms: Milliseconds of silence between chunks (default: 300)
+    """
+    if not chunk_paths:
+        raise ValueError("No chunk paths provided for concatenation")
+
+    logging.info(f"Concatenating {len(chunk_paths)} chunks with {pause_ms}ms pauses")
+
+    # Load first chunk
+    combined = AudioSegment.from_mp3(chunk_paths[0])
+
+    # Create silence segment
+    silence = AudioSegment.silent(duration=pause_ms)
+
+    # Append remaining chunks with silence
+    for chunk_path in chunk_paths[1:]:
+        combined += silence
+        combined += AudioSegment.from_mp3(chunk_path)
+
+    # Ensure correct format (mono, 44100Hz)
+    if combined.frame_rate != TARGET_SAMPLE_RATE:
+        combined = combined.set_frame_rate(TARGET_SAMPLE_RATE)
+    if combined.channels != TARGET_CHANNELS:
+        combined = combined.set_channels(TARGET_CHANNELS)
+
+    # Export to MP3 without ID3 tags
+    mp3_buffer = io.BytesIO()
+    combined.export(
+        mp3_buffer,
+        format="mp3",
+        parameters=["-id3v2_version", "0"],
+    )
+
+    mp3_data = mp3_buffer.getvalue()
+
+    # Strip any remaining ID3 tags
+    mp3_data = strip_id3_tags(mp3_data)
+
+    # Ensure output directory exists and save
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_bytes(mp3_data)
+
+    logging.info(f"Concatenated audio saved to: {output_path}")
+    logging.info(f"Final file size: {len(mp3_data):,} bytes")
 
 
 def strip_id3_tags(mp3_data: bytes) -> bytes:
@@ -690,13 +1086,51 @@ Output Format:
 
         # Generate TTS audio
         include_context = not args.no_context
-        pcm_data = generate_tts_audio(
-            client, script, speech_config, include_context=include_context
-        )
-        logging.info(f"Received {len(pcm_data):,} bytes of PCM audio")
+        output_dir = output_path.parent
 
-        # Convert to MP3
-        mp3_data = convert_to_mp3(pcm_data)
+        # Check if chunking is needed (transcript exceeds MAX_CHUNK_SIZE)
+        if len(script.transcript) > MAX_CHUNK_SIZE:
+            logging.info(
+                f"Transcript exceeds {MAX_CHUNK_SIZE} chars "
+                f"({len(script.transcript)} chars), chunking required"
+            )
+
+            # Generate chunked audio (markdown + audio files)
+            chunk_infos = generate_chunked_audio(
+                client, script, speech_config, output_dir, include_context
+            )
+
+            # Check for failures
+            failed = [c for c in chunk_infos if c.status == "failed"]
+            if failed:
+                logging.error(
+                    f"{len(failed)} chunk(s) failed. "
+                    f"Retry individually with: python generate_audio.py <chunk>.md -o <chunk>.mp3"
+                )
+                for c in failed:
+                    logging.error(f"  - {c.markdown_path.name}")
+                sys.exit(1)
+
+            # Concatenate successful chunks
+            chunk_paths = [c.audio_path for c in chunk_infos]
+            concatenate_audio_files(chunk_paths, output_path, CHUNK_PAUSE_MS)
+
+            # Read final file for verification
+            mp3_data = output_path.read_bytes()
+
+        else:
+            # Single-call path (transcript fits in one request)
+            pcm_data = generate_tts_audio(
+                client, script, speech_config, include_context=include_context
+            )
+            logging.info(f"Received {len(pcm_data):,} bytes of PCM audio")
+
+            # Convert to MP3
+            mp3_data = convert_to_mp3(pcm_data)
+
+            # Save output
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_bytes(mp3_data)
 
         # Verify format (default: on)
         if not args.no_verify:
@@ -706,10 +1140,6 @@ Output Format:
                 for issue in issues:
                     logging.error(f"  - {issue}")
                 sys.exit(1)
-
-        # Save output
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_bytes(mp3_data)
 
         logging.info(f"Audio saved to: {output_path}")
         logging.info(f"File size: {len(mp3_data):,} bytes")
