@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate audio files from story chapters using Gemini TTS via Vertex AI.
+Generate audio files from story chapters using Gemini TTS via Google AI Studio.
 
 Converts audio-script markdown files to MP3 format with specific requirements:
 - Format: MP3 (MPEG Audio Layer III)
@@ -14,9 +14,9 @@ Usage:
     python generate_audio.py script.md -o output.mp3 --debug --no-verify
 
 Prerequisites:
-    - Google Cloud project with Vertex AI API enabled
-    - Authentication via: gcloud auth application-default login
-    - Environment variables: GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION (optional)
+    - Google AI Studio API key (supports multi-speaker TTS)
+    - Get an API key at: https://aistudio.google.com/apikey
+    - Environment variables: GOOGLE_API_KEY or GEMINI_API_KEY
     - FFmpeg installed on system (required by pydub)
 """
 
@@ -42,7 +42,7 @@ GEMINI_TTS_SAMPLE_RATE = 24000  # Gemini TTS outputs 24kHz
 TARGET_SAMPLE_RATE = 44100  # Required output sample rate
 TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
-DEFAULT_TTS_MODEL = "gemini-2.5-flash-tts"
+DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 
 # Available voices (from voice-guide.md)
 AVAILABLE_VOICES = {
@@ -99,8 +99,10 @@ class AudioScript:
     tts_model: str = DEFAULT_TTS_MODEL
     speaker_configs: list[SpeakerConfig] = field(default_factory=list)
 
-    # Raw content for TTS prompt
-    full_prompt: str = ""
+    # Content fields (separated for deterministic TTS output)
+    transcript: str = ""  # Only the ## TRANSCRIPTION content (to be read aloud)
+    style_context: str = ""  # Scene + Director's notes (style guidance, not read)
+    full_prompt: str = ""  # Built from above fields
 
 
 def setup_logging(debug: bool) -> None:
@@ -113,25 +115,29 @@ def setup_logging(debug: bool) -> None:
     )
 
 
-def get_vertex_ai_config() -> tuple[str, str]:
-    """Get Vertex AI configuration from environment.
+def get_api_key() -> str:
+    """Get Google AI Studio API key from environment.
+
+    The API key is required for TTS generation, especially for multi-speaker support
+    which is only available through Google AI Studio (not Vertex AI).
 
     Returns:
-        Tuple of (project_id, location)
+        API key string
+
+    Raises:
+        SystemExit: If no API key is found in environment
     """
-    project = os.environ.get("GOOGLE_CLOUD_PROJECT")
-    if not project:
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
         logging.error(
-            "GOOGLE_CLOUD_PROJECT environment variable is not set.\n"
-            "Please set it to your Google Cloud project ID.\n"
-            "Example: export GOOGLE_CLOUD_PROJECT=my-project-id"
+            "GOOGLE_API_KEY or GEMINI_API_KEY environment variable is not set.\n"
+            "Please set it to your Google AI Studio API key.\n"
+            "Get an API key at: https://aistudio.google.com/apikey\n"
+            "Example: export GOOGLE_API_KEY=your-api-key-here"
         )
         sys.exit(1)
 
-    # Default to europe-west1 (Belgium) for EU users
-    location = os.environ.get("GOOGLE_CLOUD_LOCATION", "europe-west1")
-
-    return project, location
+    return api_key
 
 
 def parse_audio_script(file_path: Path) -> AudioScript:
@@ -212,12 +218,45 @@ def parse_audio_script(file_path: Path) -> AudioScript:
         )
 
     # Extract content sections for prompt
-    # Everything before ## TTS CONFIGURATION is the prompt
-    tts_config_pos = body.find("## TTS CONFIGURATION")
-    if tts_config_pos > 0:
-        script.full_prompt = body[:tts_config_pos].strip()
+    # Separate TRANSCRIPTION (to be read aloud) from style context (guidance only)
+
+    # Find TTS configuration section (supports both "## TTS CONFIGURATION" and "## CONFIGURATION TTS")
+    tts_config_match = re.search(
+        r"##\s*(?:TTS\s+CONFIGURATION|CONFIGURATION\s+TTS)", body, re.IGNORECASE
+    )
+    tts_config_pos = tts_config_match.start() if tts_config_match else -1
+    content_body = body[:tts_config_pos].strip() if tts_config_pos > 0 else body.strip()
+
+    # Try to extract ## TRANSCRIPTION section specifically
+    # Match content between ## TRANSCRIPTION (or ## TRANSCRIPT) and the next --- or ## section
+    transcript_match = re.search(
+        r"##\s*TRANSCRIPT(?:ION)?\s*\n(.*?)(?=\n---|\n##|$)",
+        content_body,
+        re.DOTALL | re.IGNORECASE,
+    )
+
+    if transcript_match:
+        script.transcript = transcript_match.group(1).strip()
+        # Style context is everything before ## TRANSCRIPTION
+        transcript_section_start = re.search(
+            r"##\s*TRANSCRIPT(?:ION)?", content_body, re.IGNORECASE
+        )
+        if transcript_section_start:
+            script.style_context = content_body[
+                : transcript_section_start.start()
+            ].strip()
+        else:
+            script.style_context = ""
     else:
-        script.full_prompt = body.strip()
+        # Fallback: use entire content as transcript (backward compatibility)
+        script.transcript = content_body
+        script.style_context = ""
+        logging.warning(
+            "No ## TRANSCRIPTION section found, using entire content as transcript"
+        )
+
+    # Build full_prompt for backward compatibility
+    script.full_prompt = content_body
 
     return script
 
@@ -270,15 +309,46 @@ def build_tts_config(script: AudioScript) -> types.SpeechConfig:
         )
 
 
+def build_tts_prompt(script: AudioScript, include_context: bool = True) -> str:
+    """Build the TTS prompt from script sections.
+
+    Separates style guidance (not to be read aloud) from transcript content
+    (to be read aloud) using explicit markers to ensure deterministic output.
+
+    Args:
+        script: Parsed audio script with transcript and style_context
+        include_context: Whether to include style context as guidance prefix
+
+    Returns:
+        Formatted prompt for TTS generation with clear markers
+    """
+    if include_context and script.style_context:
+        return f"""[STYLE GUIDANCE - DO NOT READ ALOUD, USE FOR VOICE TONE AND EMOTION ONLY]
+{script.style_context}
+
+[READ THE FOLLOWING TRANSCRIPT ALOUD - THIS IS THE ONLY CONTENT TO VOCALIZE]
+{script.transcript}"""
+    else:
+        return script.transcript
+
+
 def generate_tts_audio(
-    client: genai.Client, script: AudioScript, speech_config: types.SpeechConfig
+    client: genai.Client,
+    script: AudioScript,
+    speech_config: types.SpeechConfig,
+    include_context: bool = True,
 ) -> bytes:
     """Generate audio using Gemini TTS API.
+
+    Uses build_tts_prompt() to construct a prompt with explicit markers
+    separating style guidance from transcript content, ensuring deterministic
+    output where only the transcript is vocalized.
 
     Args:
         client: Gemini API client
         script: Parsed audio script
         speech_config: TTS configuration
+        include_context: Whether to include style context as guidance prefix
 
     Returns:
         Raw PCM audio data (24kHz, 16-bit, mono)
@@ -286,12 +356,18 @@ def generate_tts_audio(
     Raises:
         RuntimeError: If no audio data in response
     """
+    # Build prompt with explicit markers for deterministic output
+    tts_prompt = build_tts_prompt(script, include_context=include_context)
+
     logging.info(f"Generating TTS audio with model: {script.tts_model}")
-    logging.debug(f"Prompt length: {len(script.full_prompt)} characters")
+    logging.debug(f"Transcript length: {len(script.transcript)} characters")
+    logging.debug(f"Style context length: {len(script.style_context)} characters")
+    logging.debug(f"Total prompt length: {len(tts_prompt)} characters")
+    logging.debug(f"Include context: {include_context}")
 
     response = client.models.generate_content(
         model=script.tts_model,
-        contents=script.full_prompt,
+        contents=tts_prompt,
         config=types.GenerateContentConfig(
             response_modalities=["AUDIO"],
             speech_config=speech_config,
@@ -519,13 +595,13 @@ Examples:
   python generate_audio.py script.md -o output.mp3 --debug --no-verify
 
 Prerequisites:
-  1. Google Cloud project with Vertex AI API enabled
-  2. Authentication: gcloud auth application-default login
+  1. Google AI Studio API key (supports multi-speaker TTS)
+  2. Get an API key at: https://aistudio.google.com/apikey
   3. FFmpeg installed (required by pydub)
 
 Environment Variables:
-  GOOGLE_CLOUD_PROJECT   Required. Your Google Cloud project ID.
-  GOOGLE_CLOUD_LOCATION  Optional. Region for Vertex AI (default: europe-west1).
+  GOOGLE_API_KEY   Required. Your Google AI Studio API key.
+  GEMINI_API_KEY   Alternative to GOOGLE_API_KEY (either works).
 
 Output Format:
   - MP3 (MPEG Audio Layer III)
@@ -560,6 +636,12 @@ Output Format:
         "--no-verify",
         action="store_true",
         help="Skip output format verification",
+    )
+    parser.add_argument(
+        "--no-context",
+        action="store_true",
+        help="Disable style context (scene, director's notes) in TTS prompt. "
+        "Only the transcript will be sent to the TTS model.",
     )
 
     args = parser.parse_args()
@@ -599,21 +681,18 @@ Output Format:
         # Build TTS configuration
         speech_config = build_tts_config(script)
 
-        # Get Vertex AI config
-        project, location = get_vertex_ai_config()
-        logging.info(
-            f"Connecting to Vertex AI (project={project}, location={location})"
-        )
+        # Get API key for Google AI Studio
+        api_key = get_api_key()
+        logging.info("Connecting to Google AI Studio API")
 
-        # Create client
-        client = genai.Client(
-            vertexai=True,
-            project=project,
-            location=location,
-        )
+        # Create client (using Google AI Studio for multi-speaker TTS support)
+        client = genai.Client(api_key=api_key)
 
         # Generate TTS audio
-        pcm_data = generate_tts_audio(client, script, speech_config)
+        include_context = not args.no_context
+        pcm_data = generate_tts_audio(
+            client, script, speech_config, include_context=include_context
+        )
         logging.info(f"Received {len(pcm_data):,} bytes of PCM audio")
 
         # Convert to MP3

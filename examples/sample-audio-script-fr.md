@@ -30,7 +30,7 @@ Rythme : Modere, avec un leger ralentissement pour les moments atmospheriques
 mousseux. La foret l'accueillit avec le doux parfum des fleurs sauvages et le 
 gazouillis delicat des oiseaux caches.
 
-**Emma :** Il y a quelqu'un ? Allo ?
+**Emma :** Il y a quelqu'un ? Allo ? Je cherche à retrouver mon chemin. Ma maison est à l'orée du bois...
 
 **Narrateur :** Les arbres semblaient se pencher vers elle, comme s'ils ecoutaient. 
 Puis, du plus profond de la foret, elle entendit deux sons...
@@ -43,14 +43,14 @@ Quel son Emma devrait-elle suivre ?
 
 ---
 
-## CONFIGURATION TTS
+## TTS CONFIGURATION
 
 ```json
 {
   "model": "gemini-2.5-flash-preview-tts",
   "speakerConfigs": [
     {"speaker": "Narrateur", "voiceName": "Sulafat"},
-    {"speaker": "Emma", "voiceName": "Leda"}
+    {"speaker": "Emma", "voiceName": "Puck"}
   ]
 }
 ```
