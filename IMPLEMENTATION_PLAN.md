@@ -209,7 +209,6 @@ After interview completion:
   
   "audio": {
     "narratorVoice": "Sulafat",
-    "ttsModel": "gemini-2.5-flash-preview-tts",
     "defaultPace": 0.9
   },
   
@@ -312,7 +311,7 @@ stageUuid: "stage-entering-forest"
 chapterRef: "02-entering-forest"
 speakers: ["Narrator", "Emma"]
 duration: 45
-ttsModel: "gemini-2.5-flash-preview-tts"
+locale: "en-US"
 ---
 
 # AUDIO PROFILE: Story Narrator

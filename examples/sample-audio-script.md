@@ -2,7 +2,7 @@
 stageUuid: "stage-entering-forest"
 chapterRef: "02-entering-forest"
 speakers: ["Narrator", "Emma"]
-ttsModel: "gemini-2.5-flash-preview-tts"
+locale: "en-US"
 ---
 
 # AUDIO PROFILE: Story Narrator

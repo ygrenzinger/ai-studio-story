@@ -142,7 +142,7 @@ def parse_audio_script(file_path: Path) -> AudioScript:
     stageUuid: "stage-uuid"
     chapterRef: "chapter-ref"
     speakers: ["Narrator", "Character"]
-    ttsModel: "gemini-2.5-flash-preview-tts"
+    locale: "en-US"
     ---
 
     # AUDIO PROFILE: ...
@@ -184,7 +184,6 @@ def parse_audio_script(file_path: Path) -> AudioScript:
         stage_uuid=frontmatter.get("stageUuid", ""),
         chapter_ref=frontmatter.get("chapterRef", ""),
         speakers=frontmatter.get("speakers", []),
-        tts_model=frontmatter.get("ttsModel", DEFAULT_TTS_MODEL),
     )
 
     # Extract TTS CONFIGURATION JSON block

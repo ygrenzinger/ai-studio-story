@@ -249,7 +249,6 @@ Once both interview phases are complete:
   
   "audio": {
     "narratorVoice": "Sulafat",
-    "ttsModel": "gemini-2.5-flash-preview-tts",
     "defaultPace": 0.85
   }
 }

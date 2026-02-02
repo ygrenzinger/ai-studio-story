@@ -2,7 +2,7 @@
 stageUuid: "test-stage-001"
 chapterRef: "test-chapter"
 speakers: ["Narrator"]
-ttsModel: "gemini-2.5-flash-preview-tts"
+locale: "en-US"
 ---
 
 # AUDIO PROFILE: Story Narrator
