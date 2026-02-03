@@ -1,40 +1,13 @@
 ---
 stageUuid: "test-stage-001"
 chapterRef: "test-chapter"
-speakers: ["Narrator"]
 locale: "en-US"
+speakers:
+  - name: Narrator
+    voice: Sulafat
+    profile: "Warm storyteller, like a beloved aunt, clear enunciation, relaxed pacing"
 ---
 
-# AUDIO PROFILE: Story Narrator
-## "Warm Guide"
+**Narrator:** <emotion: warm, inviting> Once upon a time, in a land far away, there lived a curious little fox named Felix. Felix loved to explore the meadows and forests near his cozy den.
 
-## THE SCENE: A Cozy Room
-A warm, comfortable living room with soft lighting.
-
-### DIRECTOR'S NOTES
-
-Style:
-* Warm and inviting tone
-* Clear enunciation
-
-Pacing: Moderate, relaxed
-
----
-
-## TRANSCRIPT
-
-**Narrator:** Once upon a time, in a land far away, there lived a curious little fox named Felix. Felix loved to explore the meadows and forests near his cozy den.
-
-One sunny morning, Felix discovered something extraordinary - a glowing mushroom that hummed a gentle melody. What adventures awaited him? Only time would tell.
-
----
-
-## TTS CONFIGURATION
-
-```json
-{
-  "speakerConfigs": [
-    {"speaker": "Narrator", "voiceName": "Sulafat"}
-  ]
-}
-```
+**Narrator:** <emotion: mysterious, wonder> One sunny morning, Felix discovered something extraordinary - a glowing mushroom that hummed a gentle melody. What adventures awaited him? Only time would tell.

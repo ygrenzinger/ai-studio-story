@@ -341,26 +341,48 @@ For each image prompt file:
 
 ### Audio Generation
 
-For each audio script:
-1. Read the script from `audio-scripts/{stage}.md`
-2. Extract TTS configuration
-3. Call Gemini TTS API:
-   ```python
-   response = client.models.generate_content(
-     model="gemini-2.5-flash-preview-tts",
-     contents=transcript,
-     config=GenerateContentConfig(
-       response_modalities=["AUDIO"],
-       speech_config=SpeechConfig(
-         multi_speaker_voice_config=MultiSpeakerVoiceConfig(
-           speaker_voice_configs=[...]
-         )
-       )
-     )
-   )
-   ```
-4. Convert to required format
-5. Save to `assets/audio/`
+For each audio script, use the `generate_audio.py` tool which handles:
+- Per-segment TTS generation (supports unlimited speakers)
+- Parallel batch processing for speed
+- Automatic 300ms pauses between segments
+- Silence normalization for clean audio
+
+**Command:**
+```bash
+python generate_audio.py audio-scripts/{stage}.md -o assets/audio/{stage}.mp3
+```
+
+**With debug output (saves intermediate files):**
+```bash
+python generate_audio.py audio-scripts/{stage}.md -o assets/audio/{stage}.mp3 --debug
+```
+
+**Audio Script Format (new):**
+```markdown
+---
+stageUuid: "stage-uuid"
+chapterRef: "chapter-ref"
+locale: "en-US"
+speakers:
+  - name: Narrator
+    voice: Sulafat
+    profile: "Warm storyteller..."
+  - name: Emma
+    voice: Leda
+    profile: "8-year-old girl..."
+---
+
+**Narrator:** <emotion: warm> Text with inline emotional markers...
+
+**Emma:** <emotion: curious> "Dialogue with emotion guidance"
+```
+
+The tool automatically:
+1. Parses segments from the transcript
+2. Batches Narrator + Character pairs (max 2 speakers per TTS call)
+3. Generates audio in parallel (up to 5 concurrent calls)
+4. Combines segments with 300ms pauses
+5. Outputs mono 44100Hz MP3 without ID3 tags
 
 ## Archive Naming
 

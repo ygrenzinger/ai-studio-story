@@ -8,6 +8,9 @@ Converts audio-script markdown files to MP3 format with specific requirements:
 - Sample Rate: 44100 Hz
 - ID3 Tags: NOT ALLOWED (must be stripped)
 
+This version uses per-segment TTS generation with parallel execution,
+supporting unlimited speakers by batching narrator + character pairs.
+
 Usage:
     python generate_audio.py audio-scripts/stage-uuid.md -o output.mp3
     python generate_audio.py script.md -o output.mp3 --voice Puck
@@ -26,16 +29,22 @@ import json
 import logging
 import os
 import re
+import shutil
 import struct
 import sys
+import tempfile
+import time
 import wave
+
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 import yaml
 from google import genai
 from google.genai import types
 from pydub import AudioSegment
+from pydub.silence import detect_leading_silence as pydub_detect_silence
 
 # Constants
 GEMINI_TTS_SAMPLE_RATE = 24000  # Gemini TTS outputs 24kHz
@@ -44,9 +53,11 @@ TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
 DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 
-# Chunking constants (for long transcripts)
-MAX_CHUNK_SIZE = 6000  # Characters - safety margin below 8000 Gemini limit
-CHUNK_PAUSE_MS = 300  # Milliseconds of silence between chunks
+# Segment processing constants
+SILENCE_BUFFER_MS = 50  # Normalized silence at segment edges
+INTER_SEGMENT_PAUSE_MS = 300  # Pause between segments
+API_CALL_DELAY_SEC = 2  # 2 seconds between calls
+MAX_RETRIES = 3  # Retry count per segment
 
 # Available voices (from voice-guide.md)
 AVAILABLE_VOICES = {
@@ -85,12 +96,36 @@ AVAILABLE_VOICES = {
 }
 
 
+# =============================================================================
+# Data Classes
+# =============================================================================
+
+
 @dataclass
 class SpeakerConfig:
-    """Configuration for a single speaker."""
+    """Configuration for a single speaker with voice profile."""
+
+    name: str
+    voice: str = DEFAULT_VOICE
+    profile: str = ""  # Voice profile description for TTS guidance
+
+
+@dataclass
+class Segment:
+    """A single speaker segment with optional emotion marker."""
 
     speaker: str
-    voice_name: str = DEFAULT_VOICE
+    text: str
+    emotion: str = ""  # From <emotion:> marker or narrator context
+
+
+@dataclass
+class SegmentBatch:
+    """A batch of segments for a single TTS call (max 2 speakers)."""
+
+    segments: list[Segment]
+    speakers: list[str]  # Unique speakers in this batch (max 2)
+    index: int = 0  # Batch index for ordering
 
 
 @dataclass
@@ -99,27 +134,25 @@ class AudioScript:
 
     stage_uuid: str
     chapter_ref: str = ""
-    speakers: list[str] = field(default_factory=list)
-    tts_model: str = DEFAULT_TTS_MODEL
+    locale: str = "en-US"
     speaker_configs: list[SpeakerConfig] = field(default_factory=list)
-
-    # Content fields (separated for deterministic TTS output)
-    transcript: str = ""  # Only the ## TRANSCRIPTION content (to be read aloud)
-    style_context: str = ""  # Scene + Director's notes (style guidance, not read)
-    full_prompt: str = ""  # Built from above fields
+    segments: list[Segment] = field(default_factory=list)
+    tts_model: str = DEFAULT_TTS_MODEL
 
 
 @dataclass
-class ChunkInfo:
-    """Metadata for a transcript chunk, used for tracking and retry."""
+class BatchResult:
+    """Result of generating audio for a batch."""
 
-    index: int  # 0-based index
-    total: int  # Total number of chunks
-    text: str  # The chunk content
-    char_count: int  # Length of text
-    markdown_path: Path  # Path to saved .md file
-    audio_path: Path  # Path to output .mp3 file
-    status: str = "pending"  # "pending", "generated", "failed"
+    index: int
+    audio_data: bytes | None = None
+    error: str | None = None
+    success: bool = False
+
+
+# =============================================================================
+# Logging Setup
+# =============================================================================
 
 
 def setup_logging(debug: bool) -> None:
@@ -130,6 +163,11 @@ def setup_logging(debug: bool) -> None:
         format="%(asctime)s - %(levelname)s - %(message)s",
         datefmt="%H:%M:%S",
     )
+
+
+# =============================================================================
+# API Key Management
+# =============================================================================
 
 
 def get_api_key() -> str:
@@ -157,6 +195,106 @@ def get_api_key() -> str:
     return api_key
 
 
+# =============================================================================
+# Transcript Parsing (New Format)
+# =============================================================================
+
+
+def split_by_emotions(text: str) -> list[tuple[str, str]]:
+    """Split text by <emotion:> markers into (emotion, text) pairs.
+
+    Args:
+        text: Text that may contain <emotion:> markers
+
+    Returns:
+        List of (emotion, text) tuples. Empty emotion string if no marker.
+    """
+    # Pattern: <emotion: ...> followed by text
+    pattern = r"<emotion:\s*([^>]+)>\s*"
+
+    parts = re.split(pattern, text)
+    # parts = [pre_text, emotion1, text1, emotion2, text2, ...]
+
+    results = []
+
+    # Text before first emotion marker (if any)
+    if parts[0].strip():
+        results.append(("", parts[0].strip()))
+
+    # Process emotion + text pairs
+    for i in range(1, len(parts), 2):
+        emotion = parts[i].strip()
+        segment_text = parts[i + 1].strip() if i + 1 < len(parts) else ""
+        if segment_text:
+            results.append((emotion, segment_text))
+
+    return results if results else [("", text.strip())]
+
+
+def parse_transcript(
+    content: str, speaker_configs: list[SpeakerConfig]
+) -> list[Segment]:
+    """Parse transcript content into ordered segments.
+
+    Handles:
+    - Speaker labels: **Speaker:** text
+    - Emotion markers: <emotion: descriptor1, descriptor2>
+    - Multiple emotions in one block (splits into multiple segments)
+
+    Args:
+        content: The transcript content (body after frontmatter)
+        speaker_configs: List of configured speakers for validation
+
+    Returns:
+        List of Segment objects in order
+    """
+    segments = []
+    valid_speakers = {cfg.name for cfg in speaker_configs}
+
+    # Pattern: **Speaker:** followed by content until next **Speaker:** or end
+    # Using a more robust approach: find all speaker markers first
+    speaker_pattern = r"\*\*(\w+):\*\*"
+    matches = list(re.finditer(speaker_pattern, content))
+
+    for i, match in enumerate(matches):
+        speaker = match.group(1)
+
+        # Warn about undefined speakers
+        if speaker not in valid_speakers:
+            logging.warning(
+                f"Speaker '{speaker}' found in transcript but not defined in frontmatter"
+            )
+
+        # Extract text until next speaker or end
+        start = match.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(content)
+        text = content[start:end].strip()
+
+        # Skip empty segments
+        if not text:
+            continue
+
+        # Check for multiple <emotion:> markers → split
+        emotion_splits = split_by_emotions(text)
+
+        for emotion, segment_text in emotion_splits:
+            # Clean up the segment text (remove trailing dashes/separators)
+            segment_text = re.sub(r"\n---\s*$", "", segment_text).strip()
+            if not segment_text:
+                continue
+
+            segments.append(
+                Segment(speaker=speaker, text=segment_text, emotion=emotion)
+            )
+
+    return segments
+
+
+# =============================================================================
+# Audio Script Parsing
+# =============================================================================
+
+
 def parse_audio_script(file_path: Path) -> AudioScript:
     """Parse audio-script markdown file into AudioScript dataclass.
 
@@ -164,21 +302,18 @@ def parse_audio_script(file_path: Path) -> AudioScript:
     ---
     stageUuid: "stage-uuid"
     chapterRef: "chapter-ref"
-    speakers: ["Narrator", "Character"]
     locale: "en-US"
+    speakers:
+      - name: Narrator
+        voice: Sulafat
+        profile: "Warm storyteller..."
+      - name: Emma
+        voice: Leda
+        profile: "8-year-old girl..."
     ---
 
-    # AUDIO PROFILE: ...
-    ## THE SCENE: ...
-    ### DIRECTOR'S NOTES
-    ...
-    ## TRANSCRIPT
-    **Speaker:** Dialogue
-    ...
-    ## TTS CONFIGURATION
-    ```json
-    {"speakerConfigs": [...]}
-    ```
+    **Narrator:** <emotion: warm> Text with emotion marker inline...
+    **Emma:** <emotion: curious> Character dialogue...
 
     Args:
         file_path: Path to the markdown file
@@ -202,343 +337,257 @@ def parse_audio_script(file_path: Path) -> AudioScript:
     else:
         raise ValueError("Missing YAML frontmatter (must start with ---)")
 
-    # Parse frontmatter
-    script = AudioScript(
-        stage_uuid=frontmatter.get("stageUuid", ""),
-        chapter_ref=frontmatter.get("chapterRef", ""),
-        speakers=frontmatter.get("speakers", []),
-    )
-
-    # Extract TTS CONFIGURATION JSON block
-    json_match = re.search(
-        r"## TTS CONFIGURATION\s*```json\s*(\{.*?\})\s*```", body, re.DOTALL
-    )
-    if json_match:
-        tts_config = json.loads(json_match.group(1))
-        for cfg in tts_config.get("speakerConfigs", []):
-            script.speaker_configs.append(
+    # Parse speaker configs from frontmatter
+    speaker_configs = []
+    for speaker_data in frontmatter.get("speakers", []):
+        if isinstance(speaker_data, dict):
+            speaker_configs.append(
                 SpeakerConfig(
-                    speaker=cfg["speaker"],
-                    voice_name=cfg.get("voiceName", DEFAULT_VOICE),
+                    name=speaker_data.get("name", "Narrator"),
+                    voice=speaker_data.get("voice", DEFAULT_VOICE),
+                    profile=speaker_data.get("profile", ""),
                 )
             )
 
-    # If no speaker configs, create defaults from speakers list
-    if not script.speaker_configs and script.speakers:
-        for speaker in script.speakers:
-            script.speaker_configs.append(SpeakerConfig(speaker=speaker))
-
-    # If still no configs, use default narrator
-    if not script.speaker_configs:
-        script.speaker_configs.append(
-            SpeakerConfig(speaker="Narrator", voice_name=DEFAULT_VOICE)
+    # If no speakers defined, use default narrator
+    if not speaker_configs:
+        speaker_configs.append(
+            SpeakerConfig(name="Narrator", voice=DEFAULT_VOICE, profile="")
         )
 
-    # Extract content sections for prompt
-    # Separate TRANSCRIPTION (to be read aloud) from style context (guidance only)
+    # Parse segments from body
+    segments = parse_transcript(body, speaker_configs)
 
-    # Find TTS configuration section (supports both "## TTS CONFIGURATION" and "## CONFIGURATION TTS")
-    tts_config_match = re.search(
-        r"##\s*(?:TTS\s+CONFIGURATION|CONFIGURATION\s+TTS)", body, re.IGNORECASE
-    )
-    tts_config_pos = tts_config_match.start() if tts_config_match else -1
-    content_body = body[:tts_config_pos].strip() if tts_config_pos > 0 else body.strip()
-
-    # Try to extract ## TRANSCRIPTION section specifically
-    # Match content between ## TRANSCRIPTION (or ## TRANSCRIPT) and the next --- or ## section
-    transcript_match = re.search(
-        r"##\s*TRANSCRIPT(?:ION)?\s*\n(.*?)(?=\n---|\n##|$)",
-        content_body,
-        re.DOTALL | re.IGNORECASE,
+    return AudioScript(
+        stage_uuid=frontmatter.get("stageUuid", ""),
+        chapter_ref=frontmatter.get("chapterRef", ""),
+        locale=frontmatter.get("locale", "en-US"),
+        speaker_configs=speaker_configs,
+        segments=segments,
+        tts_model=frontmatter.get("model", DEFAULT_TTS_MODEL),
     )
 
-    if transcript_match:
-        script.transcript = transcript_match.group(1).strip()
-        # Style context is everything before ## TRANSCRIPTION
-        transcript_section_start = re.search(
-            r"##\s*TRANSCRIPT(?:ION)?", content_body, re.IGNORECASE
-        )
-        if transcript_section_start:
-            script.style_context = content_body[
-                : transcript_section_start.start()
-            ].strip()
-        else:
-            script.style_context = ""
-    else:
-        # Fallback: use entire content as transcript (backward compatibility)
-        script.transcript = content_body
-        script.style_context = ""
-        logging.warning(
-            "No ## TRANSCRIPTION section found, using entire content as transcript"
-        )
 
-    # Build full_prompt for backward compatibility
-    script.full_prompt = content_body
-
-    return script
+# =============================================================================
+# Segment Batching
+# =============================================================================
 
 
-def build_tts_config(script: AudioScript) -> types.SpeechConfig:
-    """Build Gemini TTS configuration from AudioScript.
+def batch_segments(segments: list[Segment]) -> list[SegmentBatch]:
+    """Batch segments for TTS generation (max 2 speakers per batch).
+
+    Strategy:
+    - Each character segment batches with preceding narrator segments
+    - Narrator-only sequences batch with the following character if one exists
+    - Character-to-character transitions create separate single-speaker batches
 
     Args:
-        script: Parsed audio script
+        segments: List of parsed segments in order
+
+    Returns:
+        List of SegmentBatch objects ready for TTS generation
+    """
+    if not segments:
+        return []
+
+    batches = []
+    pending_narrator: list[Segment] = []
+    batch_index = 0
+
+    for segment in segments:
+        if segment.speaker == "Narrator":
+            pending_narrator.append(segment)
+        else:
+            # Character segment - batch with pending narrator
+            if pending_narrator:
+                batch = SegmentBatch(
+                    segments=pending_narrator + [segment],
+                    speakers=["Narrator", segment.speaker],
+                    index=batch_index,
+                )
+                pending_narrator = []
+            else:
+                # No preceding narrator - single speaker batch
+                batch = SegmentBatch(
+                    segments=[segment],
+                    speakers=[segment.speaker],
+                    index=batch_index,
+                )
+            batches.append(batch)
+            batch_index += 1
+
+    # Handle trailing narrator segments
+    if pending_narrator:
+        batches.append(
+            SegmentBatch(
+                segments=pending_narrator,
+                speakers=["Narrator"],
+                index=batch_index,
+            )
+        )
+
+    return batches
+
+
+# =============================================================================
+# TTS Configuration Building
+# =============================================================================
+
+
+def build_single_speaker_config(speaker_config: SpeakerConfig) -> types.SpeechConfig:
+    """Build TTS config for single speaker.
+
+    Args:
+        speaker_config: Speaker configuration
 
     Returns:
         SpeechConfig for Gemini TTS API
     """
-    if len(script.speaker_configs) == 1:
-        # Single speaker mode
-        voice_name = script.speaker_configs[0].voice_name
-        logging.info(f"Single-speaker mode: {voice_name}")
-
-        return types.SpeechConfig(
-            voice_config=types.VoiceConfig(
-                prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice_name)
+    return types.SpeechConfig(
+        voice_config=types.VoiceConfig(
+            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                voice_name=speaker_config.voice
             )
         )
-    else:
-        # Multi-speaker mode (max 2 speakers supported by Gemini TTS)
-        speaker_voice_configs = []
-        for cfg in script.speaker_configs[:2]:  # Max 2 speakers
-            logging.info(f"Speaker: {cfg.speaker} -> Voice: {cfg.voice_name}")
-            speaker_voice_configs.append(
-                types.SpeakerVoiceConfig(
-                    speaker=cfg.speaker,
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=cfg.voice_name
-                        )
-                    ),
-                )
-            )
+    )
 
-        if len(script.speaker_configs) > 2:
-            logging.warning(
-                f"Only first 2 speakers used (Gemini TTS limit). "
-                f"Ignored: {[c.speaker for c in script.speaker_configs[2:]]}"
-            )
 
-        return types.SpeechConfig(
-            multi_speaker_voice_config=types.MultiSpeakerVoiceConfig(
-                speaker_voice_configs=speaker_voice_configs
+def build_multi_speaker_config(
+    speaker_configs: list[SpeakerConfig],
+) -> types.SpeechConfig:
+    """Build TTS config for multiple speakers (max 2).
+
+    Args:
+        speaker_configs: List of speaker configurations
+
+    Returns:
+        SpeechConfig for Gemini TTS API with multi-speaker support
+    """
+    speaker_voice_configs = []
+    for cfg in speaker_configs:
+        speaker_voice_configs.append(
+            types.SpeakerVoiceConfig(
+                speaker=cfg.name,
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                        voice_name=cfg.voice
+                    )
+                ),
             )
         )
 
+    return types.SpeechConfig(
+        multi_speaker_voice_config=types.MultiSpeakerVoiceConfig(
+            speaker_voice_configs=speaker_voice_configs
+        )
+    )
 
-def build_tts_prompt(script: AudioScript, include_context: bool = True) -> str:
-    """Build the TTS prompt from script sections.
 
-    Separates style guidance (not to be read aloud) from transcript content
-    (to be read aloud) using explicit markers to ensure deterministic output.
+def build_batch_speech_config(
+    batch: SegmentBatch, speaker_configs_map: dict[str, SpeakerConfig]
+) -> types.SpeechConfig:
+    """Build speech config for a batch.
 
     Args:
-        script: Parsed audio script with transcript and style_context
-        include_context: Whether to include style context as guidance prefix
+        batch: The segment batch
+        speaker_configs_map: Mapping of speaker name to config
 
     Returns:
-        Formatted prompt for TTS generation with clear markers
+        SpeechConfig appropriate for the batch
     """
-    if include_context and script.style_context:
-        return f"""[STYLE GUIDANCE - DO NOT READ ALOUD, USE FOR VOICE TONE AND EMOTION ONLY]
-{script.style_context}
-
-[READ THE FOLLOWING TRANSCRIPT ALOUD - THIS IS THE ONLY CONTENT TO VOCALIZE]
-{script.transcript}"""
+    if len(batch.speakers) == 1:
+        return build_single_speaker_config(speaker_configs_map[batch.speakers[0]])
     else:
-        return script.transcript
+        configs = [speaker_configs_map[s] for s in batch.speakers]
+        return build_multi_speaker_config(configs)
 
 
-def chunk_transcript(transcript: str, max_size: int = MAX_CHUNK_SIZE) -> list[str]:
-    """Split transcript into chunks at paragraph boundaries.
-
-    Splits long transcripts into smaller chunks that fit within the Gemini TTS
-    character limit. Prioritizes splitting at paragraph boundaries for natural
-    audio breaks.
-
-    Args:
-        transcript: The full transcript text to split
-        max_size: Maximum characters per chunk (default: 6000)
-
-    Returns:
-        List of transcript chunks, each within max_size limit
-    """
-    # If transcript fits in one chunk, return as-is
-    if len(transcript) <= max_size:
-        return [transcript]
-
-    chunks: list[str] = []
-
-    # Split by paragraphs (double newline)
-    paragraphs = transcript.split("\n\n")
-
-    current_chunk: list[str] = []
-    current_size = 0
-
-    for paragraph in paragraphs:
-        paragraph = paragraph.strip()
-        if not paragraph:
-            continue
-
-        # Calculate size including separator
-        para_size = len(paragraph)
-        separator_size = 2 if current_chunk else 0  # "\n\n" between paragraphs
-
-        # If single paragraph exceeds max_size, split by sentences
-        if para_size > max_size:
-            # First, save current chunk if any
-            if current_chunk:
-                chunks.append("\n\n".join(current_chunk))
-                current_chunk = []
-                current_size = 0
-
-            # Split paragraph by sentences
-            sentence_chunks = _split_by_sentences(paragraph, max_size)
-            chunks.extend(sentence_chunks)
-            continue
-
-        # If adding this paragraph would exceed limit, start new chunk
-        if current_size + separator_size + para_size > max_size:
-            if current_chunk:
-                chunks.append("\n\n".join(current_chunk))
-            current_chunk = [paragraph]
-            current_size = para_size
-        else:
-            current_chunk.append(paragraph)
-            current_size += separator_size + para_size
-
-    # Don't forget the last chunk
-    if current_chunk:
-        chunks.append("\n\n".join(current_chunk))
-
-    return chunks
+# =============================================================================
+# TTS Prompt Building
+# =============================================================================
 
 
-def _split_by_sentences(text: str, max_size: int) -> list[str]:
-    """Split text by sentence boundaries when paragraphs are too long.
+def build_batch_prompt(
+    batch: SegmentBatch, speaker_configs_map: dict[str, SpeakerConfig]
+) -> str:
+    """Build TTS prompt for a segment batch.
+
+    Includes voice profiles and emotion markers as style guidance.
 
     Args:
-        text: Text to split (typically a long paragraph)
-        max_size: Maximum characters per chunk
+        batch: The segment batch
+        speaker_configs_map: Mapping of speaker name to config
 
     Returns:
-        List of text chunks split at sentence boundaries
+        Formatted prompt for TTS generation
     """
-    import re
+    prompt_parts = []
 
-    # Split by sentence endings (. ! ?) followed by space or newline
-    sentence_pattern = r"(?<=[.!?])\s+"
-    sentences = re.split(sentence_pattern, text)
+    # Add style guidance header with profiles
+    style_parts = []
+    for speaker in batch.speakers:
+        config = speaker_configs_map.get(speaker)
+        if config and config.profile:
+            style_parts.append(f"{speaker}: {config.profile}")
 
-    chunks: list[str] = []
-    current_chunk: list[str] = []
-    current_size = 0
+    if style_parts:
+        prompt_parts.append(
+            "[VOICE PROFILES - Use for tone and character, do not read aloud]\n"
+            + "\n".join(style_parts)
+        )
+        prompt_parts.append("")
 
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if not sentence:
-            continue
+    # Add transcript with emotion markers
+    prompt_parts.append("[TRANSCRIPT - Read aloud with indicated emotions]")
 
-        sent_size = len(sentence)
-        separator_size = 1 if current_chunk else 0  # space between sentences
-
-        # If single sentence exceeds max_size, split by words (last resort)
-        if sent_size > max_size:
-            if current_chunk:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                current_size = 0
-
-            word_chunks = _split_by_words(sentence, max_size)
-            chunks.extend(word_chunks)
-            continue
-
-        # If adding this sentence would exceed limit, start new chunk
-        if current_size + separator_size + sent_size > max_size:
-            if current_chunk:
-                chunks.append(" ".join(current_chunk))
-            current_chunk = [sentence]
-            current_size = sent_size
+    for segment in batch.segments:
+        if segment.emotion:
+            # Include emotion as inline guidance
+            prompt_parts.append(
+                f"**{segment.speaker}:** [{segment.emotion}] {segment.text}"
+            )
         else:
-            current_chunk.append(sentence)
-            current_size += separator_size + sent_size
+            prompt_parts.append(f"**{segment.speaker}:** {segment.text}")
 
-    if current_chunk:
-        chunks.append(" ".join(current_chunk))
-
-    return chunks
+    return "\n".join(prompt_parts)
 
 
-def _split_by_words(text: str, max_size: int) -> list[str]:
-    """Split text by word boundaries as last resort.
-
-    Args:
-        text: Text to split (typically a very long sentence)
-        max_size: Maximum characters per chunk
-
-    Returns:
-        List of text chunks split at word boundaries
-    """
-    words = text.split()
-    chunks: list[str] = []
-    current_chunk: list[str] = []
-    current_size = 0
-
-    for word in words:
-        word_size = len(word)
-        separator_size = 1 if current_chunk else 0
-
-        if current_size + separator_size + word_size > max_size:
-            if current_chunk:
-                chunks.append(" ".join(current_chunk))
-            current_chunk = [word]
-            current_size = word_size
-        else:
-            current_chunk.append(word)
-            current_size += separator_size + word_size
-
-    if current_chunk:
-        chunks.append(" ".join(current_chunk))
-
-    return chunks
+# =============================================================================
+# TTS Generation
+# =============================================================================
 
 
-def generate_tts_audio(
+def generate_batch_audio(
     client: genai.Client,
-    script: AudioScript,
-    speech_config: types.SpeechConfig,
-    include_context: bool = True,
+    batch: SegmentBatch,
+    speaker_configs_map: dict[str, SpeakerConfig],
+    tts_model: str,
 ) -> bytes:
-    """Generate audio using Gemini TTS API.
-
-    Uses build_tts_prompt() to construct a prompt with explicit markers
-    separating style guidance from transcript content, ensuring deterministic
-    output where only the transcript is vocalized.
+    """Generate audio for a single segment batch.
 
     Args:
         client: Gemini API client
-        script: Parsed audio script
-        speech_config: TTS configuration
-        include_context: Whether to include style context as guidance prefix
+        batch: The segment batch to generate
+        speaker_configs_map: Mapping of speaker name to config
+        tts_model: TTS model to use
 
     Returns:
-        Raw PCM audio data (24kHz, 16-bit, mono)
+        Raw PCM audio data
 
     Raises:
         RuntimeError: If no audio data in response
     """
-    # Build prompt with explicit markers for deterministic output
-    tts_prompt = build_tts_prompt(script, include_context=include_context)
+    # Build prompt and speech config
+    prompt = build_batch_prompt(batch, speaker_configs_map)
+    speech_config = build_batch_speech_config(batch, speaker_configs_map)
 
-    logging.info(f"Generating TTS audio with model: {script.tts_model}")
-    logging.debug(f"Transcript length: {len(script.transcript)} characters")
-    logging.debug(f"Style context length: {len(script.style_context)} characters")
-    logging.debug(f"Total prompt length: {len(tts_prompt)} characters")
-    logging.debug(f"Include context: {include_context}")
+    logging.debug(
+        f"Batch {batch.index + 1} prompt ({len(prompt)} chars):\n{prompt[:500]}..."
+    )
 
     response = client.models.generate_content(
-        model=script.tts_model,
-        contents=tts_prompt,
+        model=tts_model,
+        contents=prompt,
         config=types.GenerateContentConfig(
             response_modalities=["AUDIO"],
             speech_config=speech_config,
@@ -546,211 +595,219 @@ def generate_tts_audio(
     )
 
     # Extract audio data from response
-    for part in response.candidates[0].content.parts:
-        if part.inline_data is not None:
-            logging.info("TTS audio generated successfully")
-            return part.inline_data.data
+    if response.candidates and response.candidates[0].content:
+        parts = response.candidates[0].content.parts
+        if parts:
+            for part in parts:
+                if part.inline_data is not None and part.inline_data.data is not None:
+                    return part.inline_data.data
 
     raise RuntimeError("No audio data in TTS response")
 
 
-def save_chunk_markdown(
-    chunk_info: ChunkInfo,
-    script: AudioScript,
-    output_dir: Path,
-) -> Path:
-    """Save a transcript chunk as a standalone markdown file for debugging/retry.
-
-    Creates a markdown file with the same format as the original audio script,
-    but containing only the chunk's portion of the transcript. Includes full
-    style context for voice consistency.
-
-    Args:
-        chunk_info: Metadata for the chunk
-        script: Original AudioScript with full context
-        output_dir: Directory to save the markdown file
-
-    Returns:
-        Path to the saved markdown file
-    """
-    import json
-
-    # Build frontmatter
-    frontmatter = {
-        "stageUuid": script.stage_uuid,
-        "chapterRef": script.chapter_ref,
-        "chunkIndex": chunk_info.index + 1,  # 1-based for human readability
-        "totalChunks": chunk_info.total,
-        "speakers": script.speakers,
-    }
-
-    # Build TTS configuration JSON
-    tts_config = {
-        "speakerConfigs": [
-            {"speaker": cfg.speaker, "voiceName": cfg.voice_name}
-            for cfg in script.speaker_configs
-        ]
-    }
-
-    # Construct markdown content
-    content_parts = [
-        "---",
-        yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True).strip(),
-        "---",
-        "",
-        script.style_context if script.style_context else "",
-        "",
-        "## TRANSCRIPT",
-        "",
-        chunk_info.text,
-        "",
-        "---",
-        "",
-        "## TTS CONFIGURATION",
-        "",
-        "```json",
-        json.dumps(tts_config, indent=2),
-        "```",
-    ]
-
-    markdown_content = "\n".join(content_parts)
-
-    # Save to file
-    output_dir.mkdir(parents=True, exist_ok=True)
-    chunk_info.markdown_path.write_text(markdown_content, encoding="utf-8")
-
-    return chunk_info.markdown_path
-
-
-def generate_chunked_audio(
+def generate_batch_with_retry(
     client: genai.Client,
-    script: AudioScript,
-    speech_config: types.SpeechConfig,
-    output_dir: Path,
-    include_context: bool = True,
-) -> list[ChunkInfo]:
-    """Generate audio for long transcripts by chunking.
-
-    Splits the transcript into chunks, saves each as a markdown file,
-    generates audio for each chunk, and tracks progress for retry capability.
+    batch: SegmentBatch,
+    speaker_configs_map: dict[str, SpeakerConfig],
+    tts_model: str,
+    max_retries: int = MAX_RETRIES,
+) -> BatchResult:
+    """Generate audio for a batch with retry logic.
 
     Args:
         client: Gemini API client
-        script: Parsed audio script with full transcript
-        speech_config: TTS configuration
-        output_dir: Directory for chunk files (markdown and audio)
-        include_context: Whether to include style context in prompts
+        batch: The segment batch
+        speaker_configs_map: Mapping of speaker name to config
+        tts_model: TTS model to use
+        max_retries: Maximum retry attempts
 
     Returns:
-        List of ChunkInfo objects with status for each chunk
+        BatchResult with audio data or error
     """
-    # Split transcript into chunks
-    chunks = chunk_transcript(script.transcript)
-    total_chunks = len(chunks)
-
-    logging.info(f"Splitting transcript into {total_chunks} chunks")
-
-    # Create ChunkInfo for each chunk and save markdown
-    chunk_infos: list[ChunkInfo] = []
-
-    for i, chunk_text in enumerate(chunks):
-        chunk_num = str(i + 1).zfill(3)  # Zero-padded: 001, 002, etc.
-
-        markdown_path = output_dir / f"{script.stage_uuid}_chunk_{chunk_num}.md"
-        audio_path = output_dir / f"{script.stage_uuid}_chunk_{chunk_num}.mp3"
-
-        chunk_info = ChunkInfo(
-            index=i,
-            total=total_chunks,
-            text=chunk_text,
-            char_count=len(chunk_text),
-            markdown_path=markdown_path,
-            audio_path=audio_path,
-            status="pending",
-        )
-
-        # Save markdown file
-        save_chunk_markdown(chunk_info, script, output_dir)
-        logging.info(
-            f"Chunk {i + 1}/{total_chunks}: {chunk_info.char_count} chars -> "
-            f"{markdown_path.name}"
-        )
-
-        chunk_infos.append(chunk_info)
-
-    # Generate audio for each chunk
-    for chunk_info in chunk_infos:
-        logging.info(f"Generating audio {chunk_info.index + 1}/{chunk_info.total}...")
-
+    for attempt in range(max_retries):
         try:
-            # Create a temporary AudioScript for this chunk
-            chunk_script = AudioScript(
-                stage_uuid=script.stage_uuid,
-                chapter_ref=script.chapter_ref,
-                speakers=script.speakers,
-                tts_model=script.tts_model,
-                speaker_configs=script.speaker_configs,
-                transcript=chunk_info.text,
-                style_context=script.style_context,
+            audio_data = generate_batch_audio(
+                client, batch, speaker_configs_map, tts_model
             )
-
-            # Generate TTS audio
-            pcm_data = generate_tts_audio(
-                client, chunk_script, speech_config, include_context=include_context
-            )
-
-            # Convert to MP3
-            mp3_data = convert_to_mp3(pcm_data)
-
-            # Save chunk audio
-            chunk_info.audio_path.write_bytes(mp3_data)
-            chunk_info.status = "generated"
-
-            logging.info(
-                f"Chunk {chunk_info.index + 1}/{chunk_info.total} complete: "
-                f"{chunk_info.audio_path.name}"
-            )
-
+            return BatchResult(index=batch.index, audio_data=audio_data, success=True)
         except Exception as e:
-            chunk_info.status = "failed"
-            logging.error(
-                f"Chunk {chunk_info.index + 1}/{chunk_info.total} failed: {e}"
-            )
-            # Continue to next chunk, don't abort
+            if attempt < max_retries - 1:
+                logging.warning(
+                    f"Batch {batch.index + 1} generation failed (attempt {attempt + 1}/{max_retries}): {e}"
+                )
+                time.sleep(1 * (attempt + 1))  # Exponential backoff
+            else:
+                logging.error(
+                    f"Batch {batch.index + 1} failed after {max_retries} attempts: {e}"
+                )
+                return BatchResult(index=batch.index, error=str(e), success=False)
 
-    return chunk_infos
+    return BatchResult(index=batch.index, error="Max retries exceeded", success=False)
 
 
-def concatenate_audio_files(
-    chunk_paths: list[Path],
-    output_path: Path,
-    pause_ms: int = CHUNK_PAUSE_MS,
-) -> None:
-    """Concatenate multiple MP3 files into a single output file.
-
-    Joins audio chunks with optional silence between them for natural pauses.
-    Output meets required specifications: mono, 44100Hz, no ID3 tags.
+def generate_all_batches_sequential(
+    client: genai.Client,
+    batches: list[SegmentBatch],
+    speaker_configs_map: dict[str, SpeakerConfig],
+    tts_model: str,
+    progress_callback: Callable[[int, int], None] | None = None,
+    delay_seconds: float = API_CALL_DELAY_SEC,
+) -> list[BatchResult]:
+    """Generate audio for all batches sequentially with rate limiting.
 
     Args:
-        chunk_paths: List of paths to MP3 chunk files (in order)
-        output_path: Path for the final concatenated MP3
-        pause_ms: Milliseconds of silence between chunks (default: 300)
+        client: Gemini API client
+        batches: List of segment batches
+        speaker_configs_map: Mapping of speaker name to config
+        tts_model: TTS model to use
+        progress_callback: Optional callback for progress updates
+        delay_seconds: Delay between API calls (default: 6s for 10 RPM)
+
+    Returns:
+        List of BatchResult objects in batch order
     """
-    if not chunk_paths:
-        raise ValueError("No chunk paths provided for concatenation")
+    results: list[BatchResult] = []
 
-    logging.info(f"Concatenating {len(chunk_paths)} chunks with {pause_ms}ms pauses")
+    for i, batch in enumerate(batches):
+        # Rate limiting delay (skip for first request)
+        if i > 0:
+            logging.debug(f"Rate limit delay: {delay_seconds}s")
+            time.sleep(delay_seconds)
 
-    # Load first chunk
-    combined = AudioSegment.from_mp3(chunk_paths[0])
+        result = generate_batch_with_retry(
+            client, batch, speaker_configs_map, tts_model
+        )
+        results.append(result)
 
-    # Create silence segment
-    silence = AudioSegment.silent(duration=pause_ms)
+        if progress_callback:
+            progress_callback(i + 1, len(batches))
 
-    # Append remaining chunks with silence
-    for chunk_path in chunk_paths[1:]:
-        combined += silence
-        combined += AudioSegment.from_mp3(chunk_path)
+    return results
+
+
+# =============================================================================
+# Progress Display
+# =============================================================================
+
+
+def print_progress(current: int, total: int) -> None:
+    """Print progress bar for segment generation.
+
+    Args:
+        current: Current progress count
+        total: Total items to process
+    """
+    bar_width = 40
+    progress = current / total
+    filled = int(bar_width * progress)
+    bar = "=" * filled + "-" * (bar_width - filled)
+    print(f"\rGenerating segments: [{bar}] {current}/{total}", end="", flush=True)
+    if current == total:
+        print()  # Newline at completion
+
+
+# =============================================================================
+# Audio Processing
+# =============================================================================
+
+
+def pcm_to_audio_segment(
+    pcm_data: bytes, sample_rate: int = GEMINI_TTS_SAMPLE_RATE
+) -> AudioSegment:
+    """Convert raw PCM data to AudioSegment.
+
+    Args:
+        pcm_data: Raw PCM audio (16-bit signed, mono)
+        sample_rate: Source sample rate
+
+    Returns:
+        AudioSegment object
+    """
+    wav_buffer = io.BytesIO()
+    with wave.open(wav_buffer, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)  # 16-bit
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm_data)
+
+    wav_buffer.seek(0)
+    return AudioSegment.from_wav(wav_buffer)
+
+
+def normalize_segment_audio(
+    audio: AudioSegment, buffer_ms: int = SILENCE_BUFFER_MS
+) -> AudioSegment:
+    """Normalize leading/trailing silence to consistent duration.
+
+    Trims existing silence and adds a fixed buffer at both ends.
+
+    Args:
+        audio: Input audio segment
+        buffer_ms: Target silence buffer in milliseconds
+
+    Returns:
+        Normalized audio segment
+    """
+    # Detect and trim leading silence
+    silence_threshold = audio.dBFS - 16 if audio.dBFS > -float("inf") else -50
+
+    # Use pydub's silence detection
+    start_trim = pydub_detect_silence(audio, silence_threshold=silence_threshold)
+    end_trim = pydub_detect_silence(
+        audio.reverse(), silence_threshold=silence_threshold
+    )
+
+    # Trim silence (with safety bounds)
+    duration = len(audio)
+    start_trim = min(start_trim, duration // 2)
+    end_trim = min(end_trim, duration // 2)
+
+    if start_trim + end_trim < duration:
+        trimmed = audio[start_trim : duration - end_trim]
+    else:
+        trimmed = audio  # Don't trim if it would remove everything
+
+    # Add normalized silence buffer
+    silence = AudioSegment.silent(duration=buffer_ms)
+    return silence + trimmed + silence
+
+
+def concatenate_segment_audio(
+    audio_segments: list[bytes],
+    output_path: Path,
+    pause_ms: int = INTER_SEGMENT_PAUSE_MS,
+    buffer_ms: int = SILENCE_BUFFER_MS,
+) -> None:
+    """Concatenate segment audio with pauses between them.
+
+    Args:
+        audio_segments: List of raw PCM audio data
+        output_path: Output MP3 file path
+        pause_ms: Pause duration between segments
+        buffer_ms: Silence buffer for normalization
+    """
+    if not audio_segments:
+        raise ValueError("No audio segments to concatenate")
+
+    logging.info(
+        f"Concatenating {len(audio_segments)} segments with {pause_ms}ms pauses"
+    )
+
+    # Convert PCM to AudioSegment and normalize
+    segments = []
+    for i, pcm_data in enumerate(audio_segments):
+        audio = pcm_to_audio_segment(pcm_data)
+        normalized = normalize_segment_audio(audio, buffer_ms)
+        segments.append(normalized)
+        logging.debug(
+            f"Segment {i + 1}: {len(audio)}ms -> {len(normalized)}ms (normalized)"
+        )
+
+    # Combine with pauses
+    pause = AudioSegment.silent(duration=pause_ms)
+    combined = segments[0]
+    for segment in segments[1:]:
+        combined += pause + segment
 
     # Ensure correct format (mono, 44100Hz)
     if combined.frame_rate != TARGET_SAMPLE_RATE:
@@ -776,7 +833,9 @@ def concatenate_audio_files(
     output_path.write_bytes(mp3_data)
 
     logging.info(f"Concatenated audio saved to: {output_path}")
-    logging.info(f"Final file size: {len(mp3_data):,} bytes")
+    logging.info(
+        f"Total duration: {len(combined)}ms, File size: {len(mp3_data):,} bytes"
+    )
 
 
 def strip_id3_tags(mp3_data: bytes) -> bytes:
@@ -887,6 +946,11 @@ def convert_to_mp3(
     return mp3_data
 
 
+# =============================================================================
+# MP3 Verification
+# =============================================================================
+
+
 def verify_mp3_format(mp3_data: bytes) -> tuple[bool, list[str]]:
     """Verify MP3 meets required format specifications.
 
@@ -979,6 +1043,158 @@ def verify_mp3_format(mp3_data: bytes) -> tuple[bool, list[str]]:
     return passed, issues
 
 
+# =============================================================================
+# Debug Output
+# =============================================================================
+
+
+def dump_segments_debug(
+    segments: list[Segment], batches: list[SegmentBatch], output_dir: Path
+) -> None:
+    """Dump parsed segments and batches for debugging.
+
+    Args:
+        segments: List of parsed segments
+        batches: List of segment batches
+        output_dir: Directory to save debug files
+    """
+    debug_dir = output_dir / "debug"
+    debug_dir.mkdir(parents=True, exist_ok=True)
+
+    # Print segment summary
+    print(f"\nParsed {len(segments)} segments:")
+    for i, seg in enumerate(segments):
+        emotion_str = (
+            f" (emotion: {seg.emotion})" if seg.emotion else " (emotion: none)"
+        )
+        text_preview = seg.text[:60] + "..." if len(seg.text) > 60 else seg.text
+        print(f'  [{i + 1}] {seg.speaker}: "{text_preview}"{emotion_str}')
+
+    print(f"\nBatched into {len(batches)} TTS calls:")
+    for batch in batches:
+        speakers_str = " + ".join(batch.speakers)
+        seg_count = len(batch.segments)
+        print(f"  Batch {batch.index + 1}: {speakers_str} ({seg_count} segments)")
+
+    # Save detailed JSON
+    debug_data = {
+        "segments": [
+            {"speaker": s.speaker, "text": s.text, "emotion": s.emotion}
+            for s in segments
+        ],
+        "batches": [
+            {"index": b.index, "speakers": b.speakers, "segment_count": len(b.segments)}
+            for b in batches
+        ],
+    }
+
+    debug_path = debug_dir / "segments.json"
+    debug_path.write_text(json.dumps(debug_data, indent=2))
+    print(f"\nDebug data saved to: {debug_path}")
+
+
+def save_batch_audio_debug(results: list[BatchResult], output_dir: Path) -> None:
+    """Save individual batch audio files for debugging.
+
+    Args:
+        results: List of batch generation results
+        output_dir: Directory to save debug files
+    """
+    debug_dir = output_dir / "debug"
+    debug_dir.mkdir(parents=True, exist_ok=True)
+
+    for result in results:
+        if result.success and result.audio_data:
+            # Convert to MP3 for easier playback
+            mp3_data = convert_to_mp3(result.audio_data)
+            audio_path = debug_dir / f"segment_{result.index + 1:03d}.mp3"
+            audio_path.write_bytes(mp3_data)
+            logging.debug(f"Saved debug audio: {audio_path}")
+
+    print(f"Debug audio files saved to: {debug_dir}")
+
+
+# =============================================================================
+# Main Generation Flow
+# =============================================================================
+
+
+def generate_audio_from_script(
+    script: AudioScript,
+    output_path: Path,
+    client: genai.Client,
+    debug: bool = False,
+    show_progress: bool = True,
+) -> bytes:
+    """Generate audio from parsed audio script using per-segment TTS.
+
+    Args:
+        script: Parsed AudioScript
+        output_path: Output MP3 file path
+        client: Gemini API client
+        debug: Enable debug output
+        show_progress: Show progress bar
+
+    Returns:
+        Final MP3 data
+
+    Raises:
+        RuntimeError: If any batch fails after retries
+    """
+    # Create speaker configs map for quick lookup
+    speaker_configs_map = {cfg.name: cfg for cfg in script.speaker_configs}
+
+    # Batch segments
+    batches = batch_segments(script.segments)
+
+    logging.info(
+        f"Processing {len(script.segments)} segments in {len(batches)} batches"
+    )
+
+    # Debug output
+    if debug:
+        dump_segments_debug(script.segments, batches, output_path.parent)
+
+    # Generate audio for all batches
+    progress_callback = print_progress if show_progress else None
+    results = generate_all_batches_sequential(
+        client,
+        batches,
+        speaker_configs_map,
+        script.tts_model,
+        progress_callback=progress_callback,
+    )
+
+    # Check for failures
+    failed = [r for r in results if not r.success]
+    if failed:
+        for r in failed:
+            logging.error(f"Batch {r.index + 1} failed: {r.error}")
+        raise RuntimeError(
+            f"{len(failed)} batch(es) failed after {MAX_RETRIES} retries. "
+            "Cannot generate complete audio."
+        )
+
+    # Debug: save individual batch audio
+    if debug:
+        save_batch_audio_debug(results, output_path.parent)
+
+    # Extract audio data in order
+    audio_segments = [
+        r.audio_data for r in sorted(results, key=lambda r: r.index) if r.audio_data
+    ]
+
+    # Concatenate with pauses
+    concatenate_segment_audio(audio_segments, output_path)
+
+    return output_path.read_bytes()
+
+
+# =============================================================================
+# Main Entry Point
+# =============================================================================
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -1026,7 +1242,7 @@ Output Format:
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Enable debug logging",
+        help="Enable debug logging and save intermediate files",
     )
     parser.add_argument(
         "--no-verify",
@@ -1034,10 +1250,9 @@ Output Format:
         help="Skip output format verification",
     )
     parser.add_argument(
-        "--no-context",
+        "--no-progress",
         action="store_true",
-        help="Disable style context (scene, director's notes) in TTS prompt. "
-        "Only the transcript will be sent to the TTS model.",
+        help="Disable progress bar output",
     )
 
     args = parser.parse_args()
@@ -1061,76 +1276,35 @@ Output Format:
         logging.info(f"Parsing audio script: {args.input}")
         script = parse_audio_script(args.input)
         logging.info(f"Stage UUID: {script.stage_uuid}")
-        logging.info(f"Speakers: {[cfg.speaker for cfg in script.speaker_configs]}")
+        logging.info(f"Speakers: {[cfg.name for cfg in script.speaker_configs]}")
+        logging.info(f"Segments: {len(script.segments)}")
 
-        # Override voice if specified
+        # Override voice if specified (for single speaker mode)
         if args.voice:
             if args.voice not in AVAILABLE_VOICES:
                 logging.warning(
                     f"Voice '{args.voice}' not in known voices, using anyway"
                 )
-            script.speaker_configs = [
-                SpeakerConfig(speaker="Narrator", voice_name=args.voice)
-            ]
+            # Override all speakers to use this voice
+            for cfg in script.speaker_configs:
+                cfg.voice = args.voice
             logging.info(f"Voice override: {args.voice}")
-
-        # Build TTS configuration
-        speech_config = build_tts_config(script)
 
         # Get API key for Google AI Studio
         api_key = get_api_key()
         logging.info("Connecting to Google AI Studio API")
 
-        # Create client (using Google AI Studio for multi-speaker TTS support)
+        # Create client
         client = genai.Client(api_key=api_key)
 
-        # Generate TTS audio
-        include_context = not args.no_context
-        output_dir = output_path.parent
-
-        # Check if chunking is needed (transcript exceeds MAX_CHUNK_SIZE)
-        if len(script.transcript) > MAX_CHUNK_SIZE:
-            logging.info(
-                f"Transcript exceeds {MAX_CHUNK_SIZE} chars "
-                f"({len(script.transcript)} chars), chunking required"
-            )
-
-            # Generate chunked audio (markdown + audio files)
-            chunk_infos = generate_chunked_audio(
-                client, script, speech_config, output_dir, include_context
-            )
-
-            # Check for failures
-            failed = [c for c in chunk_infos if c.status == "failed"]
-            if failed:
-                logging.error(
-                    f"{len(failed)} chunk(s) failed. "
-                    f"Retry individually with: python generate_audio.py <chunk>.md -o <chunk>.mp3"
-                )
-                for c in failed:
-                    logging.error(f"  - {c.markdown_path.name}")
-                sys.exit(1)
-
-            # Concatenate successful chunks
-            chunk_paths = [c.audio_path for c in chunk_infos]
-            concatenate_audio_files(chunk_paths, output_path, CHUNK_PAUSE_MS)
-
-            # Read final file for verification
-            mp3_data = output_path.read_bytes()
-
-        else:
-            # Single-call path (transcript fits in one request)
-            pcm_data = generate_tts_audio(
-                client, script, speech_config, include_context=include_context
-            )
-            logging.info(f"Received {len(pcm_data):,} bytes of PCM audio")
-
-            # Convert to MP3
-            mp3_data = convert_to_mp3(pcm_data)
-
-            # Save output
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_bytes(mp3_data)
+        # Generate audio
+        mp3_data = generate_audio_from_script(
+            script,
+            output_path,
+            client,
+            debug=args.debug,
+            show_progress=not args.no_progress,
+        )
 
         # Verify format (default: on)
         if not args.no_verify:

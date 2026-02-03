@@ -200,32 +200,104 @@ Flag any content that may need parental review:
 
 ## Audio Script Format
 
-For each stage node, generate a TTS-ready script:
+For each stage node, generate a TTS-ready script using the **new format** with inline emotional markers:
 
 ```markdown
-# AUDIO PROFILE: {Narrator/Character Name}
-## "{Role Description}"
-
-## THE SCENE: {Location and Mood}
-{Describe the environment and emotional atmosphere}
-
-### DIRECTOR'S NOTES
-
-Style:
-* {Specific voice direction}
-* {Emotional quality}
-* {Special techniques if age 8+}
-
-Pacing: {Speed and rhythm guidance}
-
+---
+stageUuid: "stage-{chapter-slug}"
+chapterRef: "{chapter-number}-{chapter-slug}"
+locale: "{language-code}"
+speakers:
+  - name: Narrator
+    voice: {voice-name}
+    profile: "{voice profile description}"
+  - name: {Character}
+    voice: {voice-name}
+    profile: "{character voice profile}"
 ---
 
-## TRANSCRIPT
+**Narrator:** <emotion: warm, inviting> {Narration text with emotional guidance inline}
 
-**{Speaker}:** {Dialogue or narration}
+**{Character}:** <emotion: curious, excited> {Character dialogue}
 
----
+**Narrator:** {More narration - emotion markers optional when neutral}
 ```
+
+### Emotional Markers for TTS
+
+Use inline `<emotion:>` markers to guide voice performance:
+
+**Marker Format:**
+```
+**Speaker:** <emotion: descriptor1, descriptor2> "Dialogue text"
+```
+
+**Common Emotion Descriptors:**
+- **Volume:** whispered, soft, loud, shouting
+- **Pace:** rushed, slow, hesitant, deliberate
+- **Feeling:** happy, sad, scared, excited, nervous, angry, calm, mysterious
+- **Quality:** trembling, firm, gentle, harsh, playful, serious, warm, cold
+
+**Examples:**
+```
+**Emma:** <emotion: nervous, quiet> "Is someone there?"
+**Dragon:** <emotion: gentle, rumbling> "Do not fear, little one."
+**Narrator:** <emotion: tense, hushed> The door creaked open slowly...
+```
+
+**Guidelines:**
+- Use 1-3 descriptors per marker
+- Place marker immediately after speaker label
+- Narrator can have emotions too (affects narration tone)
+- If no marker, voice uses character's baseline profile
+- Narrator descriptions like "she whispered" automatically transfer emotion to next character
+
+### Character Voice Profile Templates
+
+When defining speaker profiles, use these archetypes as starting points:
+
+**Young Child (5-8 years):**
+- Profile: "Young child, speaks with wonder and curiosity, simple vocabulary, enthusiastic"
+- Suggested voices: Leda (F), Puck (M)
+
+**Brave Young Hero (8-12 years):**
+- Profile: "Determined young hero, curious and brave, speaks clearly with growing confidence"
+- Suggested voices: Kore (F), Achird (M)
+
+**Wise Mentor/Elder:**
+- Profile: "Wise elder, patient and kind, speaks slowly with weight and warmth"
+- Suggested voices: Gacrux (F), Charon (M), Sadaltager (M)
+
+**Playful Sidekick/Animal Friend:**
+- Profile: "Playful companion, energetic and loyal, quick wit, expressive reactions"
+- Suggested voices: Laomedeia (F), Puck (M), Sadachbia (M)
+
+**Mysterious/Magical Being:**
+- Profile: "Enigmatic presence, speaks with otherworldly quality, hints at ancient knowledge"
+- Suggested voices: Zephyr (F), Enceladus (M)
+
+**Friendly Monster/Creature:**
+- Profile: "Large but gentle creature, deep voice, surprisingly kind, slightly formal"
+- Suggested voices: Fenrir (M), Algenib (M)
+
+**Warm Parent/Guardian:**
+- Profile: "Loving caregiver, warm and reassuring, protective, gentle encouragement"
+- Suggested voices: Sulafat (F), Vindemiatrix (F), Umbriel (M)
+
+**Story Narrator:**
+- Profile: "Warm storyteller, engaging and expressive, guides listener through the tale"
+- Suggested voices: Sulafat (F), Charon (M)
+
+### Audio Segment Length Guidelines
+
+To ensure optimal TTS quality:
+- Keep individual character speeches under 500 words
+- Break long monologues with narrator interjections
+- Maximum chapter transcript: 5000 characters
+
+If a chapter exceeds limits:
+1. Split into multiple chapters, OR
+2. Add narrator breaks to create natural segment boundaries
 
 ## Story Patterns Reference
 
@@ -265,6 +337,9 @@ Before completing, verify:
 - [ ] No orphaned nodes
 - [ ] All asset references documented
 - [ ] Content is age-appropriate
+- [ ] All speakers in transcript have matching entry in frontmatter `speakers` list
+- [ ] Emotional markers follow correct `<emotion: ...>` syntax
+- [ ] No character monologue exceeds 500 words
 
 ## Important Reminders
 
