@@ -8,7 +8,7 @@ Converts audio-script markdown files to MP3 format with specific requirements:
 - Sample Rate: 44100 Hz
 - ID3 Tags: NOT ALLOWED (must be stripped)
 
-This version uses per-segment TTS generation with parallel execution,
+This version uses per-segment TTS generation with sequential batch processing,
 supporting unlimited speakers by batching narrator + character pairs.
 
 Usage:
@@ -53,11 +53,50 @@ TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
 DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 
-# Segment processing constants
-SILENCE_BUFFER_MS = 50  # Normalized silence at segment edges
-INTER_SEGMENT_PAUSE_MS = 300  # Pause between segments
+# Segment processing constants (updated based on audio production best practices)
+SILENCE_BUFFER_MS = 200  # Normalized silence at segment edges (industry: 200-500ms)
+INTER_SEGMENT_PAUSE_MS = 500  # Default pause between segments (fallback)
 API_CALL_DELAY_SEC = 2  # 2 seconds between calls
 MAX_RETRIES = 3  # Retry count per segment
+
+# Advanced pause configuration (based on audiobook/podcast production standards)
+FILE_LEADING_SILENCE_MS = 500  # Silence at start of audio file
+FILE_TRAILING_SILENCE_MS = 1500  # Silence at end of audio file
+CROSSFADE_MS = 25  # Micro-crossfade to prevent clicks at edit points
+
+# Context-aware pause durations (in milliseconds)
+PAUSE_NARRATOR_TO_NARRATOR_MS = 750  # Paragraph transition
+PAUSE_NARRATOR_TO_CHARACTER_MS = 500  # Setup to dialogue
+PAUSE_CHARACTER_TO_NARRATOR_MS = 500  # Return to narration
+PAUSE_CHARACTER_TO_CHARACTER_MS = 400  # Quick dialogue exchange
+PAUSE_SCENE_BREAK_MS = 2000  # Major scene/section change
+PAUSE_DRAMATIC_MS = 1500  # Emotional moment
+
+# Emotion-based pause modifiers (multiply base pause by this factor)
+EMOTION_PAUSE_MODIFIERS: dict[str, float] = {
+    # Longer pauses for dramatic effect
+    "tense": 1.5,
+    "suspense": 1.5,
+    "mysterious": 1.3,
+    "dramatic": 1.5,
+    "sad": 1.4,
+    "thoughtful": 1.3,
+    "hushed": 1.2,
+    "soft": 1.2,
+    "gentle": 1.1,
+    "warm": 1.1,
+    "calm": 1.2,
+    "reflective": 1.3,
+    # Shorter pauses for energy
+    "excited": 0.8,
+    "rushed": 0.7,
+    "urgent": 0.75,
+    "breathless": 0.7,
+    "action": 0.8,
+    "energetic": 0.8,
+    "lively": 0.85,
+    "quick": 0.75,
+}
 
 # Available voices (from voice-guide.md)
 AVAILABLE_VOICES = {
@@ -125,7 +164,6 @@ class SegmentBatch:
 
     segments: list[Segment]
     speakers: list[str]  # Unique speakers in this batch (max 2)
-    index: int = 0  # Batch index for ordering
 
 
 @dataclass
@@ -141,13 +179,27 @@ class AudioScript:
 
 
 @dataclass
-class BatchResult:
-    """Result of generating audio for a batch."""
+class PauseConfig:
+    """Configuration for pause timing based on context.
 
-    index: int
-    audio_data: bytes | None = None
-    error: str | None = None
-    success: bool = False
+    Based on audiobook and podcast production best practices:
+    - Sentence end: 500-750ms
+    - Paragraph/topic change: 1000-1500ms
+    - Speaker change: 400-700ms
+    - Scene change: 1500-2500ms
+    - Dramatic pause: 1000-2000ms
+    """
+
+    narrator_to_narrator_ms: int = PAUSE_NARRATOR_TO_NARRATOR_MS
+    narrator_to_character_ms: int = PAUSE_NARRATOR_TO_CHARACTER_MS
+    character_to_narrator_ms: int = PAUSE_CHARACTER_TO_NARRATOR_MS
+    character_to_character_ms: int = PAUSE_CHARACTER_TO_CHARACTER_MS
+    scene_break_ms: int = PAUSE_SCENE_BREAK_MS
+    dramatic_pause_ms: int = PAUSE_DRAMATIC_MS
+    file_leading_ms: int = FILE_LEADING_SILENCE_MS
+    file_trailing_ms: int = FILE_TRAILING_SILENCE_MS
+    segment_edge_buffer_ms: int = SILENCE_BUFFER_MS
+    crossfade_ms: int = CROSSFADE_MS
 
 
 # =============================================================================
@@ -392,7 +444,6 @@ def batch_segments(segments: list[Segment]) -> list[SegmentBatch]:
 
     batches = []
     pending_narrator: list[Segment] = []
-    batch_index = 0
 
     for segment in segments:
         if segment.speaker == "Narrator":
@@ -403,7 +454,6 @@ def batch_segments(segments: list[Segment]) -> list[SegmentBatch]:
                 batch = SegmentBatch(
                     segments=pending_narrator + [segment],
                     speakers=["Narrator", segment.speaker],
-                    index=batch_index,
                 )
                 pending_narrator = []
             else:
@@ -411,10 +461,8 @@ def batch_segments(segments: list[Segment]) -> list[SegmentBatch]:
                 batch = SegmentBatch(
                     segments=[segment],
                     speakers=[segment.speaker],
-                    index=batch_index,
                 )
             batches.append(batch)
-            batch_index += 1
 
     # Handle trailing narrator segments
     if pending_narrator:
@@ -422,7 +470,6 @@ def batch_segments(segments: list[Segment]) -> list[SegmentBatch]:
             SegmentBatch(
                 segments=pending_narrator,
                 speakers=["Narrator"],
-                index=batch_index,
             )
         )
 
@@ -560,6 +607,7 @@ def build_batch_prompt(
 def generate_batch_audio(
     client: genai.Client,
     batch: SegmentBatch,
+    batch_num: int,
     speaker_configs_map: dict[str, SpeakerConfig],
     tts_model: str,
 ) -> bytes:
@@ -568,6 +616,7 @@ def generate_batch_audio(
     Args:
         client: Gemini API client
         batch: The segment batch to generate
+        batch_num: Batch number for logging (1-indexed)
         speaker_configs_map: Mapping of speaker name to config
         tts_model: TTS model to use
 
@@ -581,9 +630,7 @@ def generate_batch_audio(
     prompt = build_batch_prompt(batch, speaker_configs_map)
     speech_config = build_batch_speech_config(batch, speaker_configs_map)
 
-    logging.debug(
-        f"Batch {batch.index + 1} prompt ({len(prompt)} chars):\n{prompt[:500]}..."
-    )
+    logging.debug(f"Batch {batch_num} prompt ({len(prompt)} chars):\n{prompt[:500]}...")
 
     response = client.models.generate_content(
         model=tts_model,
@@ -608,51 +655,57 @@ def generate_batch_audio(
 def generate_batch_with_retry(
     client: genai.Client,
     batch: SegmentBatch,
+    batch_num: int,
     speaker_configs_map: dict[str, SpeakerConfig],
     tts_model: str,
     max_retries: int = MAX_RETRIES,
-) -> BatchResult:
+) -> bytes:
     """Generate audio for a batch with retry logic.
 
     Args:
         client: Gemini API client
         batch: The segment batch
+        batch_num: Batch number for logging (1-indexed)
         speaker_configs_map: Mapping of speaker name to config
         tts_model: TTS model to use
         max_retries: Maximum retry attempts
 
     Returns:
-        BatchResult with audio data or error
+        Raw PCM audio data
+
+    Raises:
+        RuntimeError: If generation fails after all retries
     """
     for attempt in range(max_retries):
         try:
-            audio_data = generate_batch_audio(
-                client, batch, speaker_configs_map, tts_model
+            return generate_batch_audio(
+                client, batch, batch_num, speaker_configs_map, tts_model
             )
-            return BatchResult(index=batch.index, audio_data=audio_data, success=True)
         except Exception as e:
             if attempt < max_retries - 1:
                 logging.warning(
-                    f"Batch {batch.index + 1} generation failed (attempt {attempt + 1}/{max_retries}): {e}"
+                    f"Batch {batch_num} generation failed (attempt {attempt + 1}/{max_retries}): {e}"
                 )
                 time.sleep(1 * (attempt + 1))  # Exponential backoff
             else:
                 logging.error(
-                    f"Batch {batch.index + 1} failed after {max_retries} attempts: {e}"
+                    f"Batch {batch_num} failed after {max_retries} attempts: {e}"
                 )
-                return BatchResult(index=batch.index, error=str(e), success=False)
+                raise RuntimeError(
+                    f"Batch {batch_num} failed after {max_retries} attempts: {e}"
+                ) from e
 
-    return BatchResult(index=batch.index, error="Max retries exceeded", success=False)
+    raise RuntimeError(f"Batch {batch_num} failed: max retries exceeded")
 
 
-def generate_all_batches_sequential(
+def generate_all_batches(
     client: genai.Client,
     batches: list[SegmentBatch],
     speaker_configs_map: dict[str, SpeakerConfig],
     tts_model: str,
     progress_callback: Callable[[int, int], None] | None = None,
     delay_seconds: float = API_CALL_DELAY_SEC,
-) -> list[BatchResult]:
+) -> list[bytes]:
     """Generate audio for all batches sequentially with rate limiting.
 
     Args:
@@ -661,12 +714,15 @@ def generate_all_batches_sequential(
         speaker_configs_map: Mapping of speaker name to config
         tts_model: TTS model to use
         progress_callback: Optional callback for progress updates
-        delay_seconds: Delay between API calls (default: 6s for 10 RPM)
+        delay_seconds: Delay between API calls (default: 2s)
 
     Returns:
-        List of BatchResult objects in batch order
+        List of raw PCM audio data in batch order
+
+    Raises:
+        RuntimeError: If any batch fails after retries
     """
-    results: list[BatchResult] = []
+    results: list[bytes] = []
 
     for i, batch in enumerate(batches):
         # Rate limiting delay (skip for first request)
@@ -674,13 +730,14 @@ def generate_all_batches_sequential(
             logging.debug(f"Rate limit delay: {delay_seconds}s")
             time.sleep(delay_seconds)
 
-        result = generate_batch_with_retry(
-            client, batch, speaker_configs_map, tts_model
+        batch_num = i + 1
+        audio_data = generate_batch_with_retry(
+            client, batch, batch_num, speaker_configs_map, tts_model
         )
-        results.append(result)
+        results.append(audio_data)
 
         if progress_callback:
-            progress_callback(i + 1, len(batches))
+            progress_callback(batch_num, len(batches))
 
     return results
 
@@ -772,42 +829,241 @@ def normalize_segment_audio(
     return silence + trimmed + silence
 
 
+def detect_natural_pauses(text: str) -> int:
+    """Detect if text ends with pause-indicating punctuation.
+
+    Analyzes the ending punctuation to determine if additional pause
+    is needed beyond the base pause duration.
+
+    Args:
+        text: Text content to analyze
+
+    Returns:
+        Additional pause duration in milliseconds
+    """
+    stripped = text.rstrip()
+
+    # Ellipsis indicates trailing thought - needs longer pause
+    if stripped.endswith("..."):
+        return 750
+
+    # Em-dash indicates abrupt cut/interruption - shorter pause
+    if stripped.endswith("—") or stripped.endswith("--"):
+        return 200
+
+    # Question mark - slight pause for implied response
+    if stripped.endswith("?"):
+        return 300
+
+    # Exclamation - slight pause for emphasis to land
+    if stripped.endswith("!"):
+        return 200
+
+    return 0
+
+
+def get_emotion_modifier(emotion: str) -> float:
+    """Get pause duration modifier based on emotion.
+
+    Emotional content affects pacing - tense moments need longer pauses,
+    exciting moments need shorter pauses.
+
+    Args:
+        emotion: Emotion string from segment (may contain multiple descriptors)
+
+    Returns:
+        Multiplier for base pause duration (default 1.0)
+    """
+    if not emotion:
+        return 1.0
+
+    # Parse emotion string (may be comma-separated: "tense, hushed")
+    emotion_lower = emotion.lower()
+    modifiers = []
+
+    for emotion_key, modifier in EMOTION_PAUSE_MODIFIERS.items():
+        if emotion_key in emotion_lower:
+            modifiers.append(modifier)
+
+    if not modifiers:
+        return 1.0
+
+    # Average the modifiers if multiple emotions detected
+    return sum(modifiers) / len(modifiers)
+
+
+def calculate_pause_duration(
+    prev_segment: Segment | None,
+    next_segment: Segment | None,
+    pause_config: PauseConfig,
+) -> int:
+    """Calculate context-appropriate pause between segments.
+
+    Considers:
+    - Speaker transition type (narrator↔character, character↔character)
+    - Emotion of the previous segment
+    - Punctuation-based pauses (ellipsis, em-dash, question mark)
+
+    Args:
+        prev_segment: Previous segment (None for file start)
+        next_segment: Next segment (None for file end)
+        pause_config: Pause configuration settings
+
+    Returns:
+        Calculated pause duration in milliseconds
+    """
+    if prev_segment is None or next_segment is None:
+        return pause_config.narrator_to_narrator_ms
+
+    # Determine base pause from speaker transition type
+    prev_is_narrator = prev_segment.speaker == "Narrator"
+    next_is_narrator = next_segment.speaker == "Narrator"
+
+    if prev_is_narrator and next_is_narrator:
+        base_pause = pause_config.narrator_to_narrator_ms
+    elif prev_is_narrator:
+        base_pause = pause_config.narrator_to_character_ms
+    elif next_is_narrator:
+        base_pause = pause_config.character_to_narrator_ms
+    else:
+        # Character to different character - check if same speaker
+        if prev_segment.speaker == next_segment.speaker:
+            base_pause = pause_config.character_to_character_ms
+        else:
+            # Different characters talking - slightly longer
+            base_pause = int(pause_config.character_to_character_ms * 1.25)
+
+    # Apply emotion modifier from previous segment
+    emotion_modifier = get_emotion_modifier(prev_segment.emotion)
+
+    # Add punctuation-based pause
+    punctuation_pause = detect_natural_pauses(prev_segment.text)
+
+    # Calculate final pause
+    final_pause = int(base_pause * emotion_modifier) + punctuation_pause
+
+    logging.debug(
+        f"Pause: {prev_segment.speaker}→{next_segment.speaker} = "
+        f"{base_pause}ms × {emotion_modifier:.2f} + {punctuation_pause}ms = {final_pause}ms"
+    )
+
+    return final_pause
+
+
+def apply_crossfade(
+    audio1: AudioSegment,
+    audio2: AudioSegment,
+    crossfade_ms: int = CROSSFADE_MS,
+) -> AudioSegment:
+    """Apply micro-crossfade between two audio segments.
+
+    Crossfading prevents clicks and pops at edit points by smoothly
+    transitioning between segments.
+
+    Args:
+        audio1: First audio segment
+        audio2: Second audio segment
+        crossfade_ms: Duration of crossfade overlap in milliseconds
+
+    Returns:
+        Combined audio with crossfade applied
+    """
+    if crossfade_ms <= 0:
+        return audio1 + audio2
+
+    # Ensure crossfade doesn't exceed segment lengths
+    max_crossfade = min(len(audio1), len(audio2), crossfade_ms)
+
+    if max_crossfade < crossfade_ms:
+        logging.debug(
+            f"Reducing crossfade from {crossfade_ms}ms to {max_crossfade}ms "
+            f"(segment too short)"
+        )
+
+    return audio1.append(audio2, crossfade=max_crossfade)
+
+
 def concatenate_segment_audio(
     audio_segments: list[bytes],
     output_path: Path,
     pause_ms: int = INTER_SEGMENT_PAUSE_MS,
     buffer_ms: int = SILENCE_BUFFER_MS,
+    segment_metadata: list[Segment] | None = None,
+    pause_config: PauseConfig | None = None,
 ) -> None:
-    """Concatenate segment audio with pauses between them.
+    """Concatenate segment audio with context-aware pauses between them.
+
+    Enhanced with professional audio production practices:
+    - Context-aware pause durations based on speaker transitions
+    - Emotion-based pause modifiers
+    - Punctuation-based pause detection
+    - Micro-crossfade to prevent clicks
+    - Leading/trailing file silence
 
     Args:
         audio_segments: List of raw PCM audio data
         output_path: Output MP3 file path
-        pause_ms: Pause duration between segments
+        pause_ms: Default pause duration between segments (fallback)
         buffer_ms: Silence buffer for normalization
+        segment_metadata: Optional list of Segment objects for context-aware pausing
+        pause_config: Optional PauseConfig for timing customization
     """
     if not audio_segments:
         raise ValueError("No audio segments to concatenate")
 
-    logging.info(
-        f"Concatenating {len(audio_segments)} segments with {pause_ms}ms pauses"
+    # Use default config if not provided
+    config = pause_config or PauseConfig()
+
+    # Determine if we can use context-aware pausing
+    use_context_aware = segment_metadata is not None and len(segment_metadata) == len(
+        audio_segments
     )
 
+    if use_context_aware:
+        logging.info(
+            f"Concatenating {len(audio_segments)} segments with context-aware pausing"
+        )
+    else:
+        logging.info(
+            f"Concatenating {len(audio_segments)} segments with {pause_ms}ms pauses"
+        )
+
     # Convert PCM to AudioSegment and normalize
-    segments = []
+    processed_segments: list[AudioSegment] = []
     for i, pcm_data in enumerate(audio_segments):
         audio = pcm_to_audio_segment(pcm_data)
-        normalized = normalize_segment_audio(audio, buffer_ms)
-        segments.append(normalized)
+        normalized = normalize_segment_audio(audio, config.segment_edge_buffer_ms)
+        processed_segments.append(normalized)
         logging.debug(
             f"Segment {i + 1}: {len(audio)}ms -> {len(normalized)}ms (normalized)"
         )
 
-    # Combine with pauses
-    pause = AudioSegment.silent(duration=pause_ms)
-    combined = segments[0]
-    for segment in segments[1:]:
-        combined += pause + segment
+    # Add leading silence (professional audio standard)
+    leading_silence = AudioSegment.silent(duration=config.file_leading_ms)
+    combined = leading_silence
+
+    # Combine segments with context-aware pauses and crossfade
+    for i, segment_audio in enumerate(processed_segments):
+        if i == 0:
+            # First segment - just add it after leading silence
+            combined = apply_crossfade(combined, segment_audio, config.crossfade_ms)
+        else:
+            # Calculate pause duration
+            if use_context_aware and segment_metadata:
+                prev_seg = segment_metadata[i - 1]
+                curr_seg = segment_metadata[i]
+                pause_duration = calculate_pause_duration(prev_seg, curr_seg, config)
+            else:
+                pause_duration = pause_ms
+
+            # Create pause and add segment with crossfade
+            pause = AudioSegment.silent(duration=pause_duration)
+            combined = combined + pause
+            combined = apply_crossfade(combined, segment_audio, config.crossfade_ms)
+
+    # Add trailing silence (professional audio standard)
+    trailing_silence = AudioSegment.silent(duration=config.file_trailing_ms)
+    combined = combined + trailing_silence
 
     # Ensure correct format (mono, 44100Hz)
     if combined.frame_rate != TARGET_SAMPLE_RATE:
@@ -834,7 +1090,9 @@ def concatenate_segment_audio(
 
     logging.info(f"Concatenated audio saved to: {output_path}")
     logging.info(
-        f"Total duration: {len(combined)}ms, File size: {len(mp3_data):,} bytes"
+        f"Total duration: {len(combined)}ms "
+        f"(incl. {config.file_leading_ms}ms lead + {config.file_trailing_ms}ms trail), "
+        f"File size: {len(mp3_data):,} bytes"
     )
 
 
@@ -1071,10 +1329,10 @@ def dump_segments_debug(
         print(f'  [{i + 1}] {seg.speaker}: "{text_preview}"{emotion_str}')
 
     print(f"\nBatched into {len(batches)} TTS calls:")
-    for batch in batches:
+    for i, batch in enumerate(batches):
         speakers_str = " + ".join(batch.speakers)
         seg_count = len(batch.segments)
-        print(f"  Batch {batch.index + 1}: {speakers_str} ({seg_count} segments)")
+        print(f"  Batch {i + 1}: {speakers_str} ({seg_count} segments)")
 
     # Save detailed JSON
     debug_data = {
@@ -1083,8 +1341,8 @@ def dump_segments_debug(
             for s in segments
         ],
         "batches": [
-            {"index": b.index, "speakers": b.speakers, "segment_count": len(b.segments)}
-            for b in batches
+            {"index": i, "speakers": b.speakers, "segment_count": len(b.segments)}
+            for i, b in enumerate(batches)
         ],
     }
 
@@ -1093,23 +1351,22 @@ def dump_segments_debug(
     print(f"\nDebug data saved to: {debug_path}")
 
 
-def save_batch_audio_debug(results: list[BatchResult], output_dir: Path) -> None:
+def save_batch_audio_debug(audio_segments: list[bytes], output_dir: Path) -> None:
     """Save individual batch audio files for debugging.
 
     Args:
-        results: List of batch generation results
+        audio_segments: List of raw PCM audio data
         output_dir: Directory to save debug files
     """
     debug_dir = output_dir / "debug"
     debug_dir.mkdir(parents=True, exist_ok=True)
 
-    for result in results:
-        if result.success and result.audio_data:
-            # Convert to MP3 for easier playback
-            mp3_data = convert_to_mp3(result.audio_data)
-            audio_path = debug_dir / f"segment_{result.index + 1:03d}.mp3"
-            audio_path.write_bytes(mp3_data)
-            logging.debug(f"Saved debug audio: {audio_path}")
+    for i, audio_data in enumerate(audio_segments):
+        # Convert to MP3 for easier playback
+        mp3_data = convert_to_mp3(audio_data)
+        audio_path = debug_dir / f"segment_{i + 1:03d}.mp3"
+        audio_path.write_bytes(mp3_data)
+        logging.debug(f"Saved debug audio: {audio_path}")
 
     print(f"Debug audio files saved to: {debug_dir}")
 
@@ -1155,9 +1412,9 @@ def generate_audio_from_script(
     if debug:
         dump_segments_debug(script.segments, batches, output_path.parent)
 
-    # Generate audio for all batches
+    # Generate audio for all batches (raises RuntimeError on failure)
     progress_callback = print_progress if show_progress else None
-    results = generate_all_batches_sequential(
+    audio_segments = generate_all_batches(
         client,
         batches,
         speaker_configs_map,
@@ -1165,27 +1422,28 @@ def generate_audio_from_script(
         progress_callback=progress_callback,
     )
 
-    # Check for failures
-    failed = [r for r in results if not r.success]
-    if failed:
-        for r in failed:
-            logging.error(f"Batch {r.index + 1} failed: {r.error}")
-        raise RuntimeError(
-            f"{len(failed)} batch(es) failed after {MAX_RETRIES} retries. "
-            "Cannot generate complete audio."
-        )
-
     # Debug: save individual batch audio
     if debug:
-        save_batch_audio_debug(results, output_path.parent)
+        save_batch_audio_debug(audio_segments, output_path.parent)
 
-    # Extract audio data in order
-    audio_segments = [
-        r.audio_data for r in sorted(results, key=lambda r: r.index) if r.audio_data
-    ]
+    # Create batch metadata for context-aware pausing
+    # Each batch may contain multiple segments, but we use the last segment
+    # of each batch for determining transitions to the next batch
+    batch_metadata: list[Segment] = []
+    for batch in batches:
+        # Use the last segment of each batch for transition context
+        # This captures the speaker and emotion that ends the batch
+        if batch.segments:
+            batch_metadata.append(batch.segments[-1])
 
-    # Concatenate with pauses
-    concatenate_segment_audio(audio_segments, output_path)
+    # Concatenate with context-aware pauses
+    pause_config = PauseConfig()
+    concatenate_segment_audio(
+        audio_segments,
+        output_path,
+        segment_metadata=batch_metadata,
+        pause_config=pause_config,
+    )
 
     return output_path.read_bytes()
 
