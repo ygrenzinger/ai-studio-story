@@ -24,6 +24,7 @@ Prerequisites:
 """
 
 import argparse
+import array
 import io
 import json
 import logging
@@ -40,6 +41,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+import numpy as np
+
 import yaml
 from google import genai
 from google.genai import types
@@ -51,7 +54,7 @@ GEMINI_TTS_SAMPLE_RATE = 24000  # Gemini TTS outputs 24kHz
 TARGET_SAMPLE_RATE = 44100  # Required output sample rate
 TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
-DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"
+DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"  # Gemini TTS model
 
 # Segment processing constants (updated based on audio production best practices)
 SILENCE_BUFFER_MS = 200  # Normalized silence at segment edges (industry: 200-500ms)
@@ -62,7 +65,13 @@ MAX_RETRIES = 3  # Retry count per segment
 # Advanced pause configuration (based on audiobook/podcast production standards)
 FILE_LEADING_SILENCE_MS = 500  # Silence at start of audio file
 FILE_TRAILING_SILENCE_MS = 1500  # Silence at end of audio file
-CROSSFADE_MS = 25  # Micro-crossfade to prevent clicks at edit points
+CROSSFADE_MS = 75  # Crossfade duration (increased from 25ms for smoother transitions)
+
+# Audio smoothing constants (for professional-grade transitions)
+SEGMENT_FADE_IN_MS = 15  # Fade in at segment start to prevent clicks
+SEGMENT_FADE_OUT_MS = 25  # Fade out at segment end (slightly longer for natural decay)
+COMFORT_NOISE_LEVEL_DB = -55.0  # Target noise floor for comfort noise
+NOISE_FADE_MS = 10  # Micro-fade on noise edges to prevent clicks
 
 # Context-aware pause durations (in milliseconds)
 PAUSE_NARRATOR_TO_NARRATOR_MS = 750  # Paragraph transition
@@ -180,7 +189,7 @@ class AudioScript:
 
 @dataclass
 class PauseConfig:
-    """Configuration for pause timing based on context.
+    """Configuration for pause timing and audio smoothing.
 
     Based on audiobook and podcast production best practices:
     - Sentence end: 500-750ms
@@ -190,6 +199,7 @@ class PauseConfig:
     - Dramatic pause: 1000-2000ms
     """
 
+    # Pause timing settings
     narrator_to_narrator_ms: int = PAUSE_NARRATOR_TO_NARRATOR_MS
     narrator_to_character_ms: int = PAUSE_NARRATOR_TO_CHARACTER_MS
     character_to_narrator_ms: int = PAUSE_CHARACTER_TO_NARRATOR_MS
@@ -200,6 +210,13 @@ class PauseConfig:
     file_trailing_ms: int = FILE_TRAILING_SILENCE_MS
     segment_edge_buffer_ms: int = SILENCE_BUFFER_MS
     crossfade_ms: int = CROSSFADE_MS
+
+    # Audio smoothing settings (for professional-grade transitions)
+    use_comfort_noise: bool = True  # Use comfort noise instead of digital silence
+    comfort_noise_db: float = COMFORT_NOISE_LEVEL_DB  # Target noise level in dBFS
+    crossfade_curve: str = "logarithmic"  # linear, logarithmic, exponential, s_curve
+    segment_fade_in_ms: int = SEGMENT_FADE_IN_MS  # Fade in at segment start
+    segment_fade_out_ms: int = SEGMENT_FADE_OUT_MS  # Fade out at segment end
 
 
 # =============================================================================
@@ -792,20 +809,32 @@ def pcm_to_audio_segment(
 
 
 def normalize_segment_audio(
-    audio: AudioSegment, buffer_ms: int = SILENCE_BUFFER_MS
+    audio: AudioSegment,
+    buffer_ms: int = SILENCE_BUFFER_MS,
+    fade_in_ms: int = SEGMENT_FADE_IN_MS,
+    fade_out_ms: int = SEGMENT_FADE_OUT_MS,
+    use_comfort_noise: bool = True,
+    comfort_noise_db: float = COMFORT_NOISE_LEVEL_DB,
 ) -> AudioSegment:
-    """Normalize leading/trailing silence to consistent duration.
+    """Normalize segment with fades and comfort noise buffers.
 
-    Trims existing silence and adds a fixed buffer at both ends.
+    Processing pipeline:
+    1. Trim existing silence from edges
+    2. Apply fade in/out to speech content to prevent clicks
+    3. Add comfort noise buffer at both ends (or digital silence if disabled)
 
     Args:
         audio: Input audio segment
-        buffer_ms: Target silence buffer in milliseconds
+        buffer_ms: Target buffer duration in milliseconds
+        fade_in_ms: Fade in duration for speech start
+        fade_out_ms: Fade out duration for speech end
+        use_comfort_noise: Use comfort noise instead of digital silence
+        comfort_noise_db: Target noise level for comfort noise
 
     Returns:
-        Normalized audio segment
+        Normalized audio segment with smooth edges
     """
-    # Detect and trim leading silence
+    # Detect and trim leading/trailing silence
     silence_threshold = audio.dBFS - 16 if audio.dBFS > -float("inf") else -50
 
     # Use pydub's silence detection
@@ -824,9 +853,140 @@ def normalize_segment_audio(
     else:
         trimmed = audio  # Don't trim if it would remove everything
 
-    # Add normalized silence buffer
-    silence = AudioSegment.silent(duration=buffer_ms)
-    return silence + trimmed + silence
+    # Apply fades to the speech content to prevent clicks
+    trimmed_len = len(trimmed)
+    if trimmed_len > fade_in_ms + fade_out_ms:
+        trimmed = trimmed.fade_in(fade_in_ms).fade_out(fade_out_ms)
+    elif trimmed_len > 20:  # Minimum viable fade
+        mini_fade = max(5, trimmed_len // 4)
+        trimmed = trimmed.fade_in(mini_fade).fade_out(mini_fade)
+
+    # Add buffer with comfort noise or digital silence
+    if use_comfort_noise and buffer_ms > 0:
+        buffer = generate_comfort_noise(
+            buffer_ms,
+            target_db=comfort_noise_db,
+            sample_rate=audio.frame_rate,
+            reference_audio=audio,
+        )
+    else:
+        buffer = AudioSegment.silent(duration=buffer_ms, frame_rate=audio.frame_rate)
+
+    return buffer + trimmed + buffer
+
+
+def generate_comfort_noise(
+    duration_ms: int,
+    target_db: float = COMFORT_NOISE_LEVEL_DB,
+    sample_rate: int = TARGET_SAMPLE_RATE,
+    reference_audio: AudioSegment | None = None,
+) -> AudioSegment:
+    """Generate low-level pink noise to replace digital silence.
+
+    Uses pink noise (1/f spectrum) which sounds more natural than white noise
+    and better matches room tone. If reference_audio is provided, the noise
+    level is adjusted to match the reference's noise floor.
+
+    Args:
+        duration_ms: Duration in milliseconds
+        target_db: Target noise level in dBFS (default -55 dB)
+        sample_rate: Output sample rate
+        reference_audio: Optional audio to match noise floor from
+
+    Returns:
+        AudioSegment containing comfort noise
+    """
+    if duration_ms <= 0:
+        return AudioSegment.silent(duration=0, frame_rate=sample_rate)
+
+    num_samples = int(sample_rate * duration_ms / 1000)
+
+    # Generate white noise as base
+    white = np.random.randn(num_samples)
+
+    # Apply simple pink noise approximation using a cumulative filter
+    # This gives 1/f characteristics (equal energy per octave)
+    pink = np.zeros(num_samples)
+    b0, b1, b2 = 0.0, 0.0, 0.0
+    for i in range(num_samples):
+        white_sample = white[i]
+        b0 = 0.99886 * b0 + white_sample * 0.0555179
+        b1 = 0.99332 * b1 + white_sample * 0.0750759
+        b2 = 0.96900 * b2 + white_sample * 0.1538520
+        pink[i] = b0 + b1 + b2 + white_sample * 0.5362
+    pink = pink / np.max(np.abs(pink)) if np.max(np.abs(pink)) > 0 else pink
+
+    # Adjust target level if reference audio provided
+    if reference_audio is not None and reference_audio.dBFS > -float("inf"):
+        # Match slightly below the reference's quiet portions
+        ref_noise_floor = analyze_noise_floor(reference_audio)
+        target_db = min(target_db, ref_noise_floor - 3)
+
+    # Convert dB to linear amplitude (16-bit range)
+    target_amplitude = 10 ** (target_db / 20) * 32767
+
+    # Scale noise to target level
+    pink = (pink * target_amplitude).astype(np.int16)
+
+    # Convert to AudioSegment
+    noise_segment = AudioSegment(
+        data=pink.tobytes(),
+        sample_width=2,
+        frame_rate=sample_rate,
+        channels=1,
+    )
+
+    # Apply micro-fades to prevent clicks at edges
+    if duration_ms > NOISE_FADE_MS * 2:
+        noise_segment = noise_segment.fade_in(NOISE_FADE_MS).fade_out(NOISE_FADE_MS)
+
+    return noise_segment
+
+
+def analyze_noise_floor(audio: AudioSegment, percentile: int = 10) -> float:
+    """Analyze the noise floor of an audio segment.
+
+    Examines the quietest portions of the audio to determine
+    the inherent noise floor level.
+
+    Args:
+        audio: Audio segment to analyze
+        percentile: Lower percentile to consider as noise floor (default 10)
+
+    Returns:
+        Noise floor level in dBFS
+    """
+    # Get samples as numpy array
+    samples = np.array(audio.get_array_of_samples(), dtype=np.float64)
+
+    # Calculate RMS in small windows (10ms windows)
+    window_size = int(audio.frame_rate * 0.010)
+    num_windows = len(samples) // window_size
+
+    if num_windows < 10:
+        # Not enough data, return conservative estimate
+        return audio.dBFS - 20 if audio.dBFS > -float("inf") else -60
+
+    rms_values = []
+    for i in range(num_windows):
+        window = samples[i * window_size : (i + 1) * window_size]
+        rms = np.sqrt(np.mean(window**2))
+        if rms > 0:
+            rms_values.append(rms)
+
+    if not rms_values:
+        return -60  # Default quiet level
+
+    # Get the percentile (quietest non-silent portions)
+    noise_floor_rms = np.percentile(rms_values, percentile)
+
+    # Convert to dBFS (relative to 16-bit max)
+    if noise_floor_rms > 0:
+        noise_floor_db = 20 * np.log10(noise_floor_rms / 32767)
+    else:
+        noise_floor_db = -60
+
+    return float(noise_floor_db)
 
 
 def detect_natural_pauses(text: str) -> int:
@@ -954,16 +1114,25 @@ def apply_crossfade(
     audio1: AudioSegment,
     audio2: AudioSegment,
     crossfade_ms: int = CROSSFADE_MS,
+    curve_type: str = "logarithmic",
 ) -> AudioSegment:
-    """Apply micro-crossfade between two audio segments.
+    """Apply crossfade between two audio segments with configurable curve.
 
     Crossfading prevents clicks and pops at edit points by smoothly
-    transitioning between segments.
+    transitioning between segments. Non-linear curves provide more
+    natural-sounding transitions than linear crossfades.
+
+    Curve types:
+    - "linear": Standard linear fade (pydub default)
+    - "logarithmic": Slower start, faster end - natural decay
+    - "exponential": Faster start, slower end - natural attack
+    - "s_curve": Slow start/end, fast middle - smoothest perceived transition
 
     Args:
         audio1: First audio segment
         audio2: Second audio segment
         crossfade_ms: Duration of crossfade overlap in milliseconds
+        curve_type: Type of fade curve to apply
 
     Returns:
         Combined audio with crossfade applied
@@ -974,13 +1143,66 @@ def apply_crossfade(
     # Ensure crossfade doesn't exceed segment lengths
     max_crossfade = min(len(audio1), len(audio2), crossfade_ms)
 
+    if max_crossfade < 10:  # Too short for meaningful crossfade
+        return audio1 + audio2
+
     if max_crossfade < crossfade_ms:
         logging.debug(
             f"Reducing crossfade from {crossfade_ms}ms to {max_crossfade}ms "
             f"(segment too short)"
         )
 
-    return audio1.append(audio2, crossfade=max_crossfade)
+    # For linear curves, use pydub's built-in (more efficient)
+    if curve_type == "linear":
+        return audio1.append(audio2, crossfade=max_crossfade)
+
+    # For non-linear curves, we need manual implementation
+    # Extract crossfade regions
+    fade_out_region = audio1[-max_crossfade:]
+    fade_in_region = audio2[:max_crossfade]
+
+    # Get samples as numpy arrays
+    samples1 = np.array(fade_out_region.get_array_of_samples(), dtype=np.float64)
+    samples2 = np.array(fade_in_region.get_array_of_samples(), dtype=np.float64)
+
+    # Ensure same length (may differ slightly due to sample rate rounding)
+    min_len = min(len(samples1), len(samples2))
+    samples1 = samples1[:min_len]
+    samples2 = samples2[:min_len]
+
+    num_samples = min_len
+    t = np.linspace(0, 1, num_samples)
+
+    # Generate fade curves based on type
+    if curve_type == "logarithmic":
+        # Logarithmic: slow decay, natural for audio fade-outs
+        fade_out = 1 - np.log1p(t * (np.e - 1)) / np.log(np.e)
+        fade_in = np.log1p(t * (np.e - 1)) / np.log(np.e)
+    elif curve_type == "exponential":
+        # Exponential: quick start, slow finish
+        fade_out = 1 - t**2
+        fade_in = t**2
+    elif curve_type == "s_curve":
+        # S-curve (smoothstep): slow-fast-slow, very smooth
+        fade_in = t * t * (3 - 2 * t)  # smoothstep function
+        fade_out = 1 - fade_in
+    else:
+        # Fallback to linear
+        fade_out = 1 - t
+        fade_in = t
+
+    # Apply fades and mix
+    mixed = (samples1 * fade_out + samples2 * fade_in).astype(np.int16)
+
+    # Create mixed segment with same properties as original
+    mixed_segment = fade_out_region._spawn(
+        array.array(fade_out_region.array_type, mixed)
+    )
+
+    # Combine: audio1 (without overlap) + mixed + audio2 (without overlap)
+    result = audio1[:-max_crossfade] + mixed_segment + audio2[max_crossfade:]
+
+    return result
 
 
 def concatenate_segment_audio(
@@ -991,14 +1213,15 @@ def concatenate_segment_audio(
     segment_metadata: list[Segment] | None = None,
     pause_config: PauseConfig | None = None,
 ) -> None:
-    """Concatenate segment audio with context-aware pauses between them.
+    """Concatenate segment audio with professional-grade transitions.
 
-    Enhanced with professional audio production practices:
-    - Context-aware pause durations based on speaker transitions
-    - Emotion-based pause modifiers
-    - Punctuation-based pause detection
-    - Micro-crossfade to prevent clicks
-    - Leading/trailing file silence
+    Enhanced pipeline for smooth audio transitions:
+    1. Convert PCM to AudioSegment
+    2. Analyze overall noise floor for consistency
+    3. Normalize each segment with comfort noise buffers and fades
+    4. Calculate context-aware pause durations
+    5. Join with comfort noise pauses and non-linear crossfades
+    6. Add file-level leading/trailing with comfort noise
 
     Args:
         audio_segments: List of raw PCM audio data
@@ -1019,34 +1242,72 @@ def concatenate_segment_audio(
         audio_segments
     )
 
+    smoothing_mode = "comfort noise" if config.use_comfort_noise else "digital silence"
     if use_context_aware:
         logging.info(
-            f"Concatenating {len(audio_segments)} segments with context-aware pausing"
+            f"Concatenating {len(audio_segments)} segments with context-aware pausing "
+            f"({smoothing_mode}, {config.crossfade_curve} crossfade)"
         )
     else:
         logging.info(
-            f"Concatenating {len(audio_segments)} segments with {pause_ms}ms pauses"
+            f"Concatenating {len(audio_segments)} segments with {pause_ms}ms pauses "
+            f"({smoothing_mode})"
         )
 
-    # Convert PCM to AudioSegment and normalize
-    processed_segments: list[AudioSegment] = []
-    for i, pcm_data in enumerate(audio_segments):
+    # Step 1: Convert all PCM to AudioSegment
+    raw_segments: list[AudioSegment] = []
+    for pcm_data in audio_segments:
         audio = pcm_to_audio_segment(pcm_data)
-        normalized = normalize_segment_audio(audio, config.segment_edge_buffer_ms)
+        raw_segments.append(audio)
+
+    # Step 2: Analyze overall noise floor for consistency (if using comfort noise)
+    target_noise_db = config.comfort_noise_db
+    if config.use_comfort_noise and raw_segments:
+        noise_floors = [
+            analyze_noise_floor(seg) for seg in raw_segments if seg.dBFS > -float("inf")
+        ]
+        if noise_floors:
+            avg_noise_floor = float(np.mean(noise_floors))
+            # Use slightly below average to be subtle
+            target_noise_db = min(config.comfort_noise_db, avg_noise_floor - 5)
+            logging.debug(f"Target comfort noise level: {target_noise_db:.1f} dBFS")
+
+    # Step 3: Normalize each segment with fades and comfort noise
+    processed_segments: list[AudioSegment] = []
+    for i, audio in enumerate(raw_segments):
+        normalized = normalize_segment_audio(
+            audio,
+            buffer_ms=config.segment_edge_buffer_ms,
+            fade_in_ms=config.segment_fade_in_ms,
+            fade_out_ms=config.segment_fade_out_ms,
+            use_comfort_noise=config.use_comfort_noise,
+            comfort_noise_db=target_noise_db,
+        )
         processed_segments.append(normalized)
         logging.debug(
             f"Segment {i + 1}: {len(audio)}ms -> {len(normalized)}ms (normalized)"
         )
 
-    # Add leading silence (professional audio standard)
-    leading_silence = AudioSegment.silent(duration=config.file_leading_ms)
-    combined = leading_silence
+    # Step 4 & 5: Combine with context-aware pauses and non-linear crossfades
+    # Generate leading buffer (comfort noise or silence)
+    if config.use_comfort_noise:
+        combined = generate_comfort_noise(
+            config.file_leading_ms,
+            target_db=target_noise_db,
+            sample_rate=TARGET_SAMPLE_RATE,
+        )
+    else:
+        combined = AudioSegment.silent(duration=config.file_leading_ms)
 
-    # Combine segments with context-aware pauses and crossfade
     for i, segment_audio in enumerate(processed_segments):
         if i == 0:
-            # First segment - just add it after leading silence
-            combined = apply_crossfade(combined, segment_audio, config.crossfade_ms)
+            # First segment - join with leading buffer
+            combined = apply_crossfade(
+                combined,
+                segment_audio,
+                config.crossfade_ms,
+                config.crossfade_curve,
+            )
         else:
             # Calculate pause duration
             if use_context_aware and segment_metadata:
@@ -1056,14 +1317,46 @@ def concatenate_segment_audio(
             else:
                 pause_duration = pause_ms
 
-            # Create pause and add segment with crossfade
-            pause = AudioSegment.silent(duration=pause_duration)
-            combined = combined + pause
-            combined = apply_crossfade(combined, segment_audio, config.crossfade_ms)
+            # Create pause with comfort noise or digital silence
+            if config.use_comfort_noise:
+                pause = generate_comfort_noise(
+                    pause_duration,
+                    target_db=target_noise_db,
+                    sample_rate=TARGET_SAMPLE_RATE,
+                )
+            else:
+                pause = AudioSegment.silent(duration=pause_duration)
 
-    # Add trailing silence (professional audio standard)
-    trailing_silence = AudioSegment.silent(duration=config.file_trailing_ms)
-    combined = combined + trailing_silence
+            # Apply crossfade through the pause to the next segment
+            combined = apply_crossfade(
+                combined,
+                pause,
+                config.crossfade_ms,
+                config.crossfade_curve,
+            )
+            combined = apply_crossfade(
+                combined,
+                segment_audio,
+                config.crossfade_ms,
+                config.crossfade_curve,
+            )
+
+    # Step 6: Add trailing buffer
+    if config.use_comfort_noise:
+        trailing = generate_comfort_noise(
+            config.file_trailing_ms,
+            target_db=target_noise_db,
+            sample_rate=TARGET_SAMPLE_RATE,
+        )
+    else:
+        trailing = AudioSegment.silent(duration=config.file_trailing_ms)
+
+    combined = apply_crossfade(
+        combined,
+        trailing,
+        config.crossfade_ms,
+        config.crossfade_curve,
+    )
 
     # Ensure correct format (mono, 44100Hz)
     if combined.frame_rate != TARGET_SAMPLE_RATE:
