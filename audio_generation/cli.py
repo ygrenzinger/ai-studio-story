@@ -1,0 +1,188 @@
+"""Command-line interface for audio generation."""
+
+import argparse
+import logging
+import os
+import sys
+from pathlib import Path
+
+from audio_generation.domain.constants import AVAILABLE_VOICES
+from audio_generation.orchestrator import AudioGenerationPipeline
+from audio_generation.progress.progress_manager import ProgressManager
+from audio_generation.tts.client import TTSClient
+from audio_generation.utils.logging import setup_logging
+
+
+def get_api_key() -> str:
+    """Get Google AI Studio API key from environment.
+
+    Returns:
+        API key string
+
+    Raises:
+        SystemExit: If no API key is found in environment
+    """
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        logging.error(
+            "GOOGLE_API_KEY or GEMINI_API_KEY environment variable is not set.\n"
+            "Please set it to your Google AI Studio API key.\n"
+            "Get an API key at: https://aistudio.google.com/apikey\n"
+            "Example: export GOOGLE_API_KEY=your-api-key-here"
+        )
+        sys.exit(1)
+    return api_key
+
+
+def print_progress(current: int, total: int) -> None:
+    """Print progress bar for segment generation.
+
+    Args:
+        current: Current progress count
+        total: Total items to process
+    """
+    bar_width = 40
+    progress = current / total
+    filled = int(bar_width * progress)
+    bar = "=" * filled + "-" * (bar_width - filled)
+    print(f"\rGenerating segments: [{bar}] {current}/{total}", end="", flush=True)
+    if current == total:
+        print()  # Newline at completion
+
+
+def main() -> None:
+    """Main entry point for CLI."""
+    parser = argparse.ArgumentParser(
+        description="Generate audio from story chapters using Gemini TTS",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python -m audio_generation.cli audio-scripts/stage-forest.md -o forest.mp3
+  python -m audio_generation.cli script.md -o output.mp3 --voice Puck
+  python -m audio_generation.cli script.md -o output.mp3 --debug --no-verify
+  python -m audio_generation.cli script.md -o output.mp3 --resume
+
+Prerequisites:
+  1. Google AI Studio API key (supports multi-speaker TTS)
+  2. Get an API key at: https://aistudio.google.com/apikey
+  3. FFmpeg installed (required by pydub)
+
+Environment Variables:
+  GOOGLE_API_KEY   Required. Your Google AI Studio API key.
+  GEMINI_API_KEY   Alternative to GOOGLE_API_KEY (either works).
+
+Output Format:
+  - MP3 (MPEG Audio Layer III)
+  - Mono (1 channel)
+  - 44100 Hz sample rate
+  - No ID3 tags (ID3v1 and ID3v2 stripped)
+        """,
+    )
+
+    parser.add_argument(
+        "input",
+        type=Path,
+        help="Path to audio-script markdown file",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        required=True,
+        type=Path,
+        help="Output MP3 file path (required)",
+    )
+    parser.add_argument(
+        "--voice",
+        help="Override voice for single-speaker mode (e.g., Sulafat, Puck, Leda)",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging and save intermediate files",
+    )
+    parser.add_argument(
+        "--no-verify",
+        action="store_true",
+        help="Skip output format verification",
+    )
+    parser.add_argument(
+        "--no-progress",
+        action="store_true",
+        help="Disable progress bar output",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from saved progress (use after rate limit or other failure)",
+    )
+
+    args = parser.parse_args()
+
+    # Setup logging
+    setup_logging(args.debug)
+
+    # Validate input file
+    if not args.input.exists():
+        logging.error(f"Input file not found: {args.input}")
+        sys.exit(1)
+
+    # Ensure output has .mp3 extension
+    output_path: Path = args.output
+    if output_path.suffix.lower() != ".mp3":
+        output_path = output_path.with_suffix(".mp3")
+        logging.warning(f"Output path changed to: {output_path}")
+
+    try:
+        # Get API key
+        api_key = get_api_key()
+        logging.info("Connecting to Google AI Studio API")
+
+        # Create pipeline with dependencies
+        pipeline = AudioGenerationPipeline()
+
+        # Parse script first to get model
+        script = pipeline.parse_script(args.input)
+
+        # Override voice if specified
+        if args.voice:
+            if args.voice not in AVAILABLE_VOICES:
+                logging.warning(
+                    f"Voice '{args.voice}' not in known voices, using anyway"
+                )
+            for cfg in script.speaker_configs:
+                cfg.voice = args.voice
+            logging.info(f"Voice override: {args.voice}")
+
+        # Configure TTS client
+        tts_client = TTSClient(api_key=api_key, model=script.tts_model)
+        pipeline.set_tts_client(tts_client)
+
+        # Configure progress manager
+        progress_manager = ProgressManager(output_path.parent)
+        pipeline.set_progress_manager(progress_manager)
+
+        # Execute pipeline
+        progress_callback = None if args.no_progress else print_progress
+
+        mp3_data = pipeline.execute(
+            input_file=args.input,
+            output_path=output_path,
+            resume=args.resume,
+            verify=not args.no_verify,
+            progress_callback=progress_callback,
+        )
+
+        logging.info(f"Audio saved to: {output_path}")
+        logging.info(f"File size: {len(mp3_data):,} bytes")
+
+    except Exception as e:
+        logging.error(f"Failed to generate audio: {e}")
+        if args.debug:
+            import traceback
+
+            traceback.print_exc()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

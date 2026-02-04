@@ -18,3 +18,8 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["."]
 only-include = ["generate_cover.py", "generate_audio.py"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
