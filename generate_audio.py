@@ -37,14 +37,17 @@ import tempfile
 import time
 import wave
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Callable
+import hashlib
 
 import numpy as np
 
 import yaml
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence as pydub_detect_silence
@@ -59,7 +62,7 @@ DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"  # Gemini TTS model
 # Segment processing constants (updated based on audio production best practices)
 SILENCE_BUFFER_MS = 200  # Normalized silence at segment edges (industry: 200-500ms)
 INTER_SEGMENT_PAUSE_MS = 500  # Default pause between segments (fallback)
-API_CALL_DELAY_SEC = 2  # 2 seconds between calls
+API_CALL_DELAY_SEC = 6  # 6 seconds between calls (10 RPM limit)
 MAX_RETRIES = 3  # Retry count per segment
 
 # Advanced pause configuration (based on audiobook/podcast production standards)
@@ -187,6 +190,29 @@ class AudioScript:
     tts_model: str = DEFAULT_TTS_MODEL
 
 
+# Progress tracking for resume capability
+PROGRESS_FILE_NAME = ".progress.json"
+
+
+@dataclass
+class GenerationProgress:
+    """Tracks batch generation progress for resume capability."""
+
+    input_file_hash: str  # MD5 of input file for invalidation detection
+    total_batches: int  # Total number of batches to process
+    completed_batches: list[int] = field(
+        default_factory=list
+    )  # Indices of completed batches (0-based)
+    audio_files: dict[int, str] = field(
+        default_factory=dict
+    )  # Mapping: batch_index -> saved audio filename
+    last_error: str | None = None  # Error message if processing stopped due to error
+    last_error_batch: int | None = None  # Which batch failed
+    last_error_time: str | None = None  # ISO timestamp of error
+    started_at: str = ""  # ISO timestamp when processing started
+    updated_at: str = ""  # ISO timestamp of last update
+
+
 @dataclass
 class PauseConfig:
     """Configuration for pause timing and audio smoothing.
@@ -217,6 +243,111 @@ class PauseConfig:
     crossfade_curve: str = "logarithmic"  # linear, logarithmic, exponential, s_curve
     segment_fade_in_ms: int = SEGMENT_FADE_IN_MS  # Fade in at segment start
     segment_fade_out_ms: int = SEGMENT_FADE_OUT_MS  # Fade out at segment end
+
+
+# =============================================================================
+# Progress File Management (Resume Capability)
+# =============================================================================
+
+
+def get_progress_file_path(output_dir: Path) -> Path:
+    """Return path to progress file in output directory."""
+    return output_dir / PROGRESS_FILE_NAME
+
+
+def calculate_file_hash(file_path: Path) -> str:
+    """Calculate MD5 hash of file for change detection."""
+    return hashlib.md5(file_path.read_bytes()).hexdigest()
+
+
+def load_progress(output_dir: Path) -> GenerationProgress | None:
+    """Load existing progress from file, or None if not found/invalid."""
+    progress_path = get_progress_file_path(output_dir)
+    if not progress_path.exists():
+        return None
+    try:
+        data = json.loads(progress_path.read_text())
+        return GenerationProgress(
+            input_file_hash=data["input_file_hash"],
+            total_batches=data["total_batches"],
+            completed_batches=data.get("completed_batches", []),
+            audio_files={int(k): v for k, v in data.get("audio_files", {}).items()},
+            last_error=data.get("last_error"),
+            last_error_batch=data.get("last_error_batch"),
+            last_error_time=data.get("last_error_time"),
+            started_at=data.get("started_at", ""),
+            updated_at=data.get("updated_at", ""),
+        )
+    except (json.JSONDecodeError, TypeError, KeyError) as e:
+        logging.warning(f"Could not load progress file: {e}")
+        return None
+
+
+def save_progress(output_dir: Path, progress: GenerationProgress) -> None:
+    """Save progress to file."""
+    progress.updated_at = datetime.now().isoformat()
+    progress_path = get_progress_file_path(output_dir)
+    # Convert audio_files keys to strings for JSON serialization
+    data = asdict(progress)
+    data["audio_files"] = {str(k): v for k, v in progress.audio_files.items()}
+    progress_path.write_text(json.dumps(data, indent=2))
+
+
+def clear_progress(output_dir: Path) -> None:
+    """Remove progress file and batch directory after successful completion."""
+    progress_path = get_progress_file_path(output_dir)
+    if progress_path.exists():
+        progress_path.unlink()
+        logging.debug("Removed progress file")
+
+    batch_dir = output_dir / "batches"
+    if batch_dir.exists():
+        shutil.rmtree(batch_dir)
+        logging.debug("Removed batch directory")
+
+
+def validate_progress(
+    progress: GenerationProgress, input_file: Path, total_batches: int
+) -> bool:
+    """Check if saved progress is still valid for current run."""
+    current_hash = calculate_file_hash(input_file)
+    if progress.input_file_hash != current_hash:
+        logging.warning("Input file has changed since last run - progress invalidated")
+        return False
+    if progress.total_batches != total_batches:
+        logging.warning("Batch count changed - progress invalidated")
+        return False
+    return True
+
+
+# =============================================================================
+# Batch Audio File Management (Resume Capability)
+# =============================================================================
+
+
+def save_batch_audio(output_dir: Path, batch_index: int, audio_data: bytes) -> str:
+    """Save a single batch's audio data to disk immediately.
+
+    Args:
+        output_dir: Output directory
+        batch_index: Index of the batch (0-based)
+        audio_data: Raw PCM audio data
+
+    Returns:
+        Filename of saved audio file (relative to batches directory)
+    """
+    audio_dir = output_dir / "batches"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"batch_{batch_index:04d}.pcm"
+    filepath = audio_dir / filename
+    filepath.write_bytes(audio_data)
+    return filename
+
+
+def load_batch_audio(output_dir: Path, filename: str) -> bytes:
+    """Load a previously saved batch audio file."""
+    filepath = output_dir / "batches" / filename
+    return filepath.read_bytes()
 
 
 # =============================================================================
@@ -757,6 +888,158 @@ def generate_all_batches(
             progress_callback(batch_num, len(batches))
 
     return results
+
+
+def generate_all_batches_resumable(
+    client: genai.Client,
+    batches: list[SegmentBatch],
+    speaker_configs_map: dict[str, SpeakerConfig],
+    tts_model: str,
+    output_dir: Path,
+    input_file: Path,
+    progress_callback: Callable[[int, int], None] | None = None,
+    delay_seconds: float = API_CALL_DELAY_SEC,
+    resume: bool = False,
+) -> list[bytes]:
+    """Generate audio for all batches with resume capability.
+
+    Args:
+        client: Gemini API client
+        batches: List of segment batches
+        speaker_configs_map: Mapping of speaker name to config
+        tts_model: TTS model to use
+        output_dir: Directory to save progress and batch files
+        input_file: Path to input markdown file (for hash validation)
+        progress_callback: Optional callback for progress updates
+        delay_seconds: Delay between API calls (default: 6s for <10 RPM)
+        resume: If True, attempt to resume from saved progress
+
+    Returns:
+        List of raw PCM audio data in batch order
+
+    Raises:
+        RuntimeError: If any batch fails (after saving error to progress)
+    """
+    total_batches = len(batches)
+    input_hash = calculate_file_hash(input_file)
+
+    # Try to load existing progress if resuming
+    progress: GenerationProgress | None = None
+    if resume:
+        progress = load_progress(output_dir)
+        if progress and validate_progress(progress, input_file, total_batches):
+            logging.info(
+                f"Resuming: {len(progress.completed_batches)}/{total_batches} "
+                "batches already complete"
+            )
+            if progress.last_error:
+                logging.info(
+                    f"Previous error on batch {(progress.last_error_batch or 0) + 1}: "
+                    f"{progress.last_error}"
+                )
+        else:
+            progress = None
+            logging.info("Starting fresh (no valid progress found)")
+
+    # Initialize new progress if needed
+    if progress is None:
+        progress = GenerationProgress(
+            input_file_hash=input_hash,
+            total_batches=total_batches,
+            completed_batches=[],
+            audio_files={},
+            last_error=None,
+            last_error_batch=None,
+            last_error_time=None,
+            started_at=datetime.now().isoformat(),
+            updated_at=datetime.now().isoformat(),
+        )
+        save_progress(output_dir, progress)
+
+    results: list[bytes | None] = [None] * total_batches
+
+    # Load already-completed batches from disk
+    for batch_idx in progress.completed_batches:
+        filename = progress.audio_files.get(batch_idx)
+        if filename:
+            results[batch_idx] = load_batch_audio(output_dir, filename)
+            logging.debug(f"Loaded cached batch {batch_idx + 1}")
+
+    # Report initial progress for resumed batches
+    if progress.completed_batches and progress_callback:
+        progress_callback(len(progress.completed_batches), total_batches)
+
+    # Track if we need delay (after any API call or resumed batches)
+    need_delay = bool(progress.completed_batches)
+
+    # Process remaining batches
+    for i, batch in enumerate(batches):
+        if i in progress.completed_batches:
+            continue  # Skip already completed
+
+        # Rate limiting delay
+        if need_delay:
+            logging.debug(f"Rate limit delay: {delay_seconds}s")
+            time.sleep(delay_seconds)
+        need_delay = True  # Need delay for subsequent calls
+
+        batch_num = i + 1
+
+        try:
+            audio_data = generate_batch_with_retry(
+                client, batch, batch_num, speaker_configs_map, tts_model
+            )
+
+            # Save immediately to disk
+            filename = save_batch_audio(output_dir, i, audio_data)
+            results[i] = audio_data
+
+            # Update progress
+            progress.completed_batches.append(i)
+            progress.audio_files[i] = filename
+            # Clear any previous error since we succeeded
+            progress.last_error = None
+            progress.last_error_batch = None
+            progress.last_error_time = None
+            save_progress(output_dir, progress)
+
+            if progress_callback:
+                progress_callback(len(progress.completed_batches), total_batches)
+
+        except genai_errors.APIError as e:
+            # Save error state and exit
+            progress.last_error = f"API Error {e.code}: {e.message}"
+            progress.last_error_batch = i
+            progress.last_error_time = datetime.now().isoformat()
+            save_progress(output_dir, progress)
+
+            logging.error(
+                f"Batch {batch_num} failed with API error: {e.code} - {e.message}"
+            )
+            logging.error("Progress saved. Resume with --resume flag.")
+            raise RuntimeError(
+                f"Batch {batch_num} failed: API Error {e.code}. "
+                f"Progress saved ({len(progress.completed_batches)}/{total_batches} complete). "
+                "Resume with --resume flag."
+            ) from e
+
+        except Exception as e:
+            # Save error state for any other exception
+            progress.last_error = str(e)
+            progress.last_error_batch = i
+            progress.last_error_time = datetime.now().isoformat()
+            save_progress(output_dir, progress)
+
+            logging.error(f"Batch {batch_num} failed: {e}")
+            logging.error("Progress saved. Resume with --resume flag.")
+            raise RuntimeError(
+                f"Batch {batch_num} failed: {e}. "
+                f"Progress saved ({len(progress.completed_batches)}/{total_batches} complete). "
+                "Resume with --resume flag."
+            ) from e
+
+    # All batches complete - return results
+    return [r for r in results if r is not None]
 
 
 # =============================================================================
@@ -1673,8 +1956,10 @@ def generate_audio_from_script(
     script: AudioScript,
     output_path: Path,
     client: genai.Client,
+    input_file: Path,
     debug: bool = False,
     show_progress: bool = True,
+    resume: bool = False,
 ) -> bytes:
     """Generate audio from parsed audio script using per-segment TTS.
 
@@ -1682,8 +1967,10 @@ def generate_audio_from_script(
         script: Parsed AudioScript
         output_path: Output MP3 file path
         client: Gemini API client
+        input_file: Path to input markdown file (for resume hash validation)
         debug: Enable debug output
         show_progress: Show progress bar
+        resume: If True, attempt to resume from saved progress
 
     Returns:
         Final MP3 data
@@ -1705,14 +1992,17 @@ def generate_audio_from_script(
     if debug:
         dump_segments_debug(script.segments, batches, output_path.parent)
 
-    # Generate audio for all batches (raises RuntimeError on failure)
+    # Generate audio for all batches with resume capability
     progress_callback = print_progress if show_progress else None
-    audio_segments = generate_all_batches(
+    audio_segments = generate_all_batches_resumable(
         client,
         batches,
         speaker_configs_map,
         script.tts_model,
+        output_dir=output_path.parent,
+        input_file=input_file,
         progress_callback=progress_callback,
+        resume=resume,
     )
 
     # Debug: save individual batch audio
@@ -1738,6 +2028,9 @@ def generate_audio_from_script(
         pause_config=pause_config,
     )
 
+    # Clean up progress files after successful completion
+    clear_progress(output_path.parent)
+
     return output_path.read_bytes()
 
 
@@ -1756,6 +2049,7 @@ Examples:
   python generate_audio.py audio-scripts/stage-forest.md -o forest.mp3
   python generate_audio.py script.md -o output.mp3 --voice Puck
   python generate_audio.py script.md -o output.mp3 --debug --no-verify
+  python generate_audio.py script.md -o output.mp3 --resume  # Resume after failure
 
 Prerequisites:
   1. Google AI Studio API key (supports multi-speaker TTS)
@@ -1805,6 +2099,11 @@ Output Format:
         action="store_true",
         help="Disable progress bar output",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from saved progress (use after rate limit or other failure)",
+    )
 
     args = parser.parse_args()
 
@@ -1853,8 +2152,10 @@ Output Format:
             script,
             output_path,
             client,
+            input_file=args.input,
             debug=args.debug,
             show_progress=not args.no_progress,
+            resume=args.resume,
         )
 
         # Verify format (default: on)
