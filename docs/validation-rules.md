@@ -190,10 +190,10 @@ stageNodes: [
 
 ```javascript
 // Stage references image
-{ uuid: "stage-1", image: "forest-scene.png", ... }
+{ uuid: "stage-1", image: "forest-scene.bmp", ... }
 
 // Must have either:
-// - assets/images/forest-scene.png (actual file)
+// - assets/images/forest-scene.bmp (actual file)
 // - assets/images/stage-1.prompt.md (generation prompt)
 ```
 
@@ -215,17 +215,17 @@ stageNodes: [
 
 ---
 
-### RULE: Image Dimensions
+### RULE: Image Format and Dimensions
 - **Severity:** WARNING (if actual images exist)
-- **Check:** Images are exactly 320x240 pixels
-- **Fix:** Resize images to correct dimensions
+- **Check:** Images are BMP format, 4-bit RLE compressed, exactly 320x240 pixels
+- **Fix:** Convert images to 4-bit RLE compressed BMP and resize to correct dimensions
 
 ---
 
 ### RULE: Audio Format
 - **Severity:** WARNING (if actual audio exists)
-- **Check:** Audio is mono, 32kHz sample rate, 16-bit signed
-- **Fix:** Convert audio to required format
+- **Check:** Audio is MP3, mono, 44100Hz sample rate, no ID3 tags
+- **Fix:** Convert audio to required format and strip ID3 tags
 
 ---
 
@@ -317,7 +317,7 @@ None
 
 ### W001: Missing Image Asset
 - **Node:** stage-entering-forest
-- **Issue:** Image reference 'forest-scene.png' has no file or prompt
+- **Issue:** Image reference 'forest-scene.bmp' has no file or prompt
 - **Fix:** Create assets/images/stage-entering-forest.prompt.md
 
 ### W002: Long Audio Segment

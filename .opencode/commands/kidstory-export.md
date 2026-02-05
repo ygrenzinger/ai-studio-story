@@ -192,18 +192,51 @@ Generate hub-specific stages:
    - Wheel disabled, OK to continue
    - `okTransition` → `action-to-menu`
 
-2. **Hub Menu** (`hub-menu`)
+2. **Hub Menu Question** (`hub-menu`)
    - `type: "menu.questionstage"`
    - **Wheel enabled** for story selection
    - `okTransition` → `action-choose-story`
-   - Options include all story entry points + goodbye
+   - Audio: "Which story would you like to hear?"
 
-3. **Welcome Back** (`hub-welcome-back`)
+3. **Story Option Stages** (`hub-option-story1`, `hub-option-story2`, etc.)
+   - `type: "menu.optionstage"`
+   - **Each story has its own option stage with unique audio**
+   - Audio plays when child scrolls to this option: "Story 1: The Forest Adventure"
+   - `okTransition` → action that starts that story
+
+   ```json
+   {
+     "uuid": "hub-option-story1",
+     "type": "menu.optionstage",
+     "groupId": "hub-menu",
+     "name": "The Forest Adventure",
+     "image": "story1-thumbnail.png",
+     "audio": "story1-option.mp3",
+     "okTransition": {"actionNode": "action-start-story1", "optionIndex": 0}
+   }
+   ```
+
+   The `menu.optionsaction` references all option stages:
+
+   ```json
+   {
+     "id": "action-choose-story",
+     "type": "menu.optionsaction",
+     "options": [
+       "hub-option-story1",
+       "hub-option-story2",
+       "hub-option-story3",
+       "hub-option-goodbye"
+     ]
+   }
+   ```
+
+4. **Welcome Back** (`hub-welcome-back`)
    - Shown after completing a story
    - Encourages exploring more stories
    - `okTransition` → `action-to-menu`
 
-4. **Goodbye** (`hub-goodbye`)
+5. **Goodbye** (`hub-goodbye`)
    - Exit message
    - `okTransition: null` (ends pack)
 

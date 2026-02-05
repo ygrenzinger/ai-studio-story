@@ -318,14 +318,31 @@ First, always generate the hub menu:
    - Welcome message introducing the pack theme
    - Engaging hook for children
 
-2. **Hub Menu** (`hub/menu.md`)
-   - Story selection prompt
-   - Brief teaser for each story option
-   - Goodbye option
+2. **Hub Menu Question** (`hub/menu-question.md`)
+   - Story selection prompt: "Which story would you like to hear?"
+   - This audio plays first when entering the menu
 
-3. **Welcome Back** (`hub/welcome-back.md`)
+3. **Story Option Audio** (`hub/story-options/`)
+   - **Each story needs its own selection audio** that plays when the child scrolls to it
+   - When the child rotates the wheel, they hear each story's name and teaser
+   - Example: "Story One: The Forest Adventure. Join Emma on a magical journey!"
+
+4. **Welcome Back** (`hub/welcome-back.md`)
    - Message when returning from a story
    - Encouragement to explore more stories
+
+5. **Goodbye** (`hub/goodbye.md`)
+   - Exit message when leaving the pack
+
+#### How Story Selection Works on Device
+
+When a child is at the hub menu:
+1. They hear the menu question: "Which story would you like?"
+2. They **rotate the wheel** to browse story options
+3. **Each option plays its own audio** as they scroll: "Story 1: The Forest Adventure"
+4. They press **OK** to select and start that story
+
+This creates an interactive browsing experience where children can "preview" each story before choosing.
 
 ### Story Generation (Based on Creation Mode)
 
@@ -368,9 +385,14 @@ stories/{pack-slug}/
 ### Hub Files
 ```
 ├── hub/
-│   ├── cover.md                     # Pack cover/intro
-│   ├── menu.md                      # Story selection menu
-│   └── welcome-back.md              # Return message
+│   ├── cover.md                     # Pack welcome/intro audio
+│   ├── menu-question.md             # "Which story?" selection prompt
+│   ├── story-options/               # Per-story selection audio
+│   │   ├── story-1-option.md        # "Story 1: Title - teaser"
+│   │   ├── story-2-option.md        # "Story 2: Title - teaser"
+│   │   └── ...
+│   ├── welcome-back.md              # Return message
+│   └── goodbye.md                   # Exit message
 ```
 
 ### Per-Story Files

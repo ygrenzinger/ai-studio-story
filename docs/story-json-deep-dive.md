@@ -30,20 +30,16 @@ Where:
 - Transitions = Directed edges between nodes
 ```
 
-**Code:** `core/src/main/java/studio/core/v1/model/StoryPack.java`
-
 ### The Two-Node Architecture
 
 #### 1. STAGE NODES
 
 **Purpose:** Display content (image + audio) to the user
 
-**Code:** `core/src/main/java/studio/core/v1/model/StageNode.java:11-80`
-
 **Properties:**
 - `uuid` - Unique identifier
-- `image` - Visual asset (320x240 pixels), or null
-- `audio` - Sound asset (mono, 32kHz, 16-bit), or null
+- `image` - Visual asset (320x240 BMP), or null
+- `audio` - Sound asset (mono MP3, 44100Hz), or null
 - `okTransition` - Where to go when OK button pressed
 - `homeTransition` - Where to go when HOME button pressed
 - `controlSettings` - Which device controls are enabled
@@ -53,8 +49,8 @@ Where:
 {
   "uuid": "00000000-0000-0000-0000-000000000000",
   "squareOne": true,
-  "image": "a3b5c7d9...t0.png",
-  "audio": "xyz789ab...u2.mp3",
+  "image": "a3b5c7d9e1f2g4h6i8j0k2l4m6n8o0p2q4r6s8t0.bmp",
+  "audio": "xyz789abc123def456ghi789jkl012mno345pqr678.mp3",
   "okTransition": {
     "actionNode": "action-choose-path",
     "optionIndex": 0
@@ -73,8 +69,6 @@ Where:
 #### 2. ACTION NODES
 
 **Purpose:** Branch the story flow (choose next path)
-
-**Code:** `core/src/main/java/studio/core/v1/model/ActionNode.java:13-36`
 
 **Properties:**
 - `id` - Unique identifier
@@ -116,8 +110,6 @@ Where:
 
 ### Playback Flow
 
-**Code:** `core/src/main/java/studio/core/v1/model/StageNode.java`
-
 1. Device starts at `squareOne` (the stage node with `"squareOne": true`)
 2. Plays image + audio of current stage node
 3. User presses OK button → follows `okTransition`
@@ -131,8 +123,6 @@ Where:
 ## 2. Transitions: The Graph Edges
 
 ### Transition Object Structure
-
-**Code:** `core/src/main/java/studio/core/v1/model/Transition.java:9-37`
 
 ```json
 {
@@ -166,11 +156,7 @@ actionNodes["action-choose-path"] = {
 // Result: Transition leads to "stage-uuid-A"
 ```
 
-**Code:** `core/src/main/java/studio/core/v1/reader/archive/ArchiveStoryPackReader.java:140-148`
-
 ### Special optionIndex Values
-
-**Code:** `web-ui/javascript/src/utils/writer.js:331`
 
 - `optionIndex: -1` → **Random choice** from action node's options
 - `optionIndex: 0 to N` → Specific option from the array
@@ -250,7 +236,7 @@ actionNodes["action-choose-path"] = {
     {
       "uuid": "stage-question",
       "squareOne": true,
-      "audio": "Which path do you choose?.mp3",
+      "audio": "which-path.mp3",
       "okTransition": {"actionNode": "action-choose", "optionIndex": 0},
       "controlSettings": {
         "wheel": true,
@@ -262,12 +248,12 @@ actionNodes["action-choose-path"] = {
     },
     {
       "uuid": "stage-left-path",
-      "audio": "You went left.mp3",
+      "audio": "you-went-left.mp3",
       "okTransition": null
     },
     {
       "uuid": "stage-right-path",
-      "audio": "You went right.mp3",
+      "audio": "you-went-right.mp3",
       "okTransition": null
     }
   ],
@@ -275,8 +261,8 @@ actionNodes["action-choose-path"] = {
     {
       "id": "action-choose",
       "options": [
-        "stage-left-path",   // optionIndex 0
-        "stage-right-path"   // optionIndex 1
+        "stage-left-path",
+        "stage-right-path"
       ]
     }
   ]
@@ -307,6 +293,19 @@ actionNodes["action-choose-path"] = {
 
 **How it works:** The device uses wheel rotation to select optionIndex (0 or 1), then user presses OK to follow that branch.
 
+#### Menu Audio Experience
+
+The menu/branching pattern creates an interactive audio browsing experience:
+
+1. **Question Stage plays**: Child hears "Which path do you choose?"
+2. **Child rotates wheel**: Device cycles through Option Stages
+3. **Each Option Stage plays its audio**: Child hears "Left path" → scroll → "Right path"
+4. **Child presses OK**: Selected option's `okTransition` is followed
+
+This allows children to "browse" options by listening before making a choice. Each option stage can have:
+- Its own **audio** (name/description of the choice)
+- Its own **image** (visual representation of the choice)
+
 ### Pattern 3: Loops (Revisiting Nodes)
 
 **Use case:** Repeatable content, continuous stories
@@ -319,17 +318,17 @@ actionNodes["action-choose-path"] = {
     {
       "uuid": "stage-loop-start",
       "squareOne": true,
-      "audio": "Story begins.mp3",
+      "audio": "story-begins.mp3",
       "okTransition": {"actionNode": "action-continue", "optionIndex": 0}
     },
     {
       "uuid": "stage-loop-end",
-      "audio": "Story ends. Listen again?.mp3",
+      "audio": "listen-again.mp3",
       "okTransition": {"actionNode": "action-repeat", "optionIndex": 0}
     },
     {
       "uuid": "stage-exit",
-      "audio": "Goodbye!.mp3",
+      "audio": "goodbye.mp3",
       "okTransition": null
     }
   ],
@@ -341,8 +340,8 @@ actionNodes["action-choose-path"] = {
     {
       "id": "action-repeat",
       "options": [
-        "stage-loop-start",  // Loop back!
-        "stage-exit"         // Or exit the loop
+        "stage-loop-start",
+        "stage-exit"
       ]
     }
   ]
@@ -369,8 +368,6 @@ actionNodes["action-choose-path"] = {
 
 **Use case:** Let user choose from multiple options with visual/audio feedback
 
-**Code:** `web-ui/javascript/src/utils/writer.js:40-68`
-
 Menus use **grouped nodes** - a question stage followed by option stages:
 
 **Simplified concept:**
@@ -378,16 +375,14 @@ Menus use **grouped nodes** - a question stage followed by option stages:
 MenuNode {
   questionAudio: "Choose your favorite color",
   options: [
-    {name: "Red", image: red.png, audio: "Red.mp3"},
-    {name: "Blue", image: blue.png, audio: "Blue.mp3"},
-    {name: "Green", image: green.png, audio: "Green.mp3"}
+    {name: "Red", image: red.bmp, audio: "red.mp3"},
+    {name: "Blue", image: blue.bmp, audio: "blue.mp3"},
+    {name: "Green", image: green.bmp, audio: "green.mp3"}
   ]
 }
 ```
 
 **Expands to story.json as:**
-
-**Code:** `web-ui/javascript/src/utils/writer.js:299-317`
 
 ```json
 {
@@ -396,7 +391,7 @@ MenuNode {
       "uuid": "menu-abc123-222222222222",
       "type": "menu.questionstage",
       "groupId": "menu-abc123",
-      "audio": "Choose your favorite color.mp3",
+      "audio": "choose-color.mp3",
       "okTransition": {
         "actionNode": "menu-abc123-333333333333",
         "optionIndex": 0
@@ -414,8 +409,8 @@ MenuNode {
       "type": "menu.optionstage",
       "groupId": "menu-abc123",
       "name": "Red",
-      "image": "red.png",
-      "audio": "Red.mp3",
+      "image": "red.bmp",
+      "audio": "red.mp3",
       "okTransition": {"actionNode": "next-action", "optionIndex": 0}
     },
     {
@@ -423,8 +418,8 @@ MenuNode {
       "type": "menu.optionstage",
       "groupId": "menu-abc123",
       "name": "Blue",
-      "image": "blue.png",
-      "audio": "Blue.mp3",
+      "image": "blue.bmp",
+      "audio": "blue.mp3",
       "okTransition": {"actionNode": "next-action", "optionIndex": 0}
     },
     {
@@ -432,8 +427,8 @@ MenuNode {
       "type": "menu.optionstage",
       "groupId": "menu-abc123",
       "name": "Green",
-      "image": "green.png",
-      "audio": "Green.mp3",
+      "image": "green.bmp",
+      "audio": "green.mp3",
       "okTransition": {"actionNode": "next-action", "optionIndex": 0}
     }
   ],
@@ -449,9 +444,9 @@ MenuNode {
       "type": "menu.optionsaction",
       "groupId": "menu-abc123",
       "options": [
-        "menu-abc123-444444440000",  // Red
-        "menu-abc123-444444440001",  // Blue
-        "menu-abc123-444444440002"   // Green
+        "menu-abc123-444444440000",
+        "menu-abc123-444444440001",
+        "menu-abc123-444444440002"
       ]
     }
   ]
@@ -497,7 +492,7 @@ Each story uses `homeTransition` to return to the central hub menu.
     {
       "uuid": "start",
       "squareOne": true,
-      "audio": "You encounter a mysterious portal.mp3",
+      "audio": "mysterious-portal.mp3",
       "okTransition": {
         "actionNode": "random-destination",
         "optionIndex": -1
@@ -505,15 +500,15 @@ Each story uses `homeTransition` to return to the central hub menu.
     },
     {
       "uuid": "destination-forest",
-      "audio": "You emerge in a dark forest.mp3"
+      "audio": "dark-forest.mp3"
     },
     {
       "uuid": "destination-castle",
-      "audio": "You appear in a grand castle.mp3"
+      "audio": "grand-castle.mp3"
     },
     {
       "uuid": "destination-ocean",
-      "audio": "You find yourself underwater.mp3"
+      "audio": "underwater.mp3"
     }
   ],
   "actionNodes": [
@@ -539,7 +534,7 @@ Each story uses `homeTransition` to return to the central hub menu.
 ```json
 {
   "uuid": "final-stage",
-  "audio": "The End.mp3",
+  "audio": "the-end.mp3",
   "okTransition": null,
   "homeTransition": null
 }
@@ -550,7 +545,7 @@ Story ends, device returns to pack selection.
 ```json
 {
   "uuid": "final-stage",
-  "audio": "Listen again?.mp3",
+  "audio": "listen-again.mp3",
   "okTransition": {
     "actionNode": "action-restart",
     "optionIndex": 0
@@ -568,9 +563,7 @@ Stage A → Action → Stage B (The End) → null
 
 ## 4. Node Types & Behaviors
 
-### EnrichedNodeType Enum
-
-**Code:** `core/src/main/java/studio/core/v1/model/enriched/EnrichedNodeType.java:10-18`
+### EnrichedNodeType Reference
 
 | Type | Code | Label | Purpose |
 |------|------|-------|---------|
@@ -588,8 +581,6 @@ Stage A → Action → Stage B (The End) → null
 
 ### Cover Node Behavior
 
-**Code:** `web-ui/javascript/src/utils/reader.js:156-184`
-
 - Special stage node marked with `"squareOne": true`
 - **Must be first node** in `stageNodes` array
 - Entry point when pack is selected on device
@@ -602,15 +593,13 @@ Stage A → Action → Stage B (The End) → null
   "squareOne": true,
   "type": "cover",
   "name": "Pack Cover",
-  "image": "thumbnail.png",
-  "audio": "Welcome to this adventure.mp3",
+  "image": "thumbnail.bmp",
+  "audio": "welcome.mp3",
   "okTransition": {"actionNode": "start-story", "optionIndex": 0}
 }
 ```
 
 ### Story Node Behavior
-
-**Code:** `web-ui/javascript/src/utils/writer.js:69-86`
 
 - Simplified UI concept for story chapters
 - Has single audio asset (typically no image)
@@ -622,8 +611,6 @@ Stage A → Action → Stage B (The End) → null
 ## 5. Control Flow Details
 
 ### What Happens When a Stage Node is Played?
-
-**Code:** `core/src/main/java/studio/core/v1/model/StageNode.java:11-80`
 
 ```
 1. Device displays image (if present)
@@ -647,8 +634,6 @@ Stage A → Action → Stage B (The End) → null
 ```
 
 ### How Action Nodes Make Choices
-
-**Code:** `core/src/main/java/studio/core/v1/model/ActionNode.java:13-36`
 
 #### Method 1: Fixed Selection
 ```
@@ -681,15 +666,13 @@ Transition: {actionNode: "action-1", optionIndex: -1}
 
 ### ControlSettings Object
 
-**Code:** `core/src/main/java/studio/core/v1/model/ControlSettings.java:9-67`
-
 ```json
 {
-  "wheel": true,      // Enable/disable wheel rotation
-  "ok": true,         // Enable/disable OK button
-  "home": true,       // Enable/disable HOME button
-  "pause": true,      // Enable/disable PAUSE button
-  "autoplay": false   // Auto-advance when audio ends
+  "wheel": true,
+  "ok": true,
+  "home": true,
+  "pause": true,
+  "autoplay": false
 }
 ```
 
@@ -840,7 +823,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     {
       "uuid": "00000000-0000-0000-0000-000000000001",
       "squareOne": true,
-      "image": "intro.png",
+      "image": "intro.bmp",
       "audio": "intro.mp3",
       "okTransition": {
         "actionNode": "action-1",
@@ -857,7 +840,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "00000000-0000-0000-0000-000000000002",
-      "image": "middle.png",
+      "image": "middle.bmp",
       "audio": "middle.mp3",
       "okTransition": {
         "actionNode": "action-2",
@@ -874,7 +857,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "00000000-0000-0000-0000-000000000003",
-      "image": "end.png",
+      "image": "end.bmp",
       "audio": "end.mp3",
       "okTransition": null,
       "homeTransition": null,
@@ -914,7 +897,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     {
       "uuid": "start",
       "squareOne": true,
-      "audio": "You come to a fork in the road.mp3",
+      "audio": "fork-in-road.mp3",
       "okTransition": {
         "actionNode": "choose-path",
         "optionIndex": 0
@@ -929,7 +912,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "left-path",
-      "audio": "You take the left path and find treasure!.mp3",
+      "audio": "found-treasure.mp3",
       "okTransition": null,
       "controlSettings": {
         "wheel": false,
@@ -941,7 +924,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "right-path",
-      "audio": "You take the right path and meet a friendly dragon.mp3",
+      "audio": "met-dragon.mp3",
       "okTransition": null,
       "controlSettings": {
         "wheel": false,
@@ -975,7 +958,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     {
       "uuid": "intro",
       "squareOne": true,
-      "audio": "Once upon a time.mp3",
+      "audio": "once-upon-a-time.mp3",
       "okTransition": {"actionNode": "a1", "optionIndex": 0},
       "controlSettings": {
         "wheel": false,
@@ -987,7 +970,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "story",
-      "audio": "The story continues.mp3",
+      "audio": "story-continues.mp3",
       "okTransition": {"actionNode": "a2", "optionIndex": 0},
       "controlSettings": {
         "wheel": false,
@@ -999,7 +982,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "ask-repeat",
-      "audio": "Would you like to hear it again?.mp3",
+      "audio": "hear-again.mp3",
       "okTransition": {"actionNode": "repeat-choice", "optionIndex": 0},
       "controlSettings": {
         "wheel": true,
@@ -1011,7 +994,7 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     },
     {
       "uuid": "goodbye",
-      "audio": "Goodnight!.mp3",
+      "audio": "goodnight.mp3",
       "okTransition": null,
       "controlSettings": {
         "wheel": false,
@@ -1035,8 +1018,8 @@ Transition: {actionNode: "action-1", optionIndex: -1}
     {
       "id": "repeat-choice",
       "options": [
-        "intro",    // Loop back to beginning
-        "goodbye"   // Exit the loop
+        "intro",
+        "goodbye"
       ]
     }
   ]
@@ -1072,14 +1055,6 @@ Stage A → Action 1 → Stage B → Action 2 → Stage A (loop!)
 - Each story path forms a weakly connected component
 
 ### Entry Point (squareOne)
-
-**Code:** `core/src/main/java/studio/core/v1/reader/archive/ArchiveStoryPackReader.java:171-173`
-
-```java
-if (node.get("squareOne") != null && node.get("squareOne").getAsBoolean()) {
-    squareOne = stageNode;
-}
-```
 
 **Rules:**
 - Only **ONE** node should have `"squareOne": true`
@@ -1256,17 +1231,6 @@ if (node.get("squareOne") != null && node.get("squareOne").getAsBoolean()) {
 
 ### Constraint 1: First Node Must Be Entry Point
 
-**Code:** `core/src/main/java/studio/core/v1/reader/archive/ArchiveStoryPackReader.java:252-257`
-
-```java
-// Make sure the first node is actually 'square one'
-List<StageNode> nodes = new ArrayList<>(stageNodes.values());
-if (squareOne != null) {
-    nodes.remove(squareOne);
-    nodes.add(0, squareOne);  // Ensure first position
-}
-```
-
 **Rule:** The node with `"squareOne": true` **must** be the first element in the `stageNodes` array.
 
 ### Constraint 2: Unique squareOne
@@ -1287,14 +1251,14 @@ if (squareOne != null) {
 ### Edge Case: Invalid References
 
 **If actionNode ID doesn't exist:**
-- Reader may throw error during validation
+- Validation should catch this error
 - Device may crash or skip to pack selection
 - **Always validate references**
 
 **If optionIndex out of bounds:**
 - Array index out of range
 - Device behavior undefined (likely crashes)
-- Frontend should validate during save
+- Validate during save
 
 **Example validation:**
 ```javascript
@@ -1353,14 +1317,9 @@ Stage A → Action → Stage A (loops forever)
 
 ### Constraint: Asset Deduplication
 
-**Code:** `core/src/main/java/studio/core/v1/writer/archive/ArchiveStoryPackWriter.java:93-105`
-
-```java
-String assetFileName = DigestUtils.sha1Hex(imageData) + extension;
-assets.putIfAbsent(assetFileName, imageData);  // Only stores unique assets
-```
-
-**Result:** Multiple nodes can reference same asset file (same SHA-1 hash = same content). This is intentional and efficient.
+Assets are stored once using SHA-1 hash naming:
+- Multiple nodes can reference same asset file (same SHA-1 hash = same content)
+- This is intentional and efficient
 
 ### Constraint: Action Node Must Have Options
 
@@ -1394,7 +1353,7 @@ assets.putIfAbsent(assetFileName, imageData);  // Only stores unique assets
   "controlSettings": {
     "wheel": false,
     "ok": true,
-    "home": false,  // ❌ No way out!
+    "home": false,
     "pause": false,
     "autoplay": false
   }
@@ -1411,35 +1370,12 @@ assets.putIfAbsent(assetFileName, imageData);  // Only stores unique assets
   "controlSettings": {
     "wheel": false,
     "ok": true,
-    "home": true,  // ✅ Can always go home
+    "home": true,
     "pause": true,
     "autoplay": false
   }
 }
 ```
-
----
-
-## Key Code References
-
-### Core Model Classes
-- **StoryPack:** `core/src/main/java/studio/core/v1/model/StoryPack.java:13-81`
-- **StageNode:** `core/src/main/java/studio/core/v1/model/StageNode.java:11-80`
-- **ActionNode:** `core/src/main/java/studio/core/v1/model/ActionNode.java:13-36`
-- **Transition:** `core/src/main/java/studio/core/v1/model/Transition.java:9-37`
-- **ControlSettings:** `core/src/main/java/studio/core/v1/model/ControlSettings.java:9-67`
-
-### Reader/Writer Implementations
-- **Archive Reader:** `core/src/main/java/studio/core/v1/reader/archive/ArchiveStoryPackReader.java:81-260`
-- **Archive Writer:** `core/src/main/java/studio/core/v1/writer/archive/ArchiveStoryPackWriter.java:28-181`
-
-### Frontend Implementation
-- **Writer (JS):** `web-ui/javascript/src/utils/writer.js:12-274`
-- **Reader (JS):** `web-ui/javascript/src/utils/reader.js:18-444`
-
-### Enriched Metadata
-- **EnrichedNodeType:** `core/src/main/java/studio/core/v1/model/enriched/EnrichedNodeType.java:9-45`
-- **EnrichedNodeMetadata:** `core/src/main/java/studio/core/v1/model/enriched/EnrichedNodeMetadata.java:9-57`
 
 ---
 

@@ -49,7 +49,7 @@ Next Stage Node
       "squareOne": true,
       "name": "Cover",
       "type": "cover",
-      "image": "cover.png",
+      "image": "cover.bmp",
       "audio": "welcome.mp3",
       "okTransition": {
         "actionNode": "action-start",
@@ -99,7 +99,7 @@ Next Stage Node
 | `squareOne` | Only first | Boolean | **Only the first stage node** should have `"squareOne": true` |
 | `name` | No | String | Human-readable name for the node (for editor only) |
 | `type` | No | String | Node type: "cover", "stage", "story", "menu.questionstage", "menu.optionstage" |
-| `image` | No | String/null | Filename in assets/ directory (e.g., "abc123.png") or null |
+| `image` | No | String/null | Filename in assets/ directory (e.g., "abc123.bmp") or null |
 | `audio` | No | String/null | Filename in assets/ directory (e.g., "xyz789.mp3") or null |
 | `okTransition` | Yes | Object/null | What happens when OK button is pressed (null = story ends) |
 | `homeTransition` | Yes | Object/null | What happens when HOME button is pressed (null = return to device home) |
@@ -189,7 +189,7 @@ Next Stage Node
       "squareOne": true,
       "name": "Introduction",
       "audio": "intro.mp3",
-      "image": "intro.png",
+      "image": "intro.bmp",
       "okTransition": {"actionNode": "action-001", "optionIndex": 0},
       "homeTransition": null,
       "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -198,7 +198,7 @@ Next Stage Node
       "uuid": "stage-002",
       "name": "Middle",
       "audio": "middle.mp3",
-      "image": "middle.png",
+      "image": "middle.bmp",
       "okTransition": {"actionNode": "action-002", "optionIndex": 0},
       "homeTransition": null,
       "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -207,7 +207,7 @@ Next Stage Node
       "uuid": "stage-003",
       "name": "Ending",
       "audio": "end.mp3",
-      "image": "end.png",
+      "image": "end.bmp",
       "okTransition": null,
       "homeTransition": null,
       "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
@@ -234,7 +234,7 @@ Next Stage Node
       "squareOne": true,
       "name": "Question",
       "audio": "which-path.mp3",
-      "image": "crossroads.png",
+      "image": "crossroads.bmp",
       "okTransition": {"actionNode": "action-choose", "optionIndex": 0},
       "homeTransition": null,
       "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -243,7 +243,7 @@ Next Stage Node
       "uuid": "stage-left",
       "name": "Left Path",
       "audio": "left-path.mp3",
-      "image": "forest.png",
+      "image": "forest.bmp",
       "okTransition": null,
       "homeTransition": null,
       "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
@@ -252,7 +252,7 @@ Next Stage Node
       "uuid": "stage-right",
       "name": "Right Path",
       "audio": "right-path.mp3",
-      "image": "mountain.png",
+      "image": "mountain.bmp",
       "okTransition": null,
       "homeTransition": null,
       "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
@@ -281,7 +281,7 @@ Next Stage Node
       "squareOne": true,
       "name": "Main Menu",
       "audio": "choose-story.mp3",
-      "image": "menu.png",
+      "image": "menu.bmp",
       "okTransition": {"actionNode": "action-menu", "optionIndex": 0},
       "homeTransition": null,
       "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -290,7 +290,7 @@ Next Stage Node
       "uuid": "stage-story1",
       "name": "Story 1",
       "audio": "story1.mp3",
-      "image": "story1.png",
+      "image": "story1.bmp",
       "okTransition": {"actionNode": "action-return1", "optionIndex": 0},
       "homeTransition": {"actionNode": "action-home", "optionIndex": 0},
       "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -299,7 +299,7 @@ Next Stage Node
       "uuid": "stage-story2",
       "name": "Story 2",
       "audio": "story2.mp3",
-      "image": "story2.png",
+      "image": "story2.bmp",
       "okTransition": {"actionNode": "action-return2", "optionIndex": 0},
       "homeTransition": {"actionNode": "action-home", "optionIndex": 0},
       "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
@@ -427,8 +427,8 @@ Next Stage Node
 story-pack.zip
 ├── story.json
 └── assets/
-    ├── image1.png
-    ├── image2.jpg
+    ├── image1.bmp
+    ├── image2.bmp
     ├── audio1.mp3
     ├── audio2.mp3
     └── ...
@@ -436,17 +436,17 @@ story-pack.zip
 
 ### Image Requirements
 
-- **Format:** PNG, JPG, or BMP
+- **Format:** BMP only (4-bit color depth, RLE compressed)
 - **Dimensions:** Exactly **320x240 pixels**
-- **Color:** 24-bit color (RGB)
-- **Naming:** Use descriptive names (e.g., "forest-scene.png", "dragon.png")
+- **Color:** Maximum 16 colors (4-bit indexed palette)
+- **Naming:** Use descriptive names (e.g., "forest-scene.bmp", "dragon.bmp")
 
 ### Audio Requirements
 
-- **Format:** MP3, OGG, or WAV
+- **Format:** MP3 only
 - **Channels:** Mono (single channel)
-- **Sample Rate:** 32,000 Hz (32 kHz)
-- **Bit Depth:** 16-bit signed
+- **Sample Rate:** 44,100 Hz (44.1 kHz)
+- **ID3 Tags:** Not allowed (must be stripped)
 - **Naming:** Use descriptive names (e.g., "welcome.mp3", "dragon-roar.mp3")
 
 ### Referencing Assets in story.json
@@ -454,7 +454,7 @@ story-pack.zip
 ```json
 {
   "uuid": "stage-001",
-  "image": "forest-scene.png",
+  "image": "forest-scene.bmp",
   "audio": "birds-chirping.mp3"
 }
 ```
@@ -518,8 +518,8 @@ Before finalizing your story.json:
 - [ ] Every optionIndex is valid for its action node's options array
 - [ ] Every stage UUID in action node options exists in stageNodes array
 - [ ] Every asset filename referenced exists in the assets/ directory
-- [ ] All images are exactly 320x240 pixels
-- [ ] All audio files are mono, 32kHz, 16-bit
+- [ ] All images are exactly 320x240 pixels, BMP format, 4-bit RLE compressed
+- [ ] All audio files are MP3, mono, 44.1kHz, no ID3 tags
 - [ ] Every story path has an exit (null transition or enabled HOME button)
 - [ ] No orphaned nodes (all stages reachable from squareOne)
 
@@ -564,7 +564,7 @@ Fly Ending      Explore Ending
       "squareOne": true,
       "name": "Cover",
       "type": "cover",
-      "image": "cover.png",
+      "image": "cover.bmp",
       "audio": "welcome.mp3",
       "okTransition": {"actionNode": "action-to-forest", "optionIndex": 0},
       "homeTransition": null,
@@ -574,7 +574,7 @@ Fly Ending      Explore Ending
       "uuid": "stage-forest",
       "name": "Enter Forest",
       "type": "stage",
-      "image": "forest.png",
+      "image": "forest.bmp",
       "audio": "forest-sounds.mp3",
       "okTransition": {"actionNode": "action-to-fairy", "optionIndex": 0},
       "homeTransition": null,
@@ -584,7 +584,7 @@ Fly Ending      Explore Ending
       "uuid": "stage-fairy",
       "name": "Meet Fairy",
       "type": "stage",
-      "image": "fairy.png",
+      "image": "fairy.bmp",
       "audio": "fairy-question.mp3",
       "okTransition": {"actionNode": "action-choose", "optionIndex": 0},
       "homeTransition": null,
@@ -594,7 +594,7 @@ Fly Ending      Explore Ending
       "uuid": "stage-fly",
       "name": "Fly Ending",
       "type": "stage",
-      "image": "flying.png",
+      "image": "flying.bmp",
       "audio": "flying-story.mp3",
       "okTransition": null,
       "homeTransition": null,
@@ -604,7 +604,7 @@ Fly Ending      Explore Ending
       "uuid": "stage-explore",
       "name": "Explore Ending",
       "type": "stage",
-      "image": "treasure.png",
+      "image": "treasure.bmp",
       "audio": "treasure-story.mp3",
       "okTransition": null,
       "homeTransition": null,
@@ -638,11 +638,11 @@ Fly Ending      Explore Ending
 ### Step 4: Create Assets
 
 Create these files in the `assets/` directory:
-- `cover.png` (320x240) - Story pack cover art
-- `forest.png` (320x240) - Forest scene
-- `fairy.png` (320x240) - Fairy character
-- `flying.png` (320x240) - View from sky
-- `treasure.png` (320x240) - Treasure chest
+- `cover.bmp` (320x240) - Story pack cover art
+- `forest.bmp` (320x240) - Forest scene
+- `fairy.bmp` (320x240) - Fairy character
+- `flying.bmp` (320x240) - View from sky
+- `treasure.bmp` (320x240) - Treasure chest
 - `welcome.mp3` - "Welcome to the Magic Forest Adventure!"
 - `forest-sounds.mp3` - "You walk into a beautiful forest..."
 - `fairy-question.mp3` - "Hello! Would you like to fly or explore?"
@@ -656,11 +656,11 @@ Create a .zip file:
 magic-forest-adventure.zip
 ├── story.json
 └── assets/
-    ├── cover.png
-    ├── forest.png
-    ├── fairy.png
-    ├── flying.png
-    ├── treasure.png
+    ├── cover.bmp
+    ├── forest.bmp
+    ├── fairy.bmp
+    ├── flying.bmp
+    ├── treasure.bmp
     ├── welcome.mp3
     ├── forest-sounds.mp3
     ├── fairy-question.mp3
@@ -822,14 +822,14 @@ Create a series where completing one story unlocks hints or elements for another
 
 ### Mistake 4: Missing Assets
 ```json
-// ❌ WRONG - References "dragon.png" but file doesn't exist
+// ❌ WRONG - References "dragon.bmp" but file doesn't exist
 {
   "uuid": "stage-dragon",
-  "image": "dragon.png",  // File not in assets/ directory!
+  "image": "dragon.bmp",  // File not in assets/ directory!
   "audio": "roar.mp3"
 }
 
-// ✅ CORRECT - File exists in assets/dragon.png
+// ✅ CORRECT - File exists in assets/dragon.bmp
 ```
 
 ### Mistake 5: Wrong Image Dimensions
@@ -848,7 +848,7 @@ When generating a story pack, provide:
 
 | Filename | Type | Description | Specifications |
 |----------|------|-------------|----------------|
-| cover.png | Image | Story pack cover | 320x240, colorful illustration of forest |
+| cover.bmp | Image | Story pack cover | 320x240, colorful illustration of forest |
 | welcome.mp3 | Audio | Welcome message | "Welcome to the Magic Forest..." (15 sec) |
 | ... | ... | ... | ... |
 

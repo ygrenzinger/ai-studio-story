@@ -56,6 +56,36 @@ Based on the basics, ask about:
    - Loop: "A story that can repeat (great for bedtime)"
    - Random: "Surprise elements that change each time"
 
+### Choice Point Audio (for Branching Stories)
+
+When a story has branching choices, children interact the same way as with hub menus:
+
+1. **Choice Question Audio**: "Which path will you take?"
+2. **Option Audio** (one per choice): "The forest path" / "The mountain trail"
+
+Each option the child scrolls to plays its own audio description, helping them decide.
+
+**How it works on device:**
+1. Child hears the choice question: "Which path will you take?"
+2. Child **rotates the wheel** to browse options
+3. **Each option plays its audio**: "The forest path - dark and mysterious"
+4. Child presses **OK** to choose that path
+
+**Example structure for a 2-way choice:**
+```
+chapters/
+├── 02-choice-point.md           # Chapter ending with choice
+audio-scripts/
+├── choice-01-question.md        # "Which path will you take?"
+├── choice-01-option-forest.md   # "The forest path - dark and mysterious"
+├── choice-01-option-mountain.md # "The mountain trail - high and windy"
+```
+
+**In story.json, this becomes:**
+- A `menu.questionstage` for the choice question
+- A `menu.optionstage` for each option (with its own audio)
+- A `menu.optionsaction` linking to the option stages
+
 6. **Story Length** (suggest based on age)
    - Ages 5-6: 2-3 chapters (5-10 min total, 3-5 min per chapter)
    - Ages 7-8: 2-3 chapters (10-15 min total, 5-7 min per chapter)
