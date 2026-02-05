@@ -56,3 +56,6 @@ logs/
 *.temp
 *.swp
 *~
+
+# OpenCode
+.opencode/plans/
