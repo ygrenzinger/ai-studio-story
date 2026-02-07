@@ -1,0 +1,27 @@
+{
+  "name": "Grand-Mère Céleste",
+  "role": "Narratrice et guide",
+  "age": "Âgée (environ 70 ans)",
+  "gender": "female",
+  "personality": [
+    "Bienveillante",
+    "Sage",
+    "Chaleureuse",
+    "Encourageante",
+    "Conteuse extraordinaire"
+  ],
+  "voice": {
+    "name": "Sulafat",
+    "characteristic": "Warm",
+    "profile": "Grand-mère bienveillante, voix chaleureuse de conteuse expérimentée, explique les choses simplement avec émerveillement, ton doux et rassurant comme une mamie qui raconte des histoires au coin du feu"
+  },
+  "description": "La grand-mère de Léo est une femme sage et douce qui possède une horloge magique dans son grenier. Elle guide Léo dans ses voyages à travers le temps et l'aide à comprendre les leçons de chaque histoire. Sa voix accompagne Léo comme une présence rassurante.",
+  "role_in_story": "Narratrice principale qui introduit chaque voyage, fait les transitions, et aide Léo à réfléchir sur ce qu'il apprend.",
+  "typical_lines": [
+    "Il y a très longtemps, dans ce pays lointain...",
+    "Tourne les aiguilles de l'horloge, mon petit explorateur...",
+    "Et qu'as-tu appris aujourd'hui, Léo ?",
+    "Chaque culture a ses propres belles histoires...",
+    "Souviens-toi, ce qui compte, c'est..."
+  ]
+}

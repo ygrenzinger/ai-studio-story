@@ -1,0 +1,88 @@
+{
+  "secondary_characters": [
+    {
+      "name": "Alexios",
+      "story": "01-dieux-olympe",
+      "role": "Jeune berger grec",
+      "age": 12,
+      "voice": {
+        "name": "Achird",
+        "characteristic": "Friendly",
+        "profile": "Jeune garçon grec enthousiaste, fier de raconter les histoires de ses dieux, voix claire et joyeuse"
+      },
+      "description": "Berger qui garde ses moutons au pied du mont Olympe, connaît toutes les histoires des dieux"
+    },
+    {
+      "name": "Néféret",
+      "story": "02-mysteres-nil",
+      "role": "Jeune prêtresse égyptienne",
+      "age": 14,
+      "voice": {
+        "name": "Kore",
+        "characteristic": "Firm",
+        "profile": "Jeune prêtresse sage et posée, voix claire et mystérieuse, parle avec révérence des dieux"
+      },
+      "description": "Prêtresse qui sert dans le temple de Râ, connaît les mystères des dieux égyptiens"
+    },
+    {
+      "name": "Freya",
+      "story": "03-guerriers-nord",
+      "role": "Jeune fille viking",
+      "age": 11,
+      "voice": {
+        "name": "Laomedeia",
+        "characteristic": "Upbeat",
+        "profile": "Jeune fille viking courageuse et énergique, voix forte et déterminée, enthousiaste"
+      },
+      "description": "Fille de guerrier viking, brave et fière, raconte les sagas des dieux nordiques"
+    },
+    {
+      "name": "Moine Dharma",
+      "story": "04-prince-sage",
+      "role": "Moine bouddhiste",
+      "age": 50,
+      "voice": {
+        "name": "Charon",
+        "characteristic": "Informative",
+        "profile": "Moine sage et paisible, voix douce et calme, parle lentement avec sagesse et sérénité"
+      },
+      "description": "Moine bienveillant qui médite sous l'arbre de la Bodhi, enseigne la compassion"
+    },
+    {
+      "name": "Rabbi Éliézer",
+      "story": "05-peuple-voyageur",
+      "role": "Vieux sage juif",
+      "age": 75,
+      "voice": {
+        "name": "Sadaltager",
+        "characteristic": "Knowledgeable",
+        "profile": "Vieux sage à la voix profonde et chaleureuse, raconte les histoires anciennes avec passion et révérence"
+      },
+      "description": "Sage qui connaît toutes les histoires du peuple, les raconte sous les étoiles"
+    },
+    {
+      "name": "Berger de Bethléem",
+      "story": "06-enfant-bethlehem",
+      "role": "Berger bienveillant",
+      "age": 40,
+      "voice": {
+        "name": "Umbriel",
+        "characteristic": "Easy-going",
+        "profile": "Berger simple et bon, voix douce et chaleureuse, raconte avec émerveillement"
+      },
+      "description": "Berger qui était présent la nuit de la naissance, témoin de l'événement miraculeux"
+    },
+    {
+      "name": "Marchand Rashid",
+      "story": "07-messager-desert",
+      "role": "Marchand sage",
+      "age": 45,
+      "voice": {
+        "name": "Algieba",
+        "characteristic": "Smooth",
+        "profile": "Marchand honnête et généreux, voix douce et accueillante, parle avec respect et sagesse"
+      },
+      "description": "Marchand d'une grande honnêteté, connaît les enseignements du prophète Mohammed"
+    }
+  ]
+}

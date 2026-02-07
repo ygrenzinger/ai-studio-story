@@ -1,0 +1,103 @@
+{
+  "type": "pack",
+  "title": "Le Petit Explorateur des Croyances",
+  "description": "Voyage à travers le temps pour découvrir les mythes et légendes qui ont façonné les cultures du monde",
+  "version": 1,
+  "language": "fr-FR",
+  "targetAge": {
+    "min": 6,
+    "max": 8
+  },
+  "totalDuration": "60-70 minutes",
+  "storiesCount": 7,
+  "createdDate": "2026-02-05",
+  "status": "in_progress",
+  "tone": "educational_curious",
+  "themes": [
+    "mythologie",
+    "religions",
+    "cultures",
+    "valeurs universelles",
+    "respect",
+    "curiosité"
+  ],
+  "educationalGoals": [
+    "Découvrir la diversité des croyances à travers le temps",
+    "Comprendre que toutes les cultures ont de belles histoires",
+    "Apprendre les valeurs universelles : courage, sagesse, compassion, partage",
+    "Développer la curiosité et le respect des différentes traditions"
+  ],
+  "approach": "Présentation respectueuse sous forme de contes : 'Il y a longtemps, des gens croyaient que...'",
+  "storyPattern": "hub",
+  "nightModeAvailable": true,
+  "stories": [
+    {
+      "id": "01-dieux-olympe",
+      "title": "Les Dieux de l'Olympe",
+      "tradition": "Mythologie grecque",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "02-mysteres-nil",
+      "title": "Les Mystères du Nil",
+      "tradition": "Mythologie égyptienne",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "03-guerriers-nord",
+      "title": "Les Guerriers du Nord",
+      "tradition": "Mythologie nordique",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "04-prince-sage",
+      "title": "Le Prince qui Devint Sage",
+      "tradition": "Bouddhisme",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "05-peuple-voyageur",
+      "title": "Les Histoires du Peuple Voyageur",
+      "tradition": "Judaïsme",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "06-enfant-bethlehem",
+      "title": "L'Enfant de Bethléem",
+      "tradition": "Christianisme",
+      "duration": "8-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "07-messager-desert",
+      "title": "Le Messager du Désert",
+      "tradition": "Islam",
+      "duration": "8-10 min",
+      "status": "pending"
+    }
+  ],
+  "mainCharacters": [
+    {
+      "name": "Léo",
+      "role": "Protagoniste",
+      "age": 7,
+      "description": "Garçon curieux et aventurier qui voyage dans le temps"
+    },
+    {
+      "name": "Grand-Mère Céleste",
+      "role": "Narratrice",
+      "description": "Voix bienveillante qui guide Léo dans ses voyages"
+    }
+  ],
+  "contentWarnings": {
+    "violence": "Aucune",
+    "scary": "Aucun élément effrayant",
+    "separation": "Léo voyage seul mais toujours en sécurité",
+    "notes": "Contenu adapté pour 6-8 ans, approche respectueuse de toutes les traditions religieuses"
+  }
+}
