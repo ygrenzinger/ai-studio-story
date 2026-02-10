@@ -85,19 +85,21 @@ Read `metadata.json` and check the `type` field:
 ├── metadata.json        # type: "pack"
 ├── outline.md           # Pack outline with all stories
 ├── story.json           # Lunii format with hub structure
-├── hub/                 # Hub/menu content
-│   ├── menu.md
-│   └── welcome-back.md
+├── hub/                 # Hub audio scripts (ALL MANDATORY for export)
+│   ├── cover-welcome.md          # Pack welcome/intro audio
+│   ├── menu.md                   # Story selection prompt
+│   ├── option-{story-1}.md       # Story 1 menu option announcement
+│   ├── option-{story-2}.md       # Story 2 menu option announcement
+│   ├── option-{story-N}.md       # ... one per story
+│   └── welcome-back.md           # Return message after story
 ├── stories/             # Individual stories in the pack
 │   ├── {story-1-slug}/
-│   │   ├── chapters/
-│   │   └── audio-scripts/
+│   │   ├── chapter.md
+│   │   └── audio-script.md
 │   ├── {story-2-slug}/
 │   └── {story-3-slug}/
 ├── characters/          # Shared character profiles
-├── assets/              # All pack assets
-│   ├── images/
-│   └── audio/
+├── assets/              # Generated assets (images + audio)
 └── validation-report.md
 ```
 

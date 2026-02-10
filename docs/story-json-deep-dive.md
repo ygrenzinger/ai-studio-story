@@ -13,6 +13,11 @@
 9. [Visual Diagrams](#9-visual-diagrams-of-common-patterns)
 10. [Edge Cases & Constraints](#10-edge-cases--constraints)
 
+> **Source vs Device Format:** Throughout this document, examples use human-readable
+> slug IDs (e.g., `"stage-cover"`, `"action-choose-path"`) for clarity. In the final
+> device archive, the export script converts all IDs to valid UUIDs (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
+> parseable by `java.util.UUID.fromString()`. See the export documentation for details.
+
 ---
 
 ## 1. Core Structure & Graph Model
@@ -1317,9 +1322,9 @@ Stage A → Action → Stage A (loops forever)
 
 ### Constraint: Asset Deduplication
 
-Assets are stored once using SHA-1 hash naming:
-- Multiple nodes can reference same asset file (same SHA-1 hash = same content)
-- This is intentional and efficient
+Multiple nodes can reference the same asset file:
+- If two stages use the same image or audio, they reference the same filename
+- This is intentional and reduces archive size
 
 ### Constraint: Action Node Must Have Options
 

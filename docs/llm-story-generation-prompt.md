@@ -467,25 +467,24 @@ story-pack.zip
 
 ## UUID Generation Guidelines
 
-**Option 1: Sequential IDs (Simple)**
-```
-Stages: "stage-001", "stage-002", "stage-003", ...
-Actions: "action-001", "action-002", "action-003", ...
-```
+**For source story.json (what you generate), use descriptive slug IDs:**
 
-**Option 2: Descriptive IDs (Recommended)**
 ```
-Stages: "stage-intro", "stage-forest", "stage-castle-entrance"
+Stages: "stage-cover", "stage-forest", "stage-castle-entrance"
 Actions: "action-choose-path", "action-repeat", "action-menu"
 ```
 
-**Option 3: Real UUIDs (Most Compatible)**
-```
-"00000000-0000-0000-0000-000000000001"
-"11111111-1111-1111-1111-111111111111"
-```
+Rules for slug IDs:
+- Every ID must be **unique** within the story
+- Use lowercase alphanumeric characters and hyphens only
+- Prefix stage IDs with `stage-` and action IDs with `action-`
+- Keep them short but descriptive
 
-Use whatever system makes sense, just ensure **every ID is unique**!
+**For device deployment (handled automatically):**
+
+The export script (`export_pack.py`) automatically converts all slug IDs to valid UUIDs (v5, deterministic) at ZIP creation time. You do **not** need to generate UUID-format strings.
+
+The Lunii device firmware calls `java.util.UUID.fromString()` on every `uuid` and `id` field, so the final archive **must** contain valid UUID strings (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). This conversion is handled automatically by the export pipeline -- the source story.json is never modified.
 
 ## Critical Rules
 

@@ -24,13 +24,17 @@ The archive format preserves "enriched metadata" (custom node names, positions, 
 
 ### Asset Naming Convention
 
-Assets are named using their SHA-1 content hash plus file extension:
+Assets use **human-readable descriptive names** with their file extension:
 
-- **Format:** `{SHA-1_hash}{extension}`
-- **Example:** `a3b5c7d9e1f2g4h6i8j0k2l4m6n8o0p2q4r6s8t0.bmp`
-- **Automatic deduplication:** Same content = same filename, stored only once
+- **Format:** `{descriptive-name}{extension}`
+- **Examples:** `cover.bmp`, `story-01-olympe.mp3`, `hub-menu.bmp`
 
 Multiple nodes can reference the same asset file, reducing archive size when the same image or audio is used in multiple places.
+
+> **Source vs Device Format:** During authoring, source `story.json` files use human-readable
+> slug IDs (e.g., `stage-cover`, `action-to-hub`) and descriptive asset filenames for developer
+> convenience. The `export_pack.py` script transforms slug IDs to valid UUIDs when creating the
+> device archive. Asset filenames are kept human-readable. The source files are never modified.
 
 ---
 
@@ -71,8 +75,8 @@ Assets are referenced from `story.json` by their filename in the `assets/` direc
 
 ```json
 {
-  "image": "a3b5c7d9e1f2g4h6i8j0k2l4m6n8o0p2q4r6s8t0.bmp",
-  "audio": "xyz789abc123def456ghi789jkl012mno345pqr678.mp3"
+  "image": "cover.bmp",
+  "audio": "cover-welcome.mp3"
 }
 ```
 
@@ -81,7 +85,7 @@ Use `null` for nodes without an image or audio:
 ```json
 {
   "image": null,
-  "audio": "xyz789abc123def456ghi789jkl012mno345pqr678.mp3"
+  "audio": "story-01-olympe.mp3"
 }
 ```
 
@@ -175,7 +179,7 @@ Use `null` for nodes without an image or audio:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `uuid` | String | Yes | Unique identifier (UUID format) |
+| `uuid` | String | Yes | Unique identifier. Must be a valid UUID (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`) in the device archive. Source files may use human-readable slugs that are converted during export. |
 | `squareOne` | Boolean | No | Entry point marker (only on first node) |
 | `name` | String | No | Custom node title (enriched metadata) |
 | `type` | String | No | Node type label (enriched metadata) |
@@ -191,7 +195,7 @@ Use `null` for nodes without an image or audio:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | String | Yes | Unique identifier |
+| `id` | String | Yes | Unique identifier. Same UUID format requirement as stage `uuid` in device archives. |
 | `name` | String | No | Custom node title (enriched metadata) |
 | `type` | String | No | Node type label (enriched metadata) |
 | `groupId` | String | No | Groups related nodes (enriched metadata) |
@@ -399,7 +403,7 @@ A simple 3-node linear story:
 2. **Optimize assets:**
    - Images: Exactly 320x240 pixels, use 16-color palette
    - Audio: Mono, 44100Hz, strip ID3 tags
-   - Let SHA-1 hashing deduplicate identical assets
+   - Use descriptive asset filenames for readability
 
 3. **Test before transferring:**
    - Validate all transitions are correct
@@ -436,7 +440,6 @@ A simple 3-node linear story:
 
 **Missing assets:**
 - Check that asset filenames in JSON match files in `assets/` directory
-- Verify SHA-1 hashes are correct
 - Ensure file extensions match MIME types
 
 **Audio won't play:**

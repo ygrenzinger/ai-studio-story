@@ -129,13 +129,17 @@ When continuing a specific story within a pack:
 
 If hub is incomplete:
 
-1. **Check hub files**
-   - `hub/cover.md` - Pack introduction
-   - `hub/menu.md` - Story selection
-   - `hub/welcome-back.md` - Return message
+1. **Check ALL hub audio-script files**
+   - `hub/cover-welcome.md` - Pack welcome/intro audio (plays on cover stage)
+   - `hub/menu.md` - Story selection prompt with dialogue
+   - `hub/option-{name}.md` - **One per story** in the pack (menu option announcements)
+   - `hub/welcome-back.md` - Return message after completing a story
+
+   **To verify**: For each story in `metadata.json.stories[]`, check that `hub/option-{short-name}.md` exists. The `{short-name}` must match the suffix used in `story.json` stage UUIDs (e.g., `stage-option-olympe` → `hub/option-olympe.md`).
 
 2. **Generate missing hub content**
-   - Create missing files
+   - Create missing files (especially per-story option scripts -- these are often overlooked)
+   - Option scripts are short: one sentence announcing the story title and a brief teaser
    - Ensure menu references all stories
 
 3. **Update story.json hub nodes**

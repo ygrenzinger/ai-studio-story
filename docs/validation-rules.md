@@ -181,6 +181,36 @@ stageNodes: [
 
 ---
 
+## Export Validation (Device Format)
+
+These rules apply to the **device-ready** story.json inside the ZIP archive, not to the source story.json on disk. The `export_pack.py` script handles the transformation automatically.
+
+### RULE: Valid UUID Format
+- **Severity:** ERROR
+- **Check:** Every stage `uuid` and action `id` in the exported archive is a valid UUID parseable by `java.util.UUID.fromString()`
+- **Format:** `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` (8-4-4-4-12 hex characters)
+- **Fix:** The export script handles this automatically via UUID v5 conversion from slug IDs
+
+```python
+import uuid
+
+# Valid
+uuid.UUID("d4e8c2f1-7a3b-4e5d-9c1f-2b8a6d4e0f3c")  # OK
+
+# Invalid (will crash Lunii device)
+uuid.UUID("stage-cover")  # ValueError!
+```
+
+### RULE: Consistent References After Transform
+- **Severity:** ERROR
+- **Check:** After UUID conversion, all references are still internally consistent:
+  - All `actionNode` IDs in transitions reference valid action node `id` values
+  - All stage UUIDs in action `options` reference valid stage node `uuid` values
+  - All asset filenames reference files present in the `assets/` directory
+- **Fix:** The export script transforms all references atomically, maintaining consistency
+
+---
+
 ## Asset Validation
 
 ### RULE: Image Reference Valid

@@ -312,26 +312,29 @@ Once both interview phases are complete:
 
 ### Hub Menu Generation
 
-First, always generate the hub menu:
+First, always generate the hub menu. **All hub audio scripts are MANDATORY** -- the export command will fail if any are missing.
 
-1. **Hub Cover** (`hub/cover.md`)
+1. **Cover Welcome** (`hub/cover-welcome.md`) -- **MANDATORY**
    - Welcome message introducing the pack theme
    - Engaging hook for children
+   - Maps to the cover stage audio in `story.json`
 
-2. **Hub Menu Question** (`hub/menu-question.md`)
-   - Story selection prompt: "Which story would you like to hear?"
-   - This audio plays first when entering the menu
+2. **Hub Menu** (`hub/menu.md`) -- **MANDATORY**
+   - Story selection prompt with dialogue: "Which story would you like to hear?"
+   - This audio plays when entering the menu
 
-3. **Story Option Audio** (`hub/story-options/`)
-   - **Each story needs its own selection audio** that plays when the child scrolls to it
-   - When the child rotates the wheel, they hear each story's name and teaser
-   - Example: "Story One: The Forest Adventure. Join Emma on a magical journey!"
+3. **Story Option Audio** (`hub/option-{short-name}.md`) -- **MANDATORY, one per story**
+   - **Each story needs its own audio script file** in `hub/` that plays when the child scrolls to it
+   - Naming convention: `hub/option-{short-name}.md` where `{short-name}` matches the story.json stage UUID suffix
+   - Content: One sentence from the narrator announcing the story title and a short teaser
+   - Example: `hub/option-forest.md` contains: "The Forest Adventure! Join Emma on a magical journey through the enchanted woods."
+   - These are short scripts (1-2 sentences) -- they play as the child turns the wheel
 
-4. **Welcome Back** (`hub/welcome-back.md`)
+4. **Welcome Back** (`hub/welcome-back.md`) -- **MANDATORY**
    - Message when returning from a story
    - Encouragement to explore more stories
 
-5. **Goodbye** (`hub/goodbye.md`)
+5. **Goodbye** (`hub/goodbye.md`) -- **MANDATORY if story.json includes a goodbye stage**
    - Exit message when leaving the pack
 
 #### How Story Selection Works on Device
@@ -382,18 +385,23 @@ stories/{pack-slug}/
 ├── validation-report.md             # Validation results
 ```
 
-### Hub Files
+### Hub Files (ALL MANDATORY)
 ```
 ├── hub/
-│   ├── cover.md                     # Pack welcome/intro audio
-│   ├── menu-question.md             # "Which story?" selection prompt
-│   ├── story-options/               # Per-story selection audio
-│   │   ├── story-1-option.md        # "Story 1: Title - teaser"
-│   │   ├── story-2-option.md        # "Story 2: Title - teaser"
-│   │   └── ...
-│   ├── welcome-back.md              # Return message
-│   └── goodbye.md                   # Exit message
+│   ├── cover-welcome.md              # Pack welcome/intro audio (MANDATORY)
+│   ├── menu.md                       # Story selection prompt with dialogue (MANDATORY)
+│   ├── option-{short-name-1}.md      # Story 1 menu option announcement (MANDATORY)
+│   ├── option-{short-name-2}.md      # Story 2 menu option announcement (MANDATORY)
+│   ├── option-{short-name-N}.md      # ... one per story in the pack (MANDATORY)
+│   ├── welcome-back.md               # Return message after story (MANDATORY)
+│   └── goodbye.md                    # Exit message (MANDATORY if goodbye stage exists)
 ```
+
+**Important**: Every audio filename referenced in `story.json` must have a corresponding source `.md` file in `hub/`. The naming convention links them:
+- `cover-welcome.mp3` in story.json ← `hub/cover-welcome.md`
+- `hub-menu.mp3` ← `hub/menu.md`
+- `option-{name}.mp3` ← `hub/option-{name}.md`
+- `hub-welcome-back.mp3` ← `hub/welcome-back.md`
 
 ### Per-Story Files
 ```
@@ -430,7 +438,12 @@ stories/{pack-slug}/
 
 ## Story.json Structure for Packs
 
-Generate a hub-based story structure:
+Generate a hub-based story structure.
+
+> **ID Format:** The template below uses human-readable slug IDs (e.g., `"hub-cover"`,
+> `"action-to-menu"`). These are the **source format** -- readable and easy to edit.
+> During export, `export_pack.py` converts all IDs to valid UUIDs (v5, deterministic)
+> for device compatibility. You do NOT need to generate UUIDs manually.
 
 ```json
 {
@@ -573,6 +586,11 @@ Before completing, verify:
 - [ ] All stories accessible from menu
 - [ ] Goodbye/exit option present
 - [ ] Home button enabled on all hub stages
+- [ ] `hub/cover-welcome.md` exists
+- [ ] `hub/menu.md` exists
+- [ ] `hub/option-{name}.md` exists for EVERY story in the pack
+- [ ] `hub/welcome-back.md` exists
+- [ ] Every audio filename in story.json has a corresponding source `.md` file
 
 ### Per-Story Validation
 - [ ] Each story has clear beginning and ending

@@ -134,11 +134,11 @@ class AudioScriptParser:
         valid_speakers = {cfg.name for cfg in speaker_configs}
 
         # Pattern: **Speaker:** followed by content until next **Speaker:** or end
-        speaker_pattern = r"\*\*(\w+):\*\*"
+        speaker_pattern = r"\*\*([^:]+):\*\*"
         matches = list(re.finditer(speaker_pattern, content))
 
         for i, match in enumerate(matches):
-            speaker = match.group(1)
+            speaker = match.group(1).strip()
 
             # Warn about undefined speakers
             if speaker not in valid_speakers:
