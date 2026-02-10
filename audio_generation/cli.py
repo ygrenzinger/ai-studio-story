@@ -13,25 +13,27 @@ from audio_generation.tts.client import TTSClient
 from audio_generation.utils.logging import setup_logging
 
 
-def get_api_key() -> str:
-    """Get Google AI Studio API key from environment.
+def get_vertex_config() -> tuple[str, str]:
+    """Get Vertex AI configuration from environment.
 
     Returns:
-        API key string
+        Tuple of (project_id, location)
 
     Raises:
-        SystemExit: If no API key is found in environment
+        SystemExit: If required environment variables are missing
     """
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-    if not api_key:
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    location = os.environ.get("GOOGLE_CLOUD_REGION", "us-central1")
+
+    if not project:
         logging.error(
-            "GOOGLE_API_KEY or GEMINI_API_KEY environment variable is not set.\n"
-            "Please set it to your Google AI Studio API key.\n"
-            "Get an API key at: https://aistudio.google.com/apikey\n"
-            "Example: export GOOGLE_API_KEY=your-api-key-here"
+            "GOOGLE_CLOUD_PROJECT environment variable is not set.\n"
+            "Please set it to your Google Cloud project ID.\n"
+            "Example: export GOOGLE_CLOUD_PROJECT=my-project-id\n"
+            "Also ensure you are authenticated via: gcloud auth application-default login"
         )
         sys.exit(1)
-    return api_key
+    return project, location
 
 
 def print_progress(current: int, total: int) -> None:
@@ -53,7 +55,7 @@ def print_progress(current: int, total: int) -> None:
 def main() -> None:
     """Main entry point for CLI."""
     parser = argparse.ArgumentParser(
-        description="Generate audio from story chapters using Gemini TTS",
+        description="Generate audio from story chapters using Vertex AI Gemini TTS",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -63,13 +65,13 @@ Examples:
   python -m audio_generation.cli script.md -o output.mp3 --resume
 
 Prerequisites:
-  1. Google AI Studio API key (supports multi-speaker TTS)
-  2. Get an API key at: https://aistudio.google.com/apikey
-  3. FFmpeg installed (required by pydub)
+   1. Google Cloud project with Vertex AI API enabled
+   2. Authenticated via: gcloud auth application-default login
+   3. FFmpeg installed (required by pydub)
 
 Environment Variables:
-  GOOGLE_API_KEY   Required. Your Google AI Studio API key.
-  GEMINI_API_KEY   Alternative to GOOGLE_API_KEY (either works).
+   GOOGLE_CLOUD_PROJECT  Required. Your Google Cloud project ID.
+   GOOGLE_CLOUD_REGION   Optional. Region (default: us-central1).
 
 Output Format:
   - MP3 (MPEG Audio Layer III)
@@ -133,9 +135,11 @@ Output Format:
         logging.warning(f"Output path changed to: {output_path}")
 
     try:
-        # Get API key
-        api_key = get_api_key()
-        logging.info("Connecting to Google AI Studio API")
+        # Get Vertex AI configuration
+        project, location = get_vertex_config()
+        logging.info(
+            f"Connecting to Vertex AI (project={project}, location={location})"
+        )
 
         # Create pipeline with dependencies
         pipeline = AudioGenerationPipeline()
@@ -154,7 +158,9 @@ Output Format:
             logging.info(f"Voice override: {args.voice}")
 
         # Configure TTS client
-        tts_client = TTSClient(api_key=api_key, model=script.tts_model)
+        tts_client = TTSClient(
+            project=project, location=location, model=script.tts_model
+        )
         pipeline.set_tts_client(tts_client)
 
         # Configure progress manager
