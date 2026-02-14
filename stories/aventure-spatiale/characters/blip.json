@@ -1,0 +1,27 @@
+{
+  "name": "BLIP",
+  "role": "Compagnon robot / Guide galactique",
+  "age": null,
+  "gender": "male",
+  "personality": [
+    "Enthousiaste",
+    "Maladroit",
+    "Encyclopédie spatiale ambulante",
+    "Se trompe parfois de façon comique",
+    "Attachant"
+  ],
+  "voice": {
+    "name": "Sadachbia",
+    "characteristic": "Lively",
+    "profile": "Petit robot rigolo et enthousiaste, voix expressive et vive, parle parfois trop vite quand il est excité, un peu maladroit mais attachant, source d'humour et de savoir"
+  },
+  "description": "BLIP est un petit robot bleu pas plus grand qu'un chat, avec deux grands yeux lumineux et une antenne qui tourne dans tous les sens. Il est le guide galactique personnel de Zara et connaît des tonnes de faits scientifiques sur l'espace. Cependant, il se trompe régulièrement de façon comique (jumelles à l'envers, fromage lunaire, compte à rebours depuis 100) ce qui crée le ressort humoristique de l'histoire.",
+  "character_arc": "BLIP commence comme un guide spatial enthousiaste et finit comme le meilleur ami de Zara, promettant d'être son copilote quand elle deviendra astronaute.",
+  "typical_lines": [
+    "Décollaaage !",
+    "ON VA TOUS MOURIR ! ...Ah non, elle est déjà passée.",
+    "Je vérifiais juste que le dessous du tableau de bord était propre.",
+    "J'en suis sûr. Et ce jour-là, je serai ton copilote.",
+    "Solidarité entre les petits !"
+  ]
+}

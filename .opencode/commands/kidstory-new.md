@@ -1,6 +1,5 @@
 ---
 description: Create a new interactive story for kids
-agent: coder
 ---
 
 # Create New KidStory

@@ -1,0 +1,27 @@
+{
+  "name": "Narrateur",
+  "role": "Narrateur",
+  "age": null,
+  "gender": "male",
+  "personality": [
+    "Chaleureux",
+    "Enjoué",
+    "Complice de l'auditeur",
+    "Dynamique",
+    "Expressif"
+  ],
+  "voice": {
+    "name": "Puck",
+    "characteristic": "Upbeat",
+    "profile": "Narrateur enjoué et dynamique, ton complice, comme un grand frère qui raconte une histoire incroyable, s'amuse autant que l'auditeur, s'adresse parfois directement à l'enfant"
+  },
+  "description": "Le narrateur guide le récit avec énergie et complicité. Il crée l'ambiance, décrit les paysages cosmiques avec émerveillement, et s'adresse parfois directement à l'auditeur pour renforcer l'immersion. Son ton est celui d'un grand frère passionné qui raconte la meilleure histoire du monde.",
+  "character_arc": null,
+  "typical_lines": [
+    "Tu imagines ?",
+    "Incroyable, non ?",
+    "Et ce qu'elle voit est stupéfiant...",
+    "L'aventure ne fait que commencer !",
+    "La tête pleine d'étoiles, le cœur rempli d'émerveillement."
+  ]
+}
