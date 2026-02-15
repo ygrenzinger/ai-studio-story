@@ -55,7 +55,7 @@ Based on status, continue from the appropriate phase:
 
 **If chapters complete but audio scripts missing:**
 - Generate audio scripts for remaining chapters
-- Create character audio profiles if missing
+- Create character voice configurations if missing
 
 **If validation pending:**
 - Run validation
@@ -102,7 +102,7 @@ Present the user with options:
 When continuing a specific story within a pack:
 
 1. **Load pack context**
-   - Load shared character profiles from `characters/`
+   - Load shared character voice configs from `characters/`
    - Load pack-level interview answers
    - Ensure consistency with pack tone and theme
 
@@ -232,7 +232,7 @@ Reference the original interview answers stored in `metadata.json.interview` to 
 - Honor the ending philosophy
 
 ### For Story Packs:
-- Use shared character profiles from `characters/` directory
+- Use shared character voice configs from `characters/` directory
 - Reference `interview.packLevel` for pack-wide settings
 - Reference `interview.stories[i]` for story-specific choices
 - Ensure stories maintain pack cohesion

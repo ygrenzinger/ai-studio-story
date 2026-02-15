@@ -5,10 +5,8 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Kore
-    profile: "Epic storyteller, cinematic and masterful, shifts between hushed intimate moments and grand sweeping descriptions, dramatic pauses before major reveals"
   - name: Kid
     voice: Puck
-    profile: "Young listener, conveys wonder fear and courage in equal measure, reacts emotionally to the story, asks curious questions"
 ---
 
 **Narrator:** <emotion: epic, atmospheric> The path had grown treacherous hours ago. Sharp volcanic rock cut through the soles of worn boots, and the air itself seemed to burn with each breath. Sir Aldric paused at the edge of a narrow ridge, his armor glinting in the dying light of the setting sun. Before him, the mouth of a massive cave yawned open like a wound in the mountainside. Scorch marks blackened the rocks around its entrance, and the unmistakable scent of sulfur hung heavy in the air.

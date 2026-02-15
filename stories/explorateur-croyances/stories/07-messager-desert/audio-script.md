@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, voix joyeuse et pleine d'énergie"
   - name: Marchand Rashid
     voice: Algieba
-    profile: "Marchand bienveillant de 45 ans, voix chaleureuse et douce, parle avec sagesse et tendresse"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse> L'horloge tinte comme l'appel d'une prière...

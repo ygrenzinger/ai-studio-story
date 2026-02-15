@@ -236,10 +236,8 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm, gentle storyteller voice"
   - name: Emma
     voice: Leda
-    profile: "8-year-old curious girl"
 ---
 
 **Narrator:** <emotion: warm, inviting> Once upon a time, in a magical forest...

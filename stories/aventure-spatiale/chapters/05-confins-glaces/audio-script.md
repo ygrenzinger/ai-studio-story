@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Narrateur
     voice: Puck
-    profile: "Narrateur enjoué et dynamique, ton complice, comme un grand frère qui raconte une histoire incroyable, s'amuse autant que l'auditeur"
   - name: Zara
     voice: Leda
-    profile: "Petite fille de 8 ans, curieuse et intrépide, parle avec émerveillement et enthousiasme, rit facilement"
   - name: BLIP
     voice: Sadachbia
-    profile: "Petit robot rigolo et enthousiaste, voix expressive et vive, parle parfois trop vite quand il est excité, un peu maladroit mais attachant"
 ---
 
 **Narrateur:** <emotion: contemplatif> La fusée s'aventure de plus en plus loin. Le Soleil, derrière eux, n'est plus qu'un point lumineux parmi les étoiles. Il fait de plus en plus sombre et de plus en plus froid.

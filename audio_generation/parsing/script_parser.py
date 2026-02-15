@@ -25,10 +25,8 @@ class AudioScriptParser:
     speakers:
       - name: Narrator
         voice: Sulafat
-        profile: "Warm storyteller..."
       - name: Emma
         voice: Leda
-        profile: "8-year-old girl..."
     ---
 
     **Narrator:** <emotion: warm> Text with emotion marker inline...
@@ -101,15 +99,12 @@ class AudioScriptParser:
                     SpeakerConfig(
                         name=speaker_data.get("name", "Narrator"),
                         voice=speaker_data.get("voice", DEFAULT_VOICE),
-                        profile=speaker_data.get("profile", ""),
                     )
                 )
 
         # If no speakers defined, use default narrator
         if not speaker_configs:
-            speaker_configs.append(
-                SpeakerConfig(name="Narrator", voice=DEFAULT_VOICE, profile="")
-            )
+            speaker_configs.append(SpeakerConfig(name="Narrator", voice=DEFAULT_VOICE))
 
         return speaker_configs
 

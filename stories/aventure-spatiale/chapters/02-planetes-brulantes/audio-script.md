@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Narrateur
     voice: Puck
-    profile: "Narrateur enjoué et dynamique, ton complice, comme un grand frère qui raconte une histoire incroyable, s'amuse autant que l'auditeur"
   - name: Zara
     voice: Leda
-    profile: "Petite fille de 8 ans, curieuse et intrépide, parle avec émerveillement et enthousiasme, rit facilement"
   - name: BLIP
     voice: Sadachbia
-    profile: "Petit robot rigolo et enthousiaste, voix expressive et vive, parle parfois trop vite quand il est excité, un peu maladroit mais attachant"
 ---
 
 **Narrateur:** <emotion: dynamique, excité> La fusée file à travers l'espace en direction du centre du système solaire. BLIP, tout excité, sort un tableau imaginaire.

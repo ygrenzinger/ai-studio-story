@@ -23,17 +23,15 @@ from audio_generation.domain.constants import (
 
 @dataclass
 class SpeakerConfig:
-    """Configuration for a single speaker with voice profile.
+    """Configuration for a single speaker.
 
     Attributes:
         name: Speaker identifier (e.g., "Narrator", "Emma")
         voice: Gemini TTS voice name (e.g., "Sulafat", "Puck")
-        profile: Voice profile description for TTS guidance
     """
 
     name: str
     voice: str = DEFAULT_VOICE
-    profile: str = ""
 
 
 @dataclass

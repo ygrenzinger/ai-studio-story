@@ -423,7 +423,7 @@ stories/{pack-slug}/
 ### Shared Assets
 ```
 ├── characters/
-│   ├── narrator.json                # Shared narrator profile
+│   ├── narrator.json                # Shared narrator voice config
 │   └── {character}.json             # Other shared characters
 ├── assets/
 │   ├── images/

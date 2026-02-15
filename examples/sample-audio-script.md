@@ -5,10 +5,8 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm storyteller, like a beloved aunt telling a bedtime story, builds gentle suspense without being scary, vocal smile on descriptions of beauty"
   - name: Emma
     voice: Leda
-    profile: "8-year-old girl, curious and brave, speaks with wonder and a hint of nervousness"
 ---
 
 **Narrator:** <emotion: warm, inviting> Emma took a deep breath... and stepped onto the mossy path.

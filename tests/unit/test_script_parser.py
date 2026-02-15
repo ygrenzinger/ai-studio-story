@@ -27,10 +27,8 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm storyteller voice"
   - name: Emma
     voice: Leda
-    profile: "Young curious girl"
 ---
 
 **Narrator:** <emotion: warm> Once upon a time, there was a girl named Emma.
@@ -62,12 +60,10 @@ speakers:
         narrator = script.speaker_configs[0]
         assert narrator.name == "Narrator"
         assert narrator.voice == "Sulafat"
-        assert narrator.profile == "Warm storyteller voice"
 
         emma = script.speaker_configs[1]
         assert emma.name == "Emma"
         assert emma.voice == "Leda"
-        assert emma.profile == "Young curious girl"
 
     def test_parse_segments_with_emotions(
         self, parser: AudioScriptParser, sample_script: Path

@@ -5,7 +5,6 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm storyteller, like a beloved aunt, clear enunciation, relaxed pacing"
 ---
 
 **Narrator:** <emotion: warm, inviting> Once upon a time, in a land far away, there lived a curious little fox named Felix. Felix loved to explore the meadows and forests near his cozy den.

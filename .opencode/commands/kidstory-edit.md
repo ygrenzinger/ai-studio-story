@@ -25,7 +25,7 @@ $ARGUMENTS
    - Read `metadata.json`
    - Read `outline.md`
    - Load chapter list / story list
-   - Load character profiles
+   - Load character voice configs
 
 ---
 
@@ -179,8 +179,8 @@ When editing a shared character, propagate changes:
 2. Allow modifications
 3. If tone changed significantly:
    - Offer to regenerate audio scripts
-   - Update character profiles
-   - Adjust director's notes
+    - Update character voice configs
+    - Adjust director's notes
 
 ### Personalization Updates
 

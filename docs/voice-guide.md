@@ -113,7 +113,7 @@ The TTS system now supports **unlimited speakers** through per-segment generatio
 
 ### New Audio Script Format
 
-Speaker configuration is now in the YAML frontmatter with voice profiles:
+Speaker configuration is now in the YAML frontmatter with voice selection:
 
 ```yaml
 ---
@@ -123,13 +123,10 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm storyteller, like a beloved aunt, vocal smile on beautiful moments"
   - name: Emma
     voice: Leda
-    profile: "8-year-old girl, curious and brave, speaks with wonder"
   - name: Dragon
     voice: Fenrir
-    profile: "Ancient but friendly dragon, deep rumbling voice, wise and patient"
 ---
 ```
 
@@ -171,19 +168,18 @@ When the narrator describes how a character speaks, that context automatically t
 **Emma:** "We have to go now!"  <!-- Inherits "whispered urgently" emotion -->
 ```
 
-### Voice Profile as Baseline
+### Voice as Baseline
 
-When no emotion marker is present, the character's voice profile provides the baseline tone:
+When no emotion marker is present, the selected voice provides the baseline tone:
 
 ```yaml
 speakers:
   - name: Thorin
     voice: Algenib
-    profile: "Gruff dwarf warrior, warmhearted beneath the grumbles"
 ```
 
 ```markdown
-**Thorin:** "Let's get moving."  <!-- Uses gruff, warmhearted baseline -->
+**Thorin:** "Let's get moving."  <!-- Uses Algenib's gravelly baseline -->
 **Thorin:** <emotion: annoyed, grumbling> "Not another swamp..."  <!-- Overrides with specific emotion -->
 ```
 
@@ -232,20 +228,20 @@ Gemini TTS supports 24 languages for story generation:
 
 ---
 
-## Character Voice Profile Templates
+## Character Voice Selection Guide
 
-Use these archetypes when defining speaker profiles:
+Use these archetypes when choosing voices for speakers:
 
-| Character Type | Profile Template | Suggested Voices |
-|----------------|------------------|------------------|
-| Young Child (5-8) | "Young child, speaks with wonder and curiosity, simple vocabulary, enthusiastic" | Leda (F), Puck (M) |
-| Brave Young Hero | "Determined young hero, curious and brave, speaks clearly with growing confidence" | Kore (F), Achird (M) |
-| Wise Mentor/Elder | "Wise elder, patient and kind, speaks slowly with weight and warmth" | Gacrux (F), Charon (M) |
-| Playful Sidekick | "Playful companion, energetic and loyal, quick wit, expressive reactions" | Laomedeia (F), Sadachbia (M) |
-| Mysterious Being | "Enigmatic presence, speaks with otherworldly quality, hints at ancient knowledge" | Zephyr (F), Enceladus (M) |
-| Friendly Monster | "Large but gentle creature, deep voice, surprisingly kind, slightly formal" | Fenrir (M), Algenib (M) |
-| Warm Parent | "Loving caregiver, warm and reassuring, protective, gentle encouragement" | Sulafat (F), Umbriel (M) |
-| Story Narrator | "Warm storyteller, engaging and expressive, guides listener through the tale" | Sulafat (F), Charon (M) |
+| Character Type | Suggested Voices |
+|----------------|------------------|
+| Young Child (5-8) | Leda (F), Puck (M) |
+| Brave Young Hero | Kore (F), Achird (M) |
+| Wise Mentor/Elder | Gacrux (F), Charon (M) |
+| Playful Sidekick | Laomedeia (F), Sadachbia (M) |
+| Mysterious Being | Zephyr (F), Enceladus (M) |
+| Friendly Monster | Fenrir (M), Algenib (M) |
+| Warm Parent | Sulafat (F), Umbriel (M) |
+| Story Narrator | Sulafat (F), Charon (M) |
 
 ---
 
@@ -261,9 +257,9 @@ Use these archetypes when defining speaker profiles:
 
 5. **Test combinations** - Some voice pairs work better together than others
 
-6. **Use emotion markers sparingly** - Not every line needs a marker; let the profile handle baseline tone
+6. **Use emotion markers sparingly** - Not every line needs a marker; the selected voice provides the baseline tone
 
-7. **Write descriptive profiles** - The more specific the profile, the more consistent the character voice
+7. **Choose voices carefully** - The voice selection determines the character's baseline sound and personality
 
 8. **Keep segments reasonable** - Avoid monologues over 500 words; break with narrator interjections
 

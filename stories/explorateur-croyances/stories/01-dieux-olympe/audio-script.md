@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse expérimentée, explique les choses simplement avec émerveillement, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, pose beaucoup de questions, s'émerveille facilement, voix joyeuse et pleine d'énergie"
   - name: Alexios
     voice: Achird
-    profile: "Jeune garçon grec enthousiaste de 12 ans, fier de raconter les histoires de ses dieux, voix claire et joyeuse, parle avec passion"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse, douce> Le tic-tac de l'horloge s'accélère... Léo ferme les yeux... et quand il les rouvre...

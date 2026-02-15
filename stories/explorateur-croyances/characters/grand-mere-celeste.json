@@ -12,8 +12,7 @@
   ],
   "voice": {
     "name": "Sulafat",
-    "characteristic": "Warm",
-    "profile": "Grand-mère bienveillante, voix chaleureuse de conteuse expérimentée, explique les choses simplement avec émerveillement, ton doux et rassurant comme une mamie qui raconte des histoires au coin du feu"
+    "characteristic": "Warm"
   },
   "description": "La grand-mère de Léo est une femme sage et douce qui possède une horloge magique dans son grenier. Elle guide Léo dans ses voyages à travers le temps et l'aide à comprendre les leçons de chaque histoire. Sa voix accompagne Léo comme une présence rassurante.",
   "role_in_story": "Narratrice principale qui introduit chaque voyage, fait les transitions, et aide Léo à réfléchir sur ce qu'il apprend.",

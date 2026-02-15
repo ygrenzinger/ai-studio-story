@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, voix joyeuse et pleine d'énergie"
   - name: Moine Dharma
     voice: Charon
-    profile: "Vieux moine sage de 50 ans, voix calme et apaisante, parle lentement avec sagesse et compassion"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse, douce> L'horloge tinte comme une cloche de temple...

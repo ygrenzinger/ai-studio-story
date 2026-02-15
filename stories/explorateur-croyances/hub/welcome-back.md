@@ -4,10 +4,8 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse expérimentée, explique les choses simplement avec émerveillement, ton doux et rassurant comme une mamie qui raconte des histoires au coin du feu"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, pose beaucoup de questions, s'émerveille facilement devant les découvertes, voix joyeuse et pleine d'énergie"
 ---
 
 [Effet sonore : tic-tac d'horloge qui ralentit, tintement doux]

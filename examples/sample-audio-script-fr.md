@@ -5,10 +5,8 @@ locale: "fr-FR"
 speakers:
   - name: Narrateur
     voice: Sulafat
-    profile: "Conteur chaleureux, comme une tante bien-aimee racontant une histoire du soir, cree un suspense leger sans faire peur, sourire vocal sur les descriptions de beaute"
   - name: Emma
     voice: Puck
-    profile: "Petite fille de 8 ans, curieuse et courageuse, parle avec emerveillement et une pointe de nervosité"
 ---
 
 **Narrateur:** <emotion: chaleureux, accueillant> Emma prit une profonde inspiration... et s'engagea sur le sentier mousseux.

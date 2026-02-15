@@ -4,10 +4,8 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse expérimentée, explique les choses simplement avec émerveillement, ton doux et rassurant comme une mamie qui raconte des histoires au coin du feu"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, pose beaucoup de questions, s'émerveille facilement devant les découvertes, voix joyeuse et pleine d'énergie"
 ---
 
 **Grand-Mère Céleste:** <emotion: chaleureuse, invitante> Bienvenue dans le grenier magique, mon petit explorateur ! Regarde cette belle horloge dorée. Elle peut te faire voyager dans le temps, vers des pays lointains et des époques oubliées.

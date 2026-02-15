@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Narrateur
     voice: Puck
-    profile: "Narrateur enjoué et dynamique, ton complice, comme un grand frère qui raconte une histoire incroyable, s'amuse autant que l'auditeur"
   - name: Zara
     voice: Leda
-    profile: "Petite fille de 8 ans, curieuse et intrépide, parle avec émerveillement et enthousiasme, rit facilement"
   - name: BLIP
     voice: Sadachbia
-    profile: "Petit robot rigolo et enthousiaste, voix expressive et vive, parle parfois trop vite quand il est excité, un peu maladroit mais attachant"
 ---
 
 **Narrateur:** <emotion: joyeux, complice> C'est le matin de l'anniversaire de Zara. Huit ans aujourd'hui ! Le soleil brille, les oiseaux chantent, et Zara a déjà mangé deux parts de gâteau au chocolat. Avant le petit-déjeuner. Mais chut, c'est son anniversaire !

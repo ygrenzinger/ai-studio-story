@@ -189,7 +189,7 @@ For each story, create:
 1. **metadata.json** - Story metadata and interview answers
 2. **outline.md** - Approved story outline
 3. **chapters/*.md** - Individual chapter files with full narrative
-4. **characters/*.json** - Character audio profiles for Gemini TTS
+4. **characters/*.json** - Character voice configurations for Gemini TTS
 5. **audio-scripts/*.md** - TTS-ready scripts with director's notes
 6. **assets/images/*.prompt.md** - AI image generation prompts
 7. **story.json** - Lunii format story structure
@@ -239,10 +239,8 @@ locale: "{language-code}"
 speakers:
   - name: Narrator
     voice: {voice-name}
-    profile: "{voice profile description}"
   - name: {Character}
     voice: {voice-name}
-    profile: "{character voice profile}"
 ---
 
 **Narrator:** <emotion: warm, inviting> {Narration text with emotional guidance inline}
@@ -278,43 +276,35 @@ Use inline `<emotion:>` markers to guide voice performance:
 - Use 1-3 descriptors per marker
 - Place marker immediately after speaker label
 - Narrator can have emotions too (affects narration tone)
-- If no marker, voice uses character's baseline profile
+- If no marker, the selected voice provides the baseline tone
 - Narrator descriptions like "she whispered" automatically transfer emotion to next character
 
-### Character Voice Profile Templates
+### Character Voice Selection Guide
 
-When defining speaker profiles, use these archetypes as starting points:
+When choosing voices, use these archetypes as starting points:
 
 **Young Child (5-8 years):**
-- Profile: "Young child, speaks with wonder and curiosity, simple vocabulary, enthusiastic"
 - Suggested voices: Leda (F), Puck (M)
 
 **Brave Young Hero (8-12 years):**
-- Profile: "Determined young hero, curious and brave, speaks clearly with growing confidence"
 - Suggested voices: Kore (F), Achird (M)
 
 **Wise Mentor/Elder:**
-- Profile: "Wise elder, patient and kind, speaks slowly with weight and warmth"
 - Suggested voices: Gacrux (F), Charon (M), Sadaltager (M)
 
 **Playful Sidekick/Animal Friend:**
-- Profile: "Playful companion, energetic and loyal, quick wit, expressive reactions"
 - Suggested voices: Laomedeia (F), Puck (M), Sadachbia (M)
 
 **Mysterious/Magical Being:**
-- Profile: "Enigmatic presence, speaks with otherworldly quality, hints at ancient knowledge"
 - Suggested voices: Zephyr (F), Enceladus (M)
 
 **Friendly Monster/Creature:**
-- Profile: "Large but gentle creature, deep voice, surprisingly kind, slightly formal"
 - Suggested voices: Fenrir (M), Algenib (M)
 
 **Warm Parent/Guardian:**
-- Profile: "Loving caregiver, warm and reassuring, protective, gentle encouragement"
 - Suggested voices: Sulafat (F), Vindemiatrix (F), Umbriel (M)
 
 **Story Narrator:**
-- Profile: "Warm storyteller, engaging and expressive, guides listener through the tale"
 - Suggested voices: Sulafat (F), Charon (M)
 
 ### Audio Segment Length Guidelines

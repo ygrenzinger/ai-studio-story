@@ -98,7 +98,7 @@ Read `metadata.json` and check the `type` field:
 │   │   └── audio-script.md
 │   ├── {story-2-slug}/
 │   └── {story-3-slug}/
-├── characters/          # Shared character profiles
+├── characters/          # Shared character voice configs
 ├── assets/              # Generated assets (images + audio)
 └── validation-report.md
 ```

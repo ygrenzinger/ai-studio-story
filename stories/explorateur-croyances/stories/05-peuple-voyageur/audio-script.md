@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, voix joyeuse et pleine d'énergie"
   - name: Rabbi Éliézer
     voice: Sadaltager
-    profile: "Vieux rabbi sage de 75 ans, voix grave et chaleureuse, raconte avec passion les histoires de son peuple"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse> L'horloge résonne comme un chant ancien...

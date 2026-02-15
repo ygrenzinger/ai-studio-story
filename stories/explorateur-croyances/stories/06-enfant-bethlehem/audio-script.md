@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, voix joyeuse et pleine d'énergie"
   - name: Berger Samuel
     voice: Umbriel
-    profile: "Berger de 40 ans, voix chaleureuse et douce, parle avec tendresse et sagesse"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse> L'horloge tinte comme une cloche de village...

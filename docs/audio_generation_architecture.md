@@ -182,7 +182,7 @@ audio_generation/
 | `SegmentBatcher` | Group segments into TTS-compatible batches (max 2 speakers) |
 | `TTSClient` | Handle Gemini API calls with retry logic |
 | `SpeechConfigBuilder` | Build TTS voice configurations |
-| `TTSPromptBuilder` | Construct prompts with voice profiles and emotions |
+| `TTSPromptBuilder` | Construct prompts with transcript text and emotions |
 | `AudioProcessor` | Convert PCM to AudioSegment, normalize audio |
 | `AudioEffects` | Apply crossfades, generate comfort noise |
 | `SegmentConcatenator` | Join segments with context-aware pauses |

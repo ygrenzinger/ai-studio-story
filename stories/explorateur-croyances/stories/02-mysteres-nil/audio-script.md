@@ -5,13 +5,10 @@ locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste
     voice: Sulafat
-    profile: "Grand-mère bienveillante, voix chaleureuse de conteuse, ton doux et rassurant"
   - name: Léo
     voice: Puck
-    profile: "Jeune garçon de 7 ans, curieux et enthousiaste, voix joyeuse et pleine d'énergie"
   - name: Néféret
     voice: Kore
-    profile: "Jeune prêtresse égyptienne sage et posée de 14 ans, voix claire et mystérieuse, parle avec révérence des dieux"
 ---
 
 **Grand-Mère Céleste:** <emotion: mystérieuse> Le tic-tac de l'horloge s'accélère à nouveau...

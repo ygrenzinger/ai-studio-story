@@ -5,10 +5,8 @@ locale: "fr-FR"
 speakers:
   - name: Narrateur
     voice: Puck
-    profile: "Narrateur enjoué et dynamique, ton complice, comme un grand frère qui raconte une histoire incroyable, s'amuse autant que l'auditeur"
   - name: BLIP
     voice: Sadachbia
-    profile: "Petit robot rigolo et enthousiaste, voix expressive et vive, parle parfois trop vite quand il est excité, un peu maladroit mais attachant"
 ---
 
 **Narrateur:** <emotion: chaleureux, mystérieux> Bienvenue à bord de l'Étoile Express ! Aujourd'hui, tu vas vivre un voyage absolument incroyable. Un voyage à travers tout le système solaire... et même au-delà !

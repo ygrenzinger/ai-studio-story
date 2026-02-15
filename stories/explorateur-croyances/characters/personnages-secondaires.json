@@ -7,8 +7,7 @@
       "age": 12,
       "voice": {
         "name": "Achird",
-        "characteristic": "Friendly",
-        "profile": "Jeune garçon grec enthousiaste, fier de raconter les histoires de ses dieux, voix claire et joyeuse"
+        "characteristic": "Friendly"
       },
       "description": "Berger qui garde ses moutons au pied du mont Olympe, connaît toutes les histoires des dieux"
     },
@@ -19,8 +18,7 @@
       "age": 14,
       "voice": {
         "name": "Kore",
-        "characteristic": "Firm",
-        "profile": "Jeune prêtresse sage et posée, voix claire et mystérieuse, parle avec révérence des dieux"
+        "characteristic": "Firm"
       },
       "description": "Prêtresse qui sert dans le temple de Râ, connaît les mystères des dieux égyptiens"
     },
@@ -31,8 +29,7 @@
       "age": 11,
       "voice": {
         "name": "Laomedeia",
-        "characteristic": "Upbeat",
-        "profile": "Jeune fille viking courageuse et énergique, voix forte et déterminée, enthousiaste"
+        "characteristic": "Upbeat"
       },
       "description": "Fille de guerrier viking, brave et fière, raconte les sagas des dieux nordiques"
     },
@@ -43,8 +40,7 @@
       "age": 50,
       "voice": {
         "name": "Charon",
-        "characteristic": "Informative",
-        "profile": "Moine sage et paisible, voix douce et calme, parle lentement avec sagesse et sérénité"
+        "characteristic": "Informative"
       },
       "description": "Moine bienveillant qui médite sous l'arbre de la Bodhi, enseigne la compassion"
     },
@@ -55,8 +51,7 @@
       "age": 75,
       "voice": {
         "name": "Sadaltager",
-        "characteristic": "Knowledgeable",
-        "profile": "Vieux sage à la voix profonde et chaleureuse, raconte les histoires anciennes avec passion et révérence"
+        "characteristic": "Knowledgeable"
       },
       "description": "Sage qui connaît toutes les histoires du peuple, les raconte sous les étoiles"
     },
@@ -67,8 +62,7 @@
       "age": 40,
       "voice": {
         "name": "Umbriel",
-        "characteristic": "Easy-going",
-        "profile": "Berger simple et bon, voix douce et chaleureuse, raconte avec émerveillement"
+        "characteristic": "Easy-going"
       },
       "description": "Berger qui était présent la nuit de la naissance, témoin de l'événement miraculeux"
     },
@@ -79,8 +73,7 @@
       "age": 45,
       "voice": {
         "name": "Algieba",
-        "characteristic": "Smooth",
-        "profile": "Marchand honnête et généreux, voix douce et accueillante, parle avec respect et sagesse"
+        "characteristic": "Smooth"
       },
       "description": "Marchand d'une grande honnêteté, connaît les enseignements du prophète Mohammed"
     }

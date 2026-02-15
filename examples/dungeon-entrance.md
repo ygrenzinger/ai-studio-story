@@ -5,16 +5,12 @@ locale: "en-US"
 speakers:
   - name: Narrator
     voice: Sulafat
-    profile: "Warm storyteller, paints vivid atmospheric scenes, slows for dramatic moments, light and adventurous tone"
   - name: Thorin
     voice: Algenib
-    profile: "Gruff dwarf warrior, 40 years of adventuring, warmhearted beneath the grumbles, practical and skeptical"
   - name: Elara
     voice: Despina
-    profile: "Elven mage, wise with dry humor, patient and mysterious, speaks with calm authority"
   - name: Finn
     voice: Puck
-    profile: "Young enthusiastic human, curious and occasionally reckless, full of wonder and excitement"
 ---
 
 **Narrator:** <emotion: warm, atmospheric> The late afternoon sun painted everything in shades of gold and amber... as three unlikely companions made their way through the ruins of what maps simply called... "The Forgotten Place."
