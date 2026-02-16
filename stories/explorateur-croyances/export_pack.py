@@ -566,7 +566,7 @@ def main():
     print(f"  Pack UUID: {pack_uuid}")
 
     # Create the archive
-    archive_name = f"{pack_uuid}.zip"
+    archive_name = f"{STORY_DIR.name}.zip"
     archive_path = STORY_DIR / archive_name
 
     # Remove previous archive with the same name if it exists

@@ -299,7 +299,12 @@ STOPPED. Re-run to regenerate missing assets:
    - Updates all stage UUID references in action `options` arrays
    - Asset filenames (`image`, `audio`) are kept as-is (human-readable)
 
-   **Step 5c: Archive Assembly**
+   **Step 5c: ZIP Filename**
+   - Reads the `title` field from `metadata.json`
+   - Slugifies it: lowercase, strip accents/diacritics, replace spaces and special characters with hyphens, collapse consecutive hyphens, trim leading/trailing hyphens
+   - Uses the result as the ZIP filename: `{title-slug}.zip`
+
+   **Step 5d: Archive Assembly**
    - Writes transformed `story.json` to ZIP root
    - Writes `thumbnail.bmp` (copy of cover image) to ZIP root
    - Writes all assets to `assets/` directory
@@ -308,7 +313,7 @@ STOPPED. Re-run to regenerate missing assets:
 
 ### Archive structure:
 ```
-{pack-uuid}.zip
+{title-slug}.zip
 ├── story.json              # Transformed: valid UUIDs for all node IDs
 ├── thumbnail.bmp           # Copy of cover image
 └── assets/
@@ -320,6 +325,10 @@ STOPPED. Re-run to regenerate missing assets:
     ├── hub-menu.mp3
     └── ...
 ```
+
+> **ZIP filename**: `{title-slug}` is derived by slugifying the `title` field from `metadata.json`:
+> lowercase, strip accents/diacritics, replace spaces and special characters with hyphens, collapse consecutive hyphens, trim leading/trailing hyphens.
+> Example: `"Le Petit Explorateur des Croyances"` → `le-petit-explorateur-des-croyances.zip`
 
 ### Important: Source files are never modified
 
@@ -351,7 +360,7 @@ After all 5 phases succeed, print:
 EXPORT COMPLETE
 ========================================
 Pack:       {title}
-Archive:    stories/{slug}/{slug}.zip
+Archive:    stories/{slug}/{title-slug}.zip
 Size:       {file size}
 
 Contents:
@@ -367,7 +376,7 @@ Action nodes:     {count}
 Next steps:
   1. Open Lunii STUdio
   2. Go to Library > Import
-  3. Select: stories/{slug}/{slug}.zip
+  3. Select: stories/{slug}/{title-slug}.zip
   4. Transfer to Lunii device
 ========================================
 ```
