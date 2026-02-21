@@ -16,6 +16,11 @@ Each story lives in `stories/{name}/` with:
 - `characters/{name}.json`
 - `assets/` - generated `.bmp` covers and `.mp3` audio
 
+## Subagents
+
+When generating audio or cover assets, delegate to the appropriate subagent via the Task tool:
+- **audio-generator**: converts audio-script `.md` files into MP3 audio files
+- **cover-generator**: converts chapter descriptions into pixel art BMP cover images
 
 ## Commands
 
@@ -25,9 +30,3 @@ Use `/kidstory` commands for story workflows:
 - `/kidstory-continue` - continue incomplete work
 - `/kidstory-pack` - create a pack of related stories
 - `/kidstory-export` - export to Lunii-ready ZIP
-
-## Subagents
-
-When generating audio or cover assets, delegate to the appropriate subagent via the Task tool:
-- audio-generator: converts audio-script .md files into MP3 audio files
-- cover-generator: converts chapter descriptions into pixel art BMP cover images
