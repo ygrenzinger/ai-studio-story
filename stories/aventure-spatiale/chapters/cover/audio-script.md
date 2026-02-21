@@ -1,5 +1,5 @@
 ---
-stageUuid: "stage-cover"
+stageUuid: "stage-cover-aventure-spatiale"
 chapterRef: "cover"
 locale: "fr-FR"
 speakers:

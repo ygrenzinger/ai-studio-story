@@ -17,6 +17,10 @@
 > slug IDs (e.g., `"stage-cover"`, `"action-choose-path"`) for clarity. In the final
 > device archive, the export script converts all IDs to valid UUIDs (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
 > parseable by `java.util.UUID.fromString()`. See the export documentation for details.
+>
+> **Cross-pack uniqueness:** The cover stage UUID (the `squareOne` node) becomes the
+> pack UUID on the device. It must be globally unique across all stories/packs.
+> Use `"stage-cover-{story-slug}"` to avoid collisions.
 
 ---
 

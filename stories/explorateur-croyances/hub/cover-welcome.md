@@ -1,5 +1,5 @@
 ---
-stageUuid: "stage-cover"
+stageUuid: "stage-cover-explorateur-croyances"
 locale: "fr-FR"
 speakers:
   - name: Grand-Mère Céleste

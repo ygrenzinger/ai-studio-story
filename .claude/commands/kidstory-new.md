@@ -233,7 +233,7 @@ For each stage node, generate a TTS-ready script using the **new format** with i
 
 ```markdown
 ---
-stageUuid: "stage-{chapter-slug}"
+stageUuid: "stage-cover-{story-slug}" (for cover) or "stage-{chapter-slug}" (for chapters)
 chapterRef: "{chapter-number}-{chapter-slug}"
 locale: "{language-code}"
 speakers:
@@ -349,6 +349,7 @@ Intro -> Main Content -> "Again?" Choice
 ## Validation Checklist
 
 Before completing, verify:
+- [ ] Cover stage UUID is globally unique: use `stage-cover-{story-slug}` format
 - [ ] One squareOne node exists
 - [ ] All chapters have okTransition or null (ending)
 - [ ] All choice branches have valid targets

@@ -7,7 +7,7 @@
 
   "stageNodes": [
     {
-      "uuid": "stage-cover",
+      "uuid": "stage-cover-aventure-spatiale",
       "squareOne": true,
       "name": "Cover",
       "type": "cover",

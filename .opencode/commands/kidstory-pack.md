@@ -444,6 +444,9 @@ Generate a hub-based story structure.
 > `"action-to-menu"`). These are the **source format** -- readable and easy to edit.
 > During export, `export_pack.py` converts all IDs to valid UUIDs (v5, deterministic)
 > for device compatibility. You do NOT need to generate UUIDs manually.
+>
+> **IMPORTANT:** The cover stage UUID must be globally unique across all packs.
+> Always use `hub-cover-{pack-slug}` to prevent Lunii Studio from confusing different packs.
 
 ```json
 {
@@ -455,7 +458,7 @@ Generate a hub-based story structure.
 
   "stageNodes": [
     {
-      "uuid": "hub-cover",
+      "uuid": "hub-cover-{pack-slug}",
       "squareOne": true,
       "name": "Pack Cover",
       "type": "cover",
@@ -581,6 +584,7 @@ Follow the same guidelines as single stories:
 Before completing, verify:
 
 ### Hub Validation
+- [ ] Cover stage UUID is globally unique: use `hub-cover-{pack-slug}` format (e.g., `hub-cover-forest-friends`)
 - [ ] Hub cover is squareOne
 - [ ] Menu has wheel enabled for story selection
 - [ ] All stories accessible from menu

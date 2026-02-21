@@ -470,7 +470,7 @@ story-pack.zip
 **For source story.json (what you generate), use descriptive slug IDs:**
 
 ```
-Stages: "stage-cover", "stage-forest", "stage-castle-entrance"
+Stages: "stage-cover-{story-slug}", "stage-forest", "stage-castle-entrance"
 Actions: "action-choose-path", "action-repeat", "action-menu"
 ```
 
@@ -479,6 +479,7 @@ Rules for slug IDs:
 - Use lowercase alphanumeric characters and hyphens only
 - Prefix stage IDs with `stage-` and action IDs with `action-`
 - Keep them short but descriptive
+- **CRITICAL: The cover stage UUID must be globally unique across all stories/packs.** Use the format `stage-cover-{story-slug}` (e.g., `stage-cover-magic-forest`, `stage-cover-space-adventure`). The cover UUID becomes the pack UUID on the device, so identical cover slugs across different stories will cause Lunii Studio to confuse them as the same pack.
 
 **For device deployment (handled automatically):**
 
@@ -559,7 +560,7 @@ Fly Ending      Explore Ending
 
   "stageNodes": [
     {
-      "uuid": "stage-cover",
+      "uuid": "stage-cover-magic-forest",
       "squareOne": true,
       "name": "Cover",
       "type": "cover",

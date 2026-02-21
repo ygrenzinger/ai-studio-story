@@ -7,7 +7,7 @@
 
   "stageNodes": [
     {
-      "uuid": "stage-cover",
+      "uuid": "stage-cover-explorateur-croyances",
       "squareOne": true,
       "name": "Cover",
       "type": "cover",
