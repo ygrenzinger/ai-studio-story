@@ -9,7 +9,7 @@
     {
       "uuid": "stage-cover-explorateur-croyances",
       "squareOne": true,
-      "name": "Cover",
+      "name": "Couverture",
       "type": "cover",
       "image": "cover.bmp",
       "audio": "cover-welcome.mp3",
@@ -21,16 +21,17 @@
       "controlSettings": {
         "wheel": false,
         "ok": true,
-        "home": true,
-        "pause": true,
+        "home": false,
+        "pause": false,
         "autoplay": false
       }
     },
     {
       "uuid": "stage-hub-menu",
-      "name": "Hub Menu - Choose Destination",
+      "name": "Menu Hub — Choix de Destination",
       "type": "menu.questionstage",
-      "image": "hub-menu.bmp",
+      "groupId": "menu-explorateur-croyances",
+      "image": null,
       "audio": "hub-menu.mp3",
       "okTransition": {
         "actionNode": "action-menu-choice",
@@ -38,329 +39,22 @@
       },
       "homeTransition": null,
       "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
       }
     },
     {
       "uuid": "stage-option-olympe",
-      "name": "Menu Option - Olympe",
+      "name": "Option Menu — Olympe",
       "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
       "image": "option-olympe.bmp",
       "audio": "option-olympe.mp3",
       "okTransition": {
         "actionNode": "action-to-story-01",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-nil",
-      "name": "Menu Option - Nil",
-      "type": "menu.optionstage",
-      "image": "option-nil.bmp",
-      "audio": "option-nil.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-02",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-nord",
-      "name": "Menu Option - Nord",
-      "type": "menu.optionstage",
-      "image": "option-nord.bmp",
-      "audio": "option-nord.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-03",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-bouddha",
-      "name": "Menu Option - Bouddha",
-      "type": "menu.optionstage",
-      "image": "option-bouddha.bmp",
-      "audio": "option-bouddha.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-04",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-voyageur",
-      "name": "Menu Option - Peuple Voyageur",
-      "type": "menu.optionstage",
-      "image": "option-voyageur.bmp",
-      "audio": "option-voyageur.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-05",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-bethlehem",
-      "name": "Menu Option - Bethléem",
-      "type": "menu.optionstage",
-      "image": "option-bethlehem.bmp",
-      "audio": "option-bethlehem.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-06",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-option-desert",
-      "name": "Menu Option - Désert",
-      "type": "menu.optionstage",
-      "image": "option-desert.bmp",
-      "audio": "option-desert.mp3",
-      "okTransition": {
-        "actionNode": "action-to-story-07",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-01-olympe",
-      "name": "Story 1 - Les Dieux de l'Olympe",
-      "type": "story",
-      "image": "story-01-olympe.bmp",
-      "audio": "story-01-olympe.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-02-nil",
-      "name": "Story 2 - Les Mystères du Nil",
-      "type": "story",
-      "image": "story-02-nil.bmp",
-      "audio": "story-02-nil.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-03-nord",
-      "name": "Story 3 - Les Guerriers du Nord",
-      "type": "story",
-      "image": "story-03-nord.bmp",
-      "audio": "story-03-nord.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-04-bouddha",
-      "name": "Story 4 - Le Prince qui Devint Sage",
-      "type": "story",
-      "image": "story-04-bouddha.bmp",
-      "audio": "story-04-bouddha.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-05-voyageur",
-      "name": "Story 5 - Les Histoires du Peuple Voyageur",
-      "type": "story",
-      "image": "story-05-voyageur.bmp",
-      "audio": "story-05-voyageur.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-06-bethlehem",
-      "name": "Story 6 - L'Enfant de Bethléem",
-      "type": "story",
-      "image": "story-06-bethlehem.bmp",
-      "audio": "story-06-bethlehem.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-story-07-desert",
-      "name": "Story 7 - Le Messager du Désert",
-      "type": "story",
-      "image": "story-07-desert.bmp",
-      "audio": "story-07-desert.mp3",
-      "okTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "homeTransition": {
-        "actionNode": "action-back-to-hub",
-        "optionIndex": 0
-      },
-      "controlSettings": {
-        "wheel": false,
-        "ok": true,
-        "home": true,
-        "pause": true,
-        "autoplay": false
-      }
-    },
-    {
-      "uuid": "stage-hub-welcome-back",
-      "name": "Hub Welcome Back",
-      "type": "menu.questionstage",
-      "image": "hub-menu.bmp",
-      "audio": "hub-welcome-back.mp3",
-      "okTransition": {
-        "actionNode": "action-menu-choice",
         "optionIndex": 0
       },
       "homeTransition": null,
@@ -368,8 +62,309 @@
         "wheel": true,
         "ok": true,
         "home": true,
-        "pause": true,
+        "pause": false,
         "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-nil",
+      "name": "Option Menu — Nil",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-nil.bmp",
+      "audio": "option-nil.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-02",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-nord",
+      "name": "Option Menu — Nord",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-nord.bmp",
+      "audio": "option-nord.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-03",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-bouddha",
+      "name": "Option Menu — Bouddha",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-bouddha.bmp",
+      "audio": "option-bouddha.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-04",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-voyageur",
+      "name": "Option Menu — Peuple Voyageur",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-voyageur.bmp",
+      "audio": "option-voyageur.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-05",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-bethlehem",
+      "name": "Option Menu — Bethléem",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-bethlehem.bmp",
+      "audio": "option-bethlehem.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-06",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-desert",
+      "name": "Option Menu — Désert",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": "option-desert.bmp",
+      "audio": "option-desert.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-07",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-story-01-olympe",
+      "name": "Histoire 1 — Les Dieux de l'Olympe",
+      "type": "story",
+      "groupId": "stage-story-01-olympe",
+      "image": "story-01-olympe.bmp",
+      "audio": "story-01-olympe.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-02-nil",
+      "name": "Histoire 2 — Les Mystères du Nil",
+      "type": "story",
+      "groupId": "stage-story-02-nil",
+      "image": "story-02-nil.bmp",
+      "audio": "story-02-nil.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-03-nord",
+      "name": "Histoire 3 — Les Guerriers du Nord",
+      "type": "story",
+      "groupId": "stage-story-03-nord",
+      "image": "story-03-nord.bmp",
+      "audio": "story-03-nord.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-04-bouddha",
+      "name": "Histoire 4 — Le Prince qui Devint Sage",
+      "type": "story",
+      "groupId": "stage-story-04-bouddha",
+      "image": "story-04-bouddha.bmp",
+      "audio": "story-04-bouddha.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-05-voyageur",
+      "name": "Histoire 5 — Les Histoires du Peuple Voyageur",
+      "type": "story",
+      "groupId": "stage-story-05-voyageur",
+      "image": "story-05-voyageur.bmp",
+      "audio": "story-05-voyageur.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-06-bethlehem",
+      "name": "Histoire 6 — L'Enfant de Bethléem",
+      "type": "story",
+      "groupId": "stage-story-06-bethlehem",
+      "image": "story-06-bethlehem.bmp",
+      "audio": "story-06-bethlehem.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-07-desert",
+      "name": "Histoire 7 — Le Messager du Désert",
+      "type": "story",
+      "groupId": "stage-story-07-desert",
+      "image": "story-07-desert.bmp",
+      "audio": "story-07-desert.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-hub-welcome-back",
+      "name": "Retour au Hub",
+      "type": "menu.questionstage",
+      "groupId": "menu-explorateur-croyances",
+      "image": null,
+      "audio": "hub-welcome-back.mp3",
+      "okTransition": {
+        "actionNode": "action-menu-choice",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
       }
     }
   ],
@@ -377,14 +372,16 @@
   "actionNodes": [
     {
       "id": "action-to-hub",
-      "name": "Go to Hub Menu",
-      "type": "action",
+      "name": "Vers le Menu",
+      "type": "menu.questionaction",
+      "groupId": "menu-explorateur-croyances",
       "options": ["stage-hub-menu"]
     },
     {
       "id": "action-menu-choice",
-      "name": "Menu Choice",
+      "name": "Choix du Menu",
       "type": "menu.optionsaction",
+      "groupId": "menu-explorateur-croyances",
       "options": [
         "stage-option-olympe",
         "stage-option-nil",
@@ -397,50 +394,58 @@
     },
     {
       "id": "action-to-story-01",
-      "name": "To Story 1",
-      "type": "action",
+      "name": "Vers Histoire 1",
+      "type": "story.storyaction",
+      "groupId": "stage-story-01-olympe",
       "options": ["stage-story-01-olympe"]
     },
     {
       "id": "action-to-story-02",
-      "name": "To Story 2",
-      "type": "action",
+      "name": "Vers Histoire 2",
+      "type": "story.storyaction",
+      "groupId": "stage-story-02-nil",
       "options": ["stage-story-02-nil"]
     },
     {
       "id": "action-to-story-03",
-      "name": "To Story 3",
-      "type": "action",
+      "name": "Vers Histoire 3",
+      "type": "story.storyaction",
+      "groupId": "stage-story-03-nord",
       "options": ["stage-story-03-nord"]
     },
     {
       "id": "action-to-story-04",
-      "name": "To Story 4",
-      "type": "action",
+      "name": "Vers Histoire 4",
+      "type": "story.storyaction",
+      "groupId": "stage-story-04-bouddha",
       "options": ["stage-story-04-bouddha"]
     },
     {
       "id": "action-to-story-05",
-      "name": "To Story 5",
-      "type": "action",
+      "name": "Vers Histoire 5",
+      "type": "story.storyaction",
+      "groupId": "stage-story-05-voyageur",
       "options": ["stage-story-05-voyageur"]
     },
     {
       "id": "action-to-story-06",
-      "name": "To Story 6",
-      "type": "action",
+      "name": "Vers Histoire 6",
+      "type": "story.storyaction",
+      "groupId": "stage-story-06-bethlehem",
       "options": ["stage-story-06-bethlehem"]
     },
     {
       "id": "action-to-story-07",
-      "name": "To Story 7",
-      "type": "action",
+      "name": "Vers Histoire 7",
+      "type": "story.storyaction",
+      "groupId": "stage-story-07-desert",
       "options": ["stage-story-07-desert"]
     },
     {
       "id": "action-back-to-hub",
-      "name": "Back to Hub",
-      "type": "action",
+      "name": "Retour au Hub",
+      "type": "menu.questionaction",
+      "groupId": "menu-explorateur-croyances",
       "options": ["stage-hub-welcome-back"]
     }
   ]
