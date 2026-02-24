@@ -22,6 +22,32 @@ from audio_generation.domain.constants import (
 
 
 @dataclass
+class CharacterProfile:
+    """Character profile loaded from story character JSON files.
+
+    Provides rich character identity for TTS prompt Audio Profile
+    and Director's Notes sections.
+
+    Attributes:
+        name: Character name matching speaker name in audio scripts
+        role: Character role (e.g., "Protagoniste principale", "Narrateur")
+        age: Character age (None for ageless characters like narrators)
+        gender: Character gender (e.g., "male", "female")
+        personality: List of personality traits
+        description: Character description text
+        typical_lines: Example lines the character would say
+    """
+
+    name: str
+    role: str = ""
+    age: int | None = None
+    gender: str = ""
+    personality: list[str] = field(default_factory=list)
+    description: str = ""
+    typical_lines: list[str] = field(default_factory=list)
+
+
+@dataclass
 class SpeakerConfig:
     """Configuration for a single speaker.
 

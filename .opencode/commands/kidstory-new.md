@@ -193,6 +193,19 @@ For each story, create:
 5. **audio-scripts/*.md** - TTS-ready scripts with director's notes
 6. **assets/images/*.prompt.md** - AI image generation prompts
 7. **story.json** - Lunii format story structure
+8. **thumbnail.png** - 300x300 colorful PNG thumbnail for library display
+
+## After Content Generation: Generate Thumbnail
+
+Once all story content is complete, generate the story thumbnail:
+
+1. **Delegate to thumbnail-generator subagent** via the Task tool
+2. Provide:
+   - Story directory: `./stories/{story-slug}/`
+   - Output path: `./stories/{story-slug}/thumbnail.png`
+   - A rich description derived from the story title, theme, main characters, and visual tone
+3. The thumbnail will be a 300x300 colorful PNG displayed in the Lunii library
+4. If `thumbnail.png` already exists, the subagent will skip generation
 
 ## Content Guidelines
 

@@ -140,9 +140,21 @@ The prompt to the subagent MUST include:
 
 After the subagent returns, inspect its final summary for the **"Failed"** count.
 
+### Thumbnail Generation
+
+After cover images are generated, check for `thumbnail.png`:
+
+1. Check if `./stories/{slug}/thumbnail.png` exists and is a valid PNG (use `file` command)
+2. If missing or invalid:
+   - Invoke the **thumbnail-generator** subagent via the **Task tool**
+   - Use the pack/story title and description from `metadata.json`
+   - Output: `./stories/{slug}/thumbnail.png`
+3. If already exists and is valid PNG: Skip
+
 ### On success (Failed: 0):
 ```
 Phase 2/5: Generate Covers ....... [OK] (16/16)
+  Thumbnail: [OK] (300x300 PNG)
 ```
 
 ### On failure (Failed > 0) -- STOP:
@@ -244,6 +256,7 @@ STOPPED. Fix the issue, then re-run:
 ### On success:
 ```
 Phase 4/5: Verify Assets ......... [OK]
+  Thumbnail: present (300x300 PNG)
   Images: 16/16 present
   Audio:  17/17 present
   Total:  33/33 assets verified
@@ -315,7 +328,7 @@ STOPPED. Re-run to regenerate missing assets:
 ```
 {title-slug}.zip
 ├── story.json              # Transformed: valid UUIDs for all node IDs
-├── thumbnail.bmp           # Copy of cover image
+├── thumbnail.png           # 300x300 pack/story thumbnail
 └── assets/
     ├── cover.bmp
     ├── hub-menu.bmp

@@ -13,9 +13,11 @@ from audio_generation.audio.effects import AudioEffects
 from audio_generation.audio.exporter import MP3Exporter
 from audio_generation.audio.processor import AudioProcessor
 from audio_generation.batching.segment_batcher import SegmentBatcher
-from audio_generation.domain.constants import API_CALL_DELAY_SEC
+from audio_generation.domain.character_loader import CharacterLoader
+from audio_generation.domain.constants import API_CALL_DELAY_SEC, TTS_SYSTEM_INSTRUCTION
 from audio_generation.domain.models import (
     AudioScript,
+    CharacterProfile,
     PauseConfig,
     Segment,
     SegmentBatch,
@@ -150,6 +152,14 @@ class AudioGenerationPipeline:
         logging.info(f"Speakers: {[cfg.name for cfg in script.speaker_configs]}")
         logging.info(f"Segments: {len(script.segments)}")
 
+        # Stage 1b: Load character profiles
+        character_loader = CharacterLoader()
+        character_profiles = character_loader.load_for_script(input_file)
+        if character_profiles:
+            logging.info(
+                f"Character profiles loaded: {list(character_profiles.keys())}"
+            )
+
         # Stage 2: Batch segments
         batches = self._batcher.batch(script.segments)
         logging.info(
@@ -163,6 +173,7 @@ class AudioGenerationPipeline:
         audio_segments = self._generate_batches(
             batches=batches,
             speaker_configs_map=speaker_configs_map,
+            character_profiles=character_profiles,
             input_file=input_file,
             output_dir=output_path.parent,
             resume=resume,
@@ -202,6 +213,7 @@ class AudioGenerationPipeline:
         self,
         batches: list[SegmentBatch],
         speaker_configs_map: dict[str, SpeakerConfig],
+        character_profiles: dict[str, CharacterProfile],
         input_file: Path,
         output_dir: Path,
         resume: bool,
@@ -213,6 +225,7 @@ class AudioGenerationPipeline:
         Args:
             batches: List of segment batches
             speaker_configs_map: Speaker name to config mapping
+            character_profiles: Speaker name to character profile mapping
             input_file: Input file for hash validation
             output_dir: Directory for progress files
             resume: Whether to resume from saved progress
@@ -291,13 +304,20 @@ class AudioGenerationPipeline:
 
             try:
                 # Build prompt and config
-                prompt = self._prompt_builder.build(batch, speaker_configs_map)
+                prompt = self._prompt_builder.build(
+                    batch, speaker_configs_map, character_profiles
+                )
                 speech_config = self._config_builder.build_for_batch(
                     batch, speaker_configs_map
                 )
 
                 # Generate audio
-                audio_data = self._tts_client.generate(prompt, speech_config, batch_num)
+                audio_data = self._tts_client.generate(
+                    prompt,
+                    speech_config,
+                    system_instruction=TTS_SYSTEM_INSTRUCTION,
+                    batch_num=batch_num,
+                )
 
                 # Save immediately to disk
                 if self._progress_manager and progress:

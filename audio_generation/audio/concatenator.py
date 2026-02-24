@@ -7,7 +7,6 @@ from pydub import AudioSegment
 
 from audio_generation.domain.models import PauseConfig, Segment
 from audio_generation.domain.constants import (
-    EMOTION_PAUSE_MODIFIERS,
     INTER_SEGMENT_PAUSE_MS,
     TARGET_SAMPLE_RATE,
 )
@@ -20,7 +19,6 @@ class SegmentConcatenator:
 
     Joins audio segments with professional-grade transitions including:
     - Context-aware pause durations based on speaker transitions
-    - Emotion-based pause modifiers
     - Punctuation-based pause adjustments
     - Comfort noise in pauses
     - Non-linear crossfades
@@ -211,7 +209,6 @@ class SegmentConcatenator:
 
         Considers:
         - Speaker transition type (narrator<->character, character<->character)
-        - Emotion of the previous segment
         - Punctuation-based pauses (ellipsis, em-dash, question mark)
 
         Args:
@@ -244,50 +241,18 @@ class SegmentConcatenator:
                 # Different characters talking - slightly longer
                 base_pause = int(config.character_to_character_ms * 1.25)
 
-        # Apply emotion modifier from previous segment
-        emotion_modifier = self._get_emotion_modifier(prev_segment.emotion)
-
         # Add punctuation-based pause
         punctuation_pause = self._detect_natural_pauses(prev_segment.text)
 
         # Calculate final pause
-        final_pause = int(base_pause * emotion_modifier) + punctuation_pause
+        final_pause = base_pause + punctuation_pause
 
         logging.debug(
             f"Pause: {prev_segment.speaker}->{next_segment.speaker} = "
-            f"{base_pause}ms x {emotion_modifier:.2f} + {punctuation_pause}ms = {final_pause}ms"
+            f"{base_pause}ms + {punctuation_pause}ms = {final_pause}ms"
         )
 
         return final_pause
-
-    def _get_emotion_modifier(self, emotion: str) -> float:
-        """Get pause duration modifier based on emotion.
-
-        Emotional content affects pacing - tense moments need longer pauses,
-        exciting moments need shorter pauses.
-
-        Args:
-            emotion: Emotion string from segment (may contain multiple descriptors)
-
-        Returns:
-            Multiplier for base pause duration (default 1.0)
-        """
-        if not emotion:
-            return 1.0
-
-        # Parse emotion string (may be comma-separated: "tense, hushed")
-        emotion_lower = emotion.lower()
-        modifiers = []
-
-        for emotion_key, modifier in EMOTION_PAUSE_MODIFIERS.items():
-            if emotion_key in emotion_lower:
-                modifiers.append(modifier)
-
-        if not modifiers:
-            return 1.0
-
-        # Average the modifiers if multiple emotions detected
-        return sum(modifiers) / len(modifiers)
 
     def _detect_natural_pauses(self, text: str) -> int:
         """Detect if text ends with pause-indicating punctuation.

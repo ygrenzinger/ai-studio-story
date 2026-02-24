@@ -36,13 +36,19 @@ class TTSClient:
         self._max_retries = max_retries
 
     def generate(
-        self, prompt: str, speech_config: types.SpeechConfig, batch_num: int = 0
+        self,
+        prompt: str,
+        speech_config: types.SpeechConfig,
+        system_instruction: str = "",
+        batch_num: int = 0,
     ) -> bytes:
         """Generate audio from prompt with retry handling.
 
         Args:
-            prompt: Text prompt for TTS
+            prompt: Text prompt for TTS (structured with sections)
             speech_config: Speech configuration from SpeechConfigBuilder
+            system_instruction: Optional system instruction for the model
+                (e.g., rules about not reading stage directions aloud)
             batch_num: Batch number for logging (1-indexed)
 
         Returns:
@@ -57,7 +63,7 @@ class TTSClient:
 
         for attempt in range(self._max_retries):
             try:
-                return self._make_request(prompt, speech_config)
+                return self._make_request(prompt, speech_config, system_instruction)
             except Exception as e:
                 if attempt < self._max_retries - 1:
                     logging.warning(
@@ -75,12 +81,18 @@ class TTSClient:
 
         raise RuntimeError(f"Batch {batch_num} failed: max retries exceeded")
 
-    def _make_request(self, prompt: str, speech_config: types.SpeechConfig) -> bytes:
+    def _make_request(
+        self,
+        prompt: str,
+        speech_config: types.SpeechConfig,
+        system_instruction: str = "",
+    ) -> bytes:
         """Make a single TTS API request.
 
         Args:
             prompt: Text prompt for TTS
             speech_config: Speech configuration
+            system_instruction: Optional system instruction
 
         Returns:
             Raw PCM audio data
@@ -88,13 +100,17 @@ class TTSClient:
         Raises:
             RuntimeError: If no audio data in response
         """
+        config = types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=speech_config,
+        )
+        if system_instruction:
+            config.system_instruction = system_instruction
+
         response = self._client.models.generate_content(
             model=self._model,
             contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["AUDIO"],
-                speech_config=speech_config,
-            ),
+            config=config,
         )
 
         # Extract audio data from response

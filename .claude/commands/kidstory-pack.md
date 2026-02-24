@@ -381,6 +381,7 @@ stories/{pack-slug}/
 ├── metadata.json                    # Pack metadata (type: "pack")
 ├── outline.md                       # Approved pack outline
 ├── story.json                       # Lunii format with hub structure
+├── thumbnail.png                    # 300x300 colorful PNG for library display
 ├── validation-report.md             # Validation results
 ```
 
@@ -655,6 +656,18 @@ Before completing, verify:
 - [ ] All asset references documented
 
 ---
+
+## After Content Generation: Generate Thumbnail
+
+Once all pack content (hub + stories) is complete, generate the pack thumbnail:
+
+1. **Delegate to thumbnail-generator subagent** via the Task tool
+2. Provide:
+   - Pack directory: `./stories/{pack-slug}/`
+   - Output path: `./stories/{pack-slug}/thumbnail.png`
+   - A rich description derived from the pack title, overall theme, and visual identity
+3. The thumbnail represents the entire pack in the Lunii library (300x300 colorful PNG)
+4. If `thumbnail.png` already exists, the subagent will skip generation
 
 ## Important Reminders
 
