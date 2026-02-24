@@ -346,6 +346,63 @@ Intro -> Main Content -> "Again?" Choice
                               |-> No -> Goodbye
 ```
 
+## MANDATORY controlSettings by Node Type
+
+These settings MUST be followed exactly. They are derived from working Lunii device stories (reference: `choses-a-savoir`).
+
+### Cover node (`type: "cover"`, `squareOne: true`)
+```json
+{"wheel": false, "ok": true, "home": false, "pause": false, "autoplay": false}
+```
+- `home: false` — this is the entry point, there's nowhere to go back to
+- `pause: false` — cover audio is a short intro, no need to pause
+
+### Story/chapter node (`type: "story"`)
+```json
+{"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
+```
+- `ok: false` and `autoplay: true` — story chapters play automatically, the child listens without pressing buttons
+- `home: true` — child can exit to return to menu/device home
+
+### Menu question stage (`type: "menu.questionstage"`)
+```json
+{"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
+```
+- `autoplay: true` — the "choose your path" prompt plays automatically, then transitions to options
+- `wheel: false, ok: false` — no user interaction on this stage, it auto-advances
+
+### Menu option stage (`type: "menu.optionstage"`)
+```json
+{"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
+```
+- `wheel: true` — child rotates the wheel to browse options
+- `ok: true` — child presses OK to select the current option
+
+### Story endpoint (last chapter, `okTransition: null`)
+```json
+{"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
+```
+- Same as story node — auto-plays, then the null okTransition ends the story
+
+## MANDATORY Node Typing and groupId Rules
+
+### groupId on menu nodes
+All `menu.questionstage`, `menu.optionstage`, `menu.questionaction`, and `menu.optionsaction` nodes
+that belong to the same choice/menu MUST share the same `groupId`.
+
+### groupId on story nodes
+Each `story` stage node MUST have a `groupId` set to its own `uuid` (self-referencing).
+
+### Action node types
+- Menu question routing: `type: "menu.questionaction"` with matching `groupId`
+- Menu options routing: `type: "menu.optionsaction"` with matching `groupId`
+- Story routing (from menu option to story): `type: "story.storyaction"` with `groupId` matching the target story stage's `groupId`
+- Simple linear transitions (non-menu): `type: "action"` (no groupId needed)
+
+### homeTransition on story stages
+Story stages that are part of a menu/hub MUST have `homeTransition` pointing back to the menu question action,
+so pressing HOME returns to the selection menu.
+
 ## Validation Checklist
 
 Before completing, verify:
@@ -353,7 +410,14 @@ Before completing, verify:
 - [ ] One squareOne node exists
 - [ ] All chapters have okTransition or null (ending)
 - [ ] All choice branches have valid targets
-- [ ] Home button enabled on all nodes
+- [ ] Cover node has `home: false` (entry point, nowhere to go back)
+- [ ] Story stages have `autoplay: true` and `ok: false`
+- [ ] Menu question stage has `autoplay: true` and `wheel: false, ok: false`
+- [ ] Menu option stages have `wheel: true` and `ok: true`
+- [ ] All menu nodes share the same `groupId`
+- [ ] All story stages have self-referencing `groupId`
+- [ ] Story-to-story action nodes use `story.storyaction` type with `groupId`
+- [ ] Story stages in hub/menu have `homeTransition` back to menu
 - [ ] No orphaned nodes
 - [ ] All asset references documented
 - [ ] Content is age-appropriate

@@ -288,35 +288,79 @@ Ages 9-10: 7-10 minutes per chapter
 ---
 
 ### RULE: Control Settings Consistency
-- **Severity:** WARNING
-- **Check:** Control settings match node type
-- **Fix:** Adjust control settings
+- **Severity:** ERROR
+- **Check:** Control settings match node type (derived from working Lunii device stories)
+- **Fix:** Apply the correct controlSettings pattern for each node type
+
+**Required patterns:**
 
 ```javascript
-// Choice point should have wheel enabled
-{
-  uuid: "choice-stage",
-  okTransition: { actionNode: "action-choice", ... },
-  controlSettings: { wheel: true, ... }  // Required for choice
-}
+// Cover node (squareOne: true)
+controlSettings: { wheel: false, ok: true, home: false, pause: false, autoplay: false }
 
-// Ending should have ok disabled
-{
-  uuid: "ending",
-  okTransition: null,
-  controlSettings: { ok: false, ... }  // No action to take
-}
+// Story chapter (type: "story")
+controlSettings: { wheel: false, ok: false, home: true, pause: true, autoplay: true }
+
+// Menu question stage (type: "menu.questionstage")
+controlSettings: { wheel: false, ok: false, home: false, pause: false, autoplay: true }
+
+// Menu option stage (type: "menu.optionstage")
+controlSettings: { wheel: true, ok: true, home: true, pause: false, autoplay: false }
+
+// Story endpoint (okTransition: null) — same as story chapter
+controlSettings: { wheel: false, ok: false, home: true, pause: true, autoplay: true }
 ```
+
+---
+
+### RULE: Cover Home Setting
+- **Severity:** ERROR
+- **Check:** Cover node (`squareOne: true`) must have `home: false`
+- **Fix:** Set `controlSettings.home` to `false` on the cover node
+
+The cover is the entry point — there's nowhere to go back to.
+
+---
+
+### RULE: Story Autoplay Setting
+- **Severity:** ERROR
+- **Check:** Story stages (`type: "story"`) must have `autoplay: true` and `ok: false`
+- **Fix:** Set `controlSettings.autoplay` to `true` and `controlSettings.ok` to `false`
+
+Story chapters play automatically. The child listens without pressing buttons.
+
+---
+
+### RULE: Menu Question Autoplay
+- **Severity:** ERROR
+- **Check:** Menu question stages (`type: "menu.questionstage"`) must have `autoplay: true` and `wheel: false, ok: false`
+- **Fix:** Set `autoplay: true`, `wheel: false`, `ok: false` on menu question stages
+
+The "choose your path" prompt plays automatically, then auto-transitions to options.
+
+---
+
+### RULE: groupId Consistency
+- **Severity:** ERROR
+- **Check:** All menu nodes (question stages, option stages, question actions, options actions) that belong to the same menu MUST share the same `groupId`. Each story stage MUST have a `groupId` set to its own `uuid` (self-referencing).
+- **Fix:** Add matching `groupId` to all related nodes
+
+---
+
+### RULE: homeTransition on Story Stages
+- **Severity:** WARNING
+- **Check:** Story stages in a hub/menu structure should have `homeTransition` pointing back to the menu question action
+- **Fix:** Add `homeTransition` to story stages pointing to the appropriate menu action
 
 ---
 
 ### RULE: Bedtime Mode Consistency
 - **Severity:** WARNING
 - **Check:** If bedtime mode, all applicable stages have autoplay
-- **Fix:** Enable autoplay on story stages
+- **Fix:** Enable autoplay on story stages (this is now the default for all story stages)
 
 ```javascript
-// Bedtime mode story
+// Story stages always have autoplay: true
 {
   uuid: "chapter-1",
   controlSettings: { autoplay: true, ... }  // Auto-advance

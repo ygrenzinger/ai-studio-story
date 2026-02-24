@@ -412,24 +412,31 @@ A simple 3-node linear story:
 
 ### Control Settings Patterns
 
-**Interactive Story (User Chooses):**
+These patterns are derived from working Lunii device stories and MUST be followed.
+
+**Cover Node (Entry Point):**
 ```json
-{"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
+{"wheel": false, "ok": true, "home": false, "pause": false, "autoplay": false}
 ```
 
-**Linear Autoplay Story:**
+**Story Chapter (Auto-Play Content):**
 ```json
 {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
 ```
 
-**Menu Option Display:**
+**Menu Question Stage (Auto-Advance Prompt):**
+```json
+{"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
+```
+
+**Menu Option Stage (User Browses & Selects):**
 ```json
 {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
 ```
 
-**Story Endpoint:**
+**Story Endpoint (Last Chapter, okTransition: null):**
 ```json
-{"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+{"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
 ```
 
 ---

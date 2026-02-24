@@ -461,79 +461,99 @@ Generate a hub-based story structure.
       "squareOne": true,
       "name": "Pack Cover",
       "type": "cover",
-      "image": "hub-cover.png",
+      "image": "hub-cover.bmp",
       "audio": "hub-cover.mp3",
       "okTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": true, "home": false, "pause": false, "autoplay": false}
     },
     {
       "uuid": "hub-menu",
       "name": "Story Menu",
       "type": "menu.questionstage",
-      "image": "hub-menu.png",
+      "groupId": "menu-{pack-slug}",
+      "image": null,
       "audio": "hub-menu.mp3",
       "okTransition": {"actionNode": "action-choose-story", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
     },
     {
       "uuid": "hub-welcome-back",
       "name": "Welcome Back",
-      "type": "stage",
-      "image": "hub-menu.png",
+      "type": "menu.questionstage",
+      "groupId": "menu-{pack-slug}",
+      "image": null,
       "audio": "hub-welcome-back.mp3",
-      "okTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
+      "okTransition": {"actionNode": "action-choose-story", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
     },
     {
       "uuid": "hub-goodbye",
       "name": "Goodbye",
-      "type": "stage",
-      "image": "hub-goodbye.png",
+      "type": "story",
+      "groupId": "hub-goodbye",
+      "image": null,
       "audio": "hub-goodbye.mp3",
       "okTransition": null,
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
-    
-    // Story 1 stages
+
+    // Menu option stages (one per story) — child rotates wheel to browse
+    {
+      "uuid": "option-story1",
+      "name": "Option - Story 1",
+      "type": "menu.optionstage",
+      "groupId": "menu-{pack-slug}",
+      "image": "option-story1.bmp",
+      "audio": "option-story1.mp3",
+      "okTransition": {"actionNode": "action-to-story1", "optionIndex": 0},
+      "homeTransition": null,
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
+    },
+    // ... one menu.optionstage per story, all sharing the same groupId
+
+    // Story 1 stages — auto-play, child just listens
     {
       "uuid": "story1-ch1",
       "name": "Story 1 - Chapter 1",
-      "type": "stage",
-      "image": "story1-ch1.png",
+      "type": "story",
+      "groupId": "story1-ch1",
+      "image": "story1-ch1.bmp",
       "audio": "story1-ch1.mp3",
       "okTransition": {"actionNode": "action-story1-ch2", "optionIndex": 0},
-      "homeTransition": {"actionNode": "action-return-menu", "optionIndex": 0},
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "homeTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
     {
       "uuid": "story1-ending",
       "name": "Story 1 - Ending",
-      "type": "stage",
-      "image": "story1-ending.png",
+      "type": "story",
+      "groupId": "story1-ending",
+      "image": "story1-ending.bmp",
       "audio": "story1-ending.mp3",
       "okTransition": {"actionNode": "action-return-welcome", "optionIndex": 0},
-      "homeTransition": {"actionNode": "action-return-menu", "optionIndex": 0},
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "homeTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     }
-    
+
     // Story 2, 3, etc. stages follow same pattern
   ],
 
   "actionNodes": [
-    {"id": "action-to-menu", "name": "To Menu", "type": "action", "options": ["hub-menu"]},
+    {"id": "action-to-menu", "name": "Vers le Menu", "type": "menu.questionaction", "groupId": "menu-{pack-slug}", "options": ["hub-menu"]},
     {
       "id": "action-choose-story",
-      "name": "Choose Story",
+      "name": "Choix Histoire",
       "type": "menu.optionsaction",
-      "options": ["story1-ch1", "story2-ch1", "story3-ch1", "hub-goodbye"]
+      "groupId": "menu-{pack-slug}",
+      "options": ["option-story1", "option-story2", "option-story3"]
     },
-    {"id": "action-return-menu", "name": "Return to Menu", "type": "action", "options": ["hub-menu"]},
-    {"id": "action-return-welcome", "name": "Return via Welcome", "type": "action", "options": ["hub-welcome-back"]},
-    {"id": "action-story1-ch2", "name": "Story 1 Ch2", "type": "action", "options": ["story1-ch2"]}
+    {"id": "action-to-story1", "name": "Vers Histoire 1", "type": "story.storyaction", "groupId": "story1-ch1", "options": ["story1-ch1"]},
+    {"id": "action-return-welcome", "name": "Retour Accueil", "type": "menu.questionaction", "groupId": "menu-{pack-slug}", "options": ["hub-welcome-back"]},
+    {"id": "action-story1-ch2", "name": "Histoire 1 Ch2", "type": "story.storyaction", "groupId": "story1-ch2", "options": ["story1-ch2"]}
     // Additional action nodes for story navigation
   ]
 }
@@ -578,6 +598,27 @@ Follow the same guidelines as single stories:
 
 ---
 
+## MANDATORY controlSettings by Node Type
+
+These settings MUST be followed exactly. They are derived from working Lunii device stories (reference: `choses-a-savoir`).
+
+| Node Type | wheel | ok | home | pause | autoplay |
+|-----------|-------|----|------|-------|----------|
+| **cover** | false | true | **false** | **false** | false |
+| **story** | false | **false** | true | true | **true** |
+| **menu.questionstage** | **false** | **false** | **false** | **false** | **true** |
+| **menu.optionstage** | **true** | true | true | **false** | false |
+| **endpoint** (okTransition:null) | false | **false** | true | true | **true** |
+
+## MANDATORY Node Typing and groupId Rules
+
+- All `menu.questionstage`, `menu.optionstage`, `menu.questionaction`, and `menu.optionsaction` nodes MUST share the same `groupId`
+- Each `story` stage node MUST have a `groupId` set to its own `uuid` (self-referencing)
+- Menu question routing: `type: "menu.questionaction"` with matching `groupId`
+- Menu options routing: `type: "menu.optionsaction"` with matching `groupId`
+- Story routing (from menu option to story): `type: "story.storyaction"` with `groupId` matching the target story stage's `groupId`
+- Story stages in hub/menu MUST have `homeTransition` pointing back to the menu question action
+
 ## Validation Checklist
 
 Before completing, verify:
@@ -585,10 +626,12 @@ Before completing, verify:
 ### Hub Validation
 - [ ] Cover stage UUID is globally unique: use `hub-cover-{pack-slug}` format (e.g., `hub-cover-forest-friends`)
 - [ ] Hub cover is squareOne
-- [ ] Menu has wheel enabled for story selection
+- [ ] Cover node has `home: false` (entry point, nowhere to go back)
+- [ ] Menu question stages have `autoplay: true` and `wheel: false, ok: false`
+- [ ] Menu option stages have `wheel: true` and `ok: true`
+- [ ] All menu nodes share the same `groupId`
 - [ ] All stories accessible from menu
 - [ ] Goodbye/exit option present
-- [ ] Home button enabled on all hub stages
 - [ ] `hub/cover-welcome.md` exists
 - [ ] `hub/menu.md` exists
 - [ ] `hub/option-{name}.md` exists for EVERY story in the pack
@@ -597,9 +640,12 @@ Before completing, verify:
 
 ### Per-Story Validation
 - [ ] Each story has clear beginning and ending
+- [ ] Story stages have `autoplay: true` and `ok: false`
+- [ ] All story stages have self-referencing `groupId`
+- [ ] Story-to-story action nodes use `story.storyaction` type with `groupId`
 - [ ] Endings transition back to hub (via welcome-back or menu)
 - [ ] No orphaned stages within stories
-- [ ] Home button returns to hub menu
+- [ ] Story stages have `homeTransition` back to hub menu
 
 ### Pack-Wide Validation
 - [ ] All stories use consistent voice configuration

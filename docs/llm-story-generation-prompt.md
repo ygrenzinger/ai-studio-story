@@ -59,8 +59,8 @@ Next Stage Node
       "controlSettings": {
         "wheel": false,
         "ok": true,
-        "home": true,
-        "pause": true,
+        "home": false,
+        "pause": false,
         "autoplay": false
       }
     }
@@ -140,31 +140,20 @@ Next Stage Node
 }
 ```
 
-**Common patterns:**
+**MANDATORY patterns by node type (derived from working Lunii device stories):**
 
-**Interactive story (wait for child to press OK):**
+**Cover node (entry point, `squareOne: true`):**
 ```json
 {
   "wheel": false,
   "ok": true,
-  "home": true,
-  "pause": true,
+  "home": false,
+  "pause": false,
   "autoplay": false
 }
 ```
 
-**Choice/menu (child rotates wheel to choose):**
-```json
-{
-  "wheel": true,
-  "ok": true,
-  "home": true,
-  "pause": true,
-  "autoplay": false
-}
-```
-
-**Auto-playing story (no interaction needed):**
+**Story chapter (`type: "story"`, auto-plays content):**
 ```json
 {
   "wheel": false,
@@ -172,6 +161,28 @@ Next Stage Node
   "home": true,
   "pause": true,
   "autoplay": true
+}
+```
+
+**Menu question stage (`type: "menu.questionstage"`, auto-advance prompt):**
+```json
+{
+  "wheel": false,
+  "ok": false,
+  "home": false,
+  "pause": false,
+  "autoplay": true
+}
+```
+
+**Menu option stage (`type: "menu.optionstage"`, child browses with wheel):**
+```json
+{
+  "wheel": true,
+  "ok": true,
+  "home": true,
+  "pause": false,
+  "autoplay": false
 }
 ```
 
@@ -188,34 +199,39 @@ Next Stage Node
       "uuid": "stage-001",
       "squareOne": true,
       "name": "Introduction",
+      "type": "cover",
       "audio": "intro.mp3",
       "image": "intro.bmp",
       "okTransition": {"actionNode": "action-001", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": true, "home": false, "pause": false, "autoplay": false}
     },
     {
       "uuid": "stage-002",
       "name": "Middle",
+      "type": "story",
+      "groupId": "stage-002",
       "audio": "middle.mp3",
       "image": "middle.bmp",
       "okTransition": {"actionNode": "action-002", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
     {
       "uuid": "stage-003",
       "name": "Ending",
+      "type": "story",
+      "groupId": "stage-003",
       "audio": "end.mp3",
       "image": "end.bmp",
       "okTransition": null,
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     }
   ],
   "actionNodes": [
-    {"id": "action-001", "options": ["stage-002"]},
-    {"id": "action-002", "options": ["stage-003"]}
+    {"id": "action-001", "type": "story.storyaction", "groupId": "stage-002", "options": ["stage-002"]},
+    {"id": "action-002", "type": "story.storyaction", "groupId": "stage-003", "options": ["stage-003"]}
   ]
 }
 ```
@@ -233,29 +249,35 @@ Next Stage Node
       "uuid": "stage-question",
       "squareOne": true,
       "name": "Question",
+      "type": "menu.questionstage",
+      "groupId": "menu-choice",
       "audio": "which-path.mp3",
-      "image": "crossroads.bmp",
+      "image": null,
       "okTransition": {"actionNode": "action-choose", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
     },
     {
       "uuid": "stage-left",
       "name": "Left Path",
+      "type": "menu.optionstage",
+      "groupId": "menu-choice",
       "audio": "left-path.mp3",
       "image": "forest.bmp",
-      "okTransition": null,
+      "okTransition": {"actionNode": "action-to-left-story", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
     },
     {
       "uuid": "stage-right",
       "name": "Right Path",
+      "type": "menu.optionstage",
+      "groupId": "menu-choice",
       "audio": "right-path.mp3",
       "image": "mountain.bmp",
-      "okTransition": null,
+      "okTransition": {"actionNode": "action-to-right-story", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
     }
   ],
   "actionNodes": [
@@ -280,46 +302,94 @@ Next Stage Node
       "uuid": "stage-menu",
       "squareOne": true,
       "name": "Main Menu",
+      "type": "menu.questionstage",
+      "groupId": "menu-main",
       "audio": "choose-story.mp3",
-      "image": "menu.bmp",
-      "okTransition": {"actionNode": "action-menu", "optionIndex": 0},
+      "image": null,
+      "okTransition": {"actionNode": "action-menu-options", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
+    },
+    {
+      "uuid": "option-story1",
+      "name": "Option - Story 1",
+      "type": "menu.optionstage",
+      "groupId": "menu-main",
+      "audio": "option-story1.mp3",
+      "image": "option-story1.bmp",
+      "okTransition": {"actionNode": "action-to-story1", "optionIndex": 0},
+      "homeTransition": null,
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
+    },
+    {
+      "uuid": "option-story2",
+      "name": "Option - Story 2",
+      "type": "menu.optionstage",
+      "groupId": "menu-main",
+      "audio": "option-story2.mp3",
+      "image": "option-story2.bmp",
+      "okTransition": {"actionNode": "action-to-story2", "optionIndex": 0},
+      "homeTransition": null,
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
     },
     {
       "uuid": "stage-story1",
       "name": "Story 1",
+      "type": "story",
+      "groupId": "stage-story1",
       "audio": "story1.mp3",
       "image": "story1.bmp",
       "okTransition": {"actionNode": "action-return1", "optionIndex": 0},
-      "homeTransition": {"actionNode": "action-home", "optionIndex": 0},
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "homeTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
     {
       "uuid": "stage-story2",
       "name": "Story 2",
+      "type": "story",
+      "groupId": "stage-story2",
       "audio": "story2.mp3",
       "image": "story2.bmp",
       "okTransition": {"actionNode": "action-return2", "optionIndex": 0},
-      "homeTransition": {"actionNode": "action-home", "optionIndex": 0},
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "homeTransition": {"actionNode": "action-to-menu", "optionIndex": 0},
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     }
   ],
   "actionNodes": [
     {
-      "id": "action-menu",
-      "options": ["stage-story1", "stage-story2"]
+      "id": "action-to-menu",
+      "type": "menu.questionaction",
+      "groupId": "menu-main",
+      "options": ["stage-menu"]
+    },
+    {
+      "id": "action-menu-options",
+      "type": "menu.optionsaction",
+      "groupId": "menu-main",
+      "options": ["option-story1", "option-story2"]
+    },
+    {
+      "id": "action-to-story1",
+      "type": "story.storyaction",
+      "groupId": "stage-story1",
+      "options": ["stage-story1"]
+    },
+    {
+      "id": "action-to-story2",
+      "type": "story.storyaction",
+      "groupId": "stage-story2",
+      "options": ["stage-story2"]
     },
     {
       "id": "action-return1",
+      "type": "menu.questionaction",
+      "groupId": "menu-main",
       "options": ["stage-menu"]
     },
     {
       "id": "action-return2",
-      "options": ["stage-menu"]
-    },
-    {
-      "id": "action-home",
+      "type": "menu.questionaction",
+      "groupId": "menu-main",
       "options": ["stage-menu"]
     }
   ]
@@ -497,7 +567,14 @@ The Lunii device firmware calls `java.util.UUID.fromString()` on every `uuid` an
 4. **Always** validate that actionNode IDs exist
 5. **Always** validate that optionIndex is within bounds of options array
 6. **Always** use exact dimensions for images (320x240)
-7. **Always** enable the HOME button unless you have a very good reason
+7. **Always** set cover node `home: false` (entry point, nowhere to go back)
+8. **Always** set story stages to `autoplay: true, ok: false` (auto-play content)
+9. **Always** set menu question stages to `autoplay: true, wheel: false, ok: false`
+10. **Always** set menu option stages to `wheel: true, ok: true`
+11. **Always** add `groupId` to all menu nodes (shared) and story stages (self-referencing)
+12. **Always** use `story.storyaction` type for action nodes linking to story stages
+13. **Always** use `menu.questionaction`/`menu.optionsaction` types for menu routing actions
+14. **Always** set `homeTransition` on story stages in hub/menu pointing back to the menu
 
 ### ❌ DON'T
 
@@ -507,6 +584,9 @@ The Lunii device firmware calls `java.util.UUID.fromString()` on every `uuid` an
 4. **Don't** trap the user (always provide home button or null transition)
 5. **Don't** forget to include all referenced assets in the assets/ directory
 6. **Don't** use relative paths in asset references
+7. **Don't** set `home: true` on cover nodes (there's nowhere to go back)
+8. **Don't** set `ok: true, autoplay: false` on story stages (they must auto-play)
+9. **Don't** omit `groupId` from story or menu nodes
 
 ## Validation Checklist
 
@@ -568,47 +648,73 @@ Fly Ending      Explore Ending
       "audio": "welcome.mp3",
       "okTransition": {"actionNode": "action-to-forest", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": true, "home": false, "pause": false, "autoplay": false}
     },
     {
       "uuid": "stage-forest",
       "name": "Enter Forest",
-      "type": "stage",
+      "type": "story",
+      "groupId": "stage-forest",
       "image": "forest.bmp",
       "audio": "forest-sounds.mp3",
       "okTransition": {"actionNode": "action-to-fairy", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
     {
       "uuid": "stage-fairy",
-      "name": "Meet Fairy",
-      "type": "stage",
-      "image": "fairy.bmp",
+      "name": "Meet Fairy - Choose",
+      "type": "menu.questionstage",
+      "groupId": "menu-fairy-choice",
+      "image": null,
       "audio": "fairy-question.mp3",
       "okTransition": {"actionNode": "action-choose", "optionIndex": 0},
       "homeTransition": null,
-      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": false, "pause": false, "autoplay": true}
+    },
+    {
+      "uuid": "option-fly",
+      "name": "Option - Fly",
+      "type": "menu.optionstage",
+      "groupId": "menu-fairy-choice",
+      "image": "flying.bmp",
+      "audio": "option-fly.mp3",
+      "okTransition": {"actionNode": "action-to-fly", "optionIndex": 0},
+      "homeTransition": null,
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
+    },
+    {
+      "uuid": "option-explore",
+      "name": "Option - Explore",
+      "type": "menu.optionstage",
+      "groupId": "menu-fairy-choice",
+      "image": "treasure.bmp",
+      "audio": "option-explore.mp3",
+      "okTransition": {"actionNode": "action-to-explore", "optionIndex": 0},
+      "homeTransition": null,
+      "controlSettings": {"wheel": true, "ok": true, "home": true, "pause": false, "autoplay": false}
     },
     {
       "uuid": "stage-fly",
       "name": "Fly Ending",
-      "type": "stage",
+      "type": "story",
+      "groupId": "stage-fly",
       "image": "flying.bmp",
       "audio": "flying-story.mp3",
       "okTransition": null,
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     },
     {
       "uuid": "stage-explore",
       "name": "Explore Ending",
-      "type": "stage",
+      "type": "story",
+      "groupId": "stage-explore",
       "image": "treasure.bmp",
       "audio": "treasure-story.mp3",
       "okTransition": null,
       "homeTransition": null,
-      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": false}
+      "controlSettings": {"wheel": false, "ok": false, "home": true, "pause": true, "autoplay": true}
     }
   ],
 
@@ -616,20 +722,37 @@ Fly Ending      Explore Ending
     {
       "id": "action-to-forest",
       "name": "To Forest",
-      "type": "action",
+      "type": "story.storyaction",
+      "groupId": "stage-forest",
       "options": ["stage-forest"]
     },
     {
       "id": "action-to-fairy",
-      "name": "To Fairy",
-      "type": "action",
+      "name": "To Fairy Choice",
+      "type": "menu.questionaction",
+      "groupId": "menu-fairy-choice",
       "options": ["stage-fairy"]
     },
     {
       "id": "action-choose",
-      "name": "Fly or Explore",
-      "type": "action",
-      "options": ["stage-fly", "stage-explore"]
+      "name": "Fly or Explore Options",
+      "type": "menu.optionsaction",
+      "groupId": "menu-fairy-choice",
+      "options": ["option-fly", "option-explore"]
+    },
+    {
+      "id": "action-to-fly",
+      "name": "To Fly Story",
+      "type": "story.storyaction",
+      "groupId": "stage-fly",
+      "options": ["stage-fly"]
+    },
+    {
+      "id": "action-to-explore",
+      "name": "To Explore Story",
+      "type": "story.storyaction",
+      "groupId": "stage-explore",
+      "options": ["stage-explore"]
     }
   ]
 }

@@ -11,10 +11,14 @@ Always use `uv` to run Python scripts. Use `context7` MCP for library docs.
 ## Story structure
 
 Each story lives in `stories/{name}/` with:
-- `metadata.json`, `story.json`, `outline.md`
-- `chapters/{nn-slug}/chapter.md` and `audio-script.md`
-- `characters/{name}.json`
+- `story.json` - Lunii device story graph (the only required file)
+- `thumbnail.png` - Pack thumbnail for library display
 - `assets/` - generated `.bmp` covers and `.mp3` audio
+- `src/` - source files (for editing/regeneration):
+  - `metadata.json`, `outline.md`
+  - `chapters/{nn-slug}/chapter.md` and `audio-script.md`
+  - `characters/{name}.json`
+  - For packs: `hub/` and `stories/` subdirectories
 
 
 ## Commands

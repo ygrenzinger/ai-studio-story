@@ -406,11 +406,11 @@ MenuNode {
         "optionIndex": 0
       },
       "controlSettings": {
-        "wheel": true,
-        "ok": true,
-        "home": true,
+        "wheel": false,
+        "ok": false,
+        "home": false,
         "pause": false,
-        "autoplay": false
+        "autoplay": true
       }
     },
     {
@@ -420,7 +420,14 @@ MenuNode {
       "name": "Red",
       "image": "red.bmp",
       "audio": "red.mp3",
-      "okTransition": {"actionNode": "next-action", "optionIndex": 0}
+      "okTransition": {"actionNode": "next-action", "optionIndex": 0},
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
     },
     {
       "uuid": "menu-abc123-444444440001",
@@ -429,7 +436,14 @@ MenuNode {
       "name": "Blue",
       "image": "blue.bmp",
       "audio": "blue.mp3",
-      "okTransition": {"actionNode": "next-action", "optionIndex": 0}
+      "okTransition": {"actionNode": "next-action", "optionIndex": 0},
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
     },
     {
       "uuid": "menu-abc123-444444440002",
@@ -438,7 +452,14 @@ MenuNode {
       "name": "Green",
       "image": "green.bmp",
       "audio": "green.mp3",
-      "okTransition": {"actionNode": "next-action", "optionIndex": 0}
+      "okTransition": {"actionNode": "next-action", "optionIndex": 0},
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
     }
   ],
   "actionNodes": [
@@ -769,18 +790,21 @@ Transition: {actionNode: "action-1", optionIndex: -1}
 
 ### Control Settings Patterns
 
-#### Interactive Story (User Chooses)
+These patterns are derived from working Lunii device stories and MUST be followed.
+
+#### Cover Node (Entry Point)
 ```json
 {
-  "wheel": true,
+  "wheel": false,
   "ok": true,
-  "home": true,
-  "pause": true,
+  "home": false,
+  "pause": false,
   "autoplay": false
 }
 ```
+Cover is the entry point — `home: false` because there's nowhere to go back to.
 
-#### Linear Autoplay Story
+#### Story Chapter (Auto-Play Content)
 ```json
 {
   "wheel": false,
@@ -790,19 +814,9 @@ Transition: {actionNode: "action-1", optionIndex: -1}
   "autoplay": true
 }
 ```
+Story content plays automatically. Child listens without pressing buttons.
 
-#### Menu Option Display
-```json
-{
-  "wheel": true,
-  "ok": true,
-  "home": true,
-  "pause": false,
-  "autoplay": false
-}
-```
-
-#### Cutscene/Non-Interactive
+#### Menu Question Stage (Auto-Advance Prompt)
 ```json
 {
   "wheel": false,
@@ -812,6 +826,31 @@ Transition: {actionNode: "action-1", optionIndex: -1}
   "autoplay": true
 }
 ```
+Plays "Choose your story" prompt, then auto-transitions to options display.
+
+#### Menu Option Stage (User Browses & Selects)
+```json
+{
+  "wheel": true,
+  "ok": true,
+  "home": true,
+  "pause": false,
+  "autoplay": false
+}
+```
+Child rotates wheel to browse options, presses OK to select.
+
+#### Story Endpoint (Last Chapter, okTransition: null)
+```json
+{
+  "wheel": false,
+  "ok": false,
+  "home": true,
+  "pause": true,
+  "autoplay": true
+}
+```
+Same as story chapter. After audio finishes, null transition ends the story.
 
 ---
 
