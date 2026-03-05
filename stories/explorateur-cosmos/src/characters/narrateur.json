@@ -1,0 +1,21 @@
+{
+  "name": "Narrateur",
+  "role": "Voix-off narrative",
+  "gender": "male",
+  "personality": [
+    "Informatif et posé",
+    "Capable de transmettre l'émerveillement",
+    "Voix d'autorité douce",
+    "Poétique dans les descriptions"
+  ],
+  "voice": {
+    "name": "Charon",
+    "characteristic": "Informative"
+  },
+  "description": "Le narrateur est une voix off qui pose le décor, décrit les environnements cosmiques, et assure les transitions entre les dialogues. Sa voix est calme, informative et teintée d'émerveillement devant les merveilles de l'univers.",
+  "typical_lines": [
+    "Le vaisseau Céleste glissa silencieusement à travers le vide de l'espace...",
+    "Devant eux s'étendait un spectacle que peu d'êtres humains avaient jamais contemplé.",
+    "Dans l'immensité du cosmos, une lumière nouvelle venait de s'allumer."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Professeur Hypnos",
+  "role": "Expert scientifique",
+  "age": "Indéterminé (c'est un neurone)",
+  "gender": "male",
+  "personality": [
+    "Passionné",
+    "Enthousiaste",
+    "Pédagogue naturel",
+    "Adore les analogies et les comparaisons",
+    "Un peu professoral mais jamais ennuyeux",
+    "S'émerveille de ses propres explications"
+  ],
+  "voice": {
+    "name": "Sadaltager",
+    "characteristic": "Knowledgeable"
+  },
+  "appearance": "Neurone géant anthropomorphe avec des dendrites qui bougent comme des bras expressifs. Il porte de minuscules lunettes sur ce qui ressemble à un visage amical. Il brille d'une lumière dorée quand il est enthousiaste.",
+  "description": "Le Professeur Hypnos est un neurone du cerveau de Nora, devenu au fil du temps un véritable savant du sommeil. Il adore expliquer les choses et utilise constamment des analogies pour rendre les concepts scientifiques accessibles. Il est le personnage qui porte la majorité du contenu éducatif de l'histoire.",
+  "role_in_story": "Apparaît dans les chapitres 1 et 2 pour fournir les explications scientifiques sur les cycles du sommeil, le fonctionnement du corps pendant la nuit, et les mécanismes des rêves et des cauchemars. C'est le 'professeur' de l'aventure.",
+  "typical_lines": [
+    "Excellente question, Nora ! Laisse-moi te montrer quelque chose de fascinant...",
+    "Imagine que ton cerveau est une immense bibliothèque...",
+    "Chaque nuit, tu traverses quatre à six cycles de sommeil. C'est comme une montagne russe !",
+    "Les cauchemars, c'est ton cerveau qui s'entraîne. Comme un super-héros qui fait des exercices.",
+    "Dormir, c'est littéralement grandir !"
+  ]
+}

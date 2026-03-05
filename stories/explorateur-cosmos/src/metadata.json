@@ -1,0 +1,117 @@
+{
+  "type": "pack",
+  "title": "Les Merveilles du Cosmos",
+  "description": "Un voyage extraordinaire à travers le système solaire pour découvrir les phénomènes les plus étonnants de l'univers",
+  "version": 1,
+  "language": "fr-FR",
+  "targetAge": {
+    "min": 9,
+    "max": 10
+  },
+  "totalDuration": "70-90 minutes",
+  "storiesCount": 9,
+  "createdDate": "2026-03-04",
+  "status": "in_progress",
+  "tone": "calm_educational",
+  "themes": [
+    "astronomie",
+    "système solaire",
+    "physique",
+    "exploration spatiale",
+    "curiosité scientifique",
+    "émerveillement"
+  ],
+  "educationalGoals": [
+    "Développer la curiosité et l'émerveillement face à l'univers",
+    "Apprendre des faits scientifiques réels sur le système solaire et les phénomènes cosmiques",
+    "Comprendre que la science est une aventure en constante évolution",
+    "Encourager le questionnement et la réflexion scientifique"
+  ],
+  "approach": "Exploration narrative à travers un vaisseau spatial, chaque destination révélant un phénomène cosmique réel expliqué de manière accessible et poétique",
+  "storyPattern": "hub",
+  "nightModeAvailable": false,
+  "stories": [
+    {
+      "id": "01-soleil",
+      "title": "Le Gardien de Lumière",
+      "subject": "Le Soleil",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "02-anneaux-saturne",
+      "title": "La Danse des Anneaux",
+      "subject": "Les anneaux de Saturne",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "03-trous-noirs",
+      "title": "Le Mangeur de Lumière",
+      "subject": "Les trous noirs",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "04-tache-jupiter",
+      "title": "La Tempête Éternelle",
+      "subject": "La Grande Tache Rouge de Jupiter",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "05-volcans-io",
+      "title": "Le Monde en Feu",
+      "subject": "Les volcans de Io",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "06-naissance-etoiles",
+      "title": "La Pouponnière des Étoiles",
+      "subject": "La naissance des étoiles",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "07-comete-voyageuse",
+      "title": "La Voyageuse de Glace",
+      "subject": "Les comètes",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "08-mars-mysteres",
+      "title": "Les Secrets de la Planète Rouge",
+      "subject": "Mars",
+      "duration": "7-10 min",
+      "status": "pending"
+    },
+    {
+      "id": "09-lunes-glacees",
+      "title": "L'Océan Sous la Glace",
+      "subject": "Europa, lune de Jupiter",
+      "duration": "7-10 min",
+      "status": "pending"
+    }
+  ],
+  "mainCharacters": [
+    {
+      "name": "Nova",
+      "role": "Protagoniste",
+      "age": 10,
+      "description": "Jeune exploratrice spatiale curieuse et courageuse"
+    },
+    {
+      "name": "Zéphyr",
+      "role": "IA du vaisseau / compagnon",
+      "description": "Intelligence artificielle bienveillante et savante qui guide Nova"
+    }
+  ],
+  "contentWarnings": {
+    "violence": "Aucune",
+    "scary": "Quelques éléments impressionnants (trous noirs, volcans) mais toujours expliqués avec bienveillance",
+    "separation": "Nova voyage seule avec Zéphyr mais est toujours en sécurité",
+    "notes": "Contenu adapté pour 9-10 ans, faits scientifiques vérifiés et simplifiés"
+  }
+}

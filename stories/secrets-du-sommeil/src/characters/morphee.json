@@ -1,0 +1,28 @@
+{
+  "name": "Morphée",
+  "role": "Guide et compagnon",
+  "age": "Ancien, existe depuis que les humains dorment",
+  "gender": "neutral",
+  "personality": [
+    "Bienveillant",
+    "Patient",
+    "Légèrement espiègle",
+    "Poétique dans ses métaphores",
+    "Sage sans être condescendant",
+    "Rassurant"
+  ],
+  "voice": {
+    "name": "Achird",
+    "characteristic": "Friendly"
+  },
+  "appearance": "Petit être bioluminescent en forme de méduse flottante, bleu-violet iridescent. Il pulse doucement de lumière et laisse une traînée scintillante derrière lui.",
+  "description": "Morphée est un gardien du sommeil, une créature lumineuse qui veille sur les dormeurs depuis la nuit des temps. Il apparaît à Nora parce qu'elle a besoin de comprendre le sommeil pour pouvoir s'endormir. Il la guide avec douceur à travers le voyage, pose des questions pour stimuler sa réflexion, et la rassure quand les choses deviennent impressionnantes. Il parle souvent en métaphores poétiques.",
+  "role_in_story": "Guide principal de l'aventure. Il accompagne Nora dans les trois chapitres, assure les transitions entre les mondes, et offre le réconfort émotionnel. C'est aussi lui qui enseigne les bonnes habitudes du sommeil dans le chapitre 3.",
+  "typical_lines": [
+    "Suis-moi, petite exploratrice... ton corps a tant de merveilles à te montrer.",
+    "Tu sais, le sommeil est le plus beau voyage que tu fais chaque nuit.",
+    "N'aie pas peur. Ce que tu vois ici, c'est ton cerveau qui prend soin de toi.",
+    "Je suis toujours là, Nora. Chaque nuit, quand tu fermes les yeux, je veille sur ton sommeil.",
+    "Bonne nuit, petite gardienne de la nuit."
+  ]
+}

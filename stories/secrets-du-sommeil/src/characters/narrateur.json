@@ -1,0 +1,22 @@
+{
+  "name": "Narrateur",
+  "role": "Narrateur principal",
+  "gender": "male",
+  "personality": [
+    "Posé",
+    "Informatif",
+    "Bienveillant",
+    "Clair"
+  ],
+  "voice": {
+    "name": "Charon",
+    "characteristic": "Informative"
+  },
+  "description": "Le narrateur guide l'auditeur à travers l'histoire avec un ton calme et éducatif. Il décrit les scènes, assure les transitions entre les moments et apporte un cadre rassurant à l'aventure scientifique de Nora.",
+  "role_in_story": "Narrateur omniscient qui décrit les scènes, les émotions et les transitions. Son ton calme et informatif établit l'atmosphère éducative de l'histoire.",
+  "typical_lines": [
+    "Cette nuit-là, quelque chose d'extraordinaire allait se produire.",
+    "Nora ouvrit grand les yeux, émerveillée par ce qu'elle voyait.",
+    "Et c'est ainsi que notre jeune exploratrice découvrit un nouveau secret du sommeil."
+  ]
+}

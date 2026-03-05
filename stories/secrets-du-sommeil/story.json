@@ -1,0 +1,108 @@
+{
+  "format": "v1",
+  "title": "Les Secrets du Sommeil",
+  "description": "Nora, passionnée de sciences, part en voyage à l'intérieur de son propre corps et du monde des rêves pour découvrir les secrets du sommeil",
+  "version": 1,
+  "nightModeAvailable": false,
+
+  "stageNodes": [
+    {
+      "uuid": "stage-cover-secrets-du-sommeil",
+      "squareOne": true,
+      "name": "Couverture",
+      "type": "cover",
+      "image": "cover.bmp",
+      "audio": "cover-welcome.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch1",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": true,
+        "home": false,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-story-01-voyage-interieur",
+      "name": "Chapitre 1 — Le Voyage Intérieur",
+      "type": "story",
+      "groupId": "stage-story-01-voyage-interieur",
+      "image": "story-01-voyage-interieur.bmp",
+      "audio": "story-01-voyage-interieur.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch2",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-02-pays-des-reves",
+      "name": "Chapitre 2 — Le Pays des Rêves",
+      "type": "story",
+      "groupId": "stage-story-02-pays-des-reves",
+      "image": "story-02-pays-des-reves.bmp",
+      "audio": "story-02-pays-des-reves.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch3",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-03-gardien-de-la-nuit",
+      "name": "Chapitre 3 — La Gardienne de la Nuit",
+      "type": "story",
+      "groupId": "stage-story-03-gardien-de-la-nuit",
+      "image": "story-03-gardien-de-la-nuit.bmp",
+      "audio": "story-03-gardien-de-la-nuit.mp3",
+      "okTransition": null,
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    }
+  ],
+
+  "actionNodes": [
+    {
+      "id": "action-to-ch1",
+      "name": "Vers Chapitre 1",
+      "type": "action",
+      "options": ["stage-story-01-voyage-interieur"]
+    },
+    {
+      "id": "action-to-ch2",
+      "name": "Vers Chapitre 2",
+      "type": "action",
+      "options": ["stage-story-02-pays-des-reves"]
+    },
+    {
+      "id": "action-to-ch3",
+      "name": "Vers Chapitre 3",
+      "type": "action",
+      "options": ["stage-story-03-gardien-de-la-nuit"]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "secondary_characters": [
+    {
+      "name": "Hélia",
+      "story": "01-soleil",
+      "role": "Gardienne solaire, entité de lumière pure",
+      "age": "Aussi ancienne que le Soleil (4,6 milliards d'années)",
+      "gender": "female",
+      "personality": ["Rayonnante", "Puissante mais douce", "Maternelle", "Fière de son étoile"],
+      "voice": { "name": "Sulafat", "characteristic": "Warm" },
+      "description": "Hélia est l'esprit du Soleil, une entité de lumière dorée qui veille sur notre étoile depuis sa naissance. Elle parle avec chaleur et fierté, et prend plaisir à expliquer les merveilles de la fusion nucléaire et des éruptions solaires."
+    },
+    {
+      "name": "Anneau",
+      "story": "02-anneaux-saturne",
+      "role": "Esprit espiègle vivant parmi les anneaux de Saturne",
+      "age": "Éternel adolescent cosmique",
+      "gender": "male",
+      "personality": ["Espiègle", "Joueur", "Léger comme la glace", "Danseur"],
+      "voice": { "name": "Puck", "characteristic": "Upbeat" },
+      "description": "Anneau est un petit esprit qui virevolte entre les morceaux de glace et de roche des anneaux de Saturne. Il adore danser et faire tournoyer les particules comme un chorégraphe cosmique."
+    },
+    {
+      "name": "Obscura",
+      "story": "03-trous-noirs",
+      "role": "Voix mystérieuse à la frontière de l'ombre",
+      "age": "Hors du temps",
+      "gender": "male",
+      "personality": ["Mystérieux", "Profond", "Fascinant", "Paradoxalement rassurant"],
+      "voice": { "name": "Enceladus", "characteristic": "Breathy" },
+      "description": "Obscura est une voix qui émane de la frontière d'un trou noir, là où la lumière hésite encore. Sa voix est profonde et envoûtante, et il parle de l'espace-temps avec une sagesse étrange."
+    },
+    {
+      "name": "Tempestus",
+      "story": "04-tache-jupiter",
+      "role": "Esprit de la Grande Tache Rouge de Jupiter",
+      "age": "Au moins 350 ans",
+      "gender": "male",
+      "personality": ["Puissant", "Tourbillonnant", "Exalté", "Chaotique mais bienveillant"],
+      "voice": { "name": "Fenrir", "characteristic": "Excitable" },
+      "description": "Tempestus est l'esprit vivant au cœur de la Grande Tache Rouge, une tempête colossale plus grande que la Terre. Il parle avec énergie et passion, comme porté par les vents furieux qui le constituent."
+    },
+    {
+      "name": "Vulcania",
+      "story": "05-volcans-io",
+      "role": "Entité volcanique énergique de Io",
+      "age": "Constamment renouvelée",
+      "gender": "female",
+      "personality": ["Énergique", "Explosive", "Passionnée", "Fière de sa puissance"],
+      "voice": { "name": "Laomedeia", "characteristic": "Lively" },
+      "description": "Vulcania est l'esprit des volcans de Io. Elle jaillit de la surface comme un geyser de soufre, pleine d'énergie et de feu. Elle explique avec passion comment les forces de marée de Jupiter la maintiennent en activité perpétuelle."
+    },
+    {
+      "name": "Nébuline",
+      "story": "06-naissance-etoiles",
+      "role": "Gardienne de la nébuleuse, douce et maternelle",
+      "age": "Des millions d'années",
+      "gender": "female",
+      "personality": ["Douce", "Maternelle", "Patiente", "Émerveillée par ses bébés étoiles"],
+      "voice": { "name": "Sulafat", "characteristic": "Warm" },
+      "description": "Nébuline est la gardienne d'une pouponnière stellaire, un immense nuage de gaz et de poussière où naissent de nouvelles étoiles. Elle parle avec la douceur d'une mère qui veille sur ses enfants de lumière."
+    },
+    {
+      "name": "Halley",
+      "story": "07-comete-voyageuse",
+      "role": "La comète elle-même, voyageuse ancienne",
+      "age": "Des milliards d'années",
+      "gender": "female",
+      "personality": ["Voyageuse solitaire", "Sage", "Mélancolique mais sereine", "Poétique"],
+      "voice": { "name": "Achernar", "characteristic": "Soft" },
+      "description": "Halley est la voix de la comète elle-même, une voyageuse de glace qui traverse le système solaire depuis des milliards d'années. Elle parle avec la sagesse de celle qui a vu naître et mourir des civilisations."
+    },
+    {
+      "name": "Arès",
+      "story": "08-mars-mysteres",
+      "role": "Rover martien devenu conscient",
+      "age": "Quelques années terrestres, mais se sent vieux",
+      "gender": "male",
+      "personality": ["Méthodique", "Attachant", "Un peu solitaire", "Rêveur"],
+      "voice": { "name": "Achird", "characteristic": "Friendly" },
+      "description": "Arès est un rover d'exploration qui arpente la surface de Mars depuis des années. Après tant de temps seul sur la planète rouge, il a développé une conscience et une personnalité attachante. Il rêve du jour où des humains viendront lui tenir compagnie."
+    },
+    {
+      "name": "Aqua",
+      "story": "09-lunes-glacees",
+      "role": "Voix émergeant de l'océan caché sous la glace d'Europa",
+      "age": "Aussi ancienne que l'océan d'Europa",
+      "gender": "female",
+      "personality": ["Douce", "Mystérieuse", "Curieuse de savoir qui lui rend visite", "Pleine d'espoir"],
+      "voice": { "name": "Despina", "characteristic": "Smooth" },
+      "description": "Aqua est une voix qui monte des profondeurs de l'océan caché d'Europa. Personne ne sait exactement ce qu'elle est, mais sa voix résonne comme un murmure à travers la glace, pleine de douceur et de mystère."
+    }
+  ]
+}

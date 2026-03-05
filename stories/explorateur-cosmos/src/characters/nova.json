@@ -1,0 +1,26 @@
+{
+  "name": "Nova",
+  "role": "Protagoniste principale",
+  "age": 10,
+  "gender": "female",
+  "personality": [
+    "Curieuse et passionnée de sciences",
+    "Courageuse face à l'inconnu",
+    "Émerveillée par la beauté de l'univers",
+    "Pose des questions profondes",
+    "Enthousiaste et déterminée"
+  ],
+  "voice": {
+    "name": "Kore",
+    "characteristic": "Firm"
+  },
+  "description": "Nova est une jeune exploratrice spatiale de 10 ans qui parcourt le système solaire à bord du vaisseau Céleste. Passionnée d'astronomie depuis toujours, elle rêvait de voir de ses propres yeux les merveilles qu'elle avait lues dans ses livres de sciences. Accompagnée de Zéphyr, l'IA de son vaisseau, elle s'émerveille devant chaque découverte et n'a pas peur de poser les grandes questions.",
+  "character_arc": "Au fil de ses voyages, Nova développe une compréhension profonde de l'univers et de la place de la Terre dans le cosmos. Chaque destination lui enseigne l'humilité et l'émerveillement face à la grandeur de l'univers.",
+  "typical_lines": [
+    "Zéphyr, regarde ça ! C'est encore plus beau que dans mes livres !",
+    "Mais comment est-ce possible ?",
+    "J'ai tellement de questions...",
+    "C'est incroyable, l'univers est plein de surprises !",
+    "Attends, explique-moi encore une fois !"
+  ]
+}

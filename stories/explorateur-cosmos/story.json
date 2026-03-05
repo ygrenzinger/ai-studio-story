@@ -1,0 +1,554 @@
+{
+  "format": "v1",
+  "title": "Les Merveilles du Cosmos",
+  "description": "Un voyage extraordinaire à travers le système solaire pour découvrir les phénomènes les plus étonnants de l'univers",
+  "version": 1,
+  "nightModeAvailable": false,
+
+  "stageNodes": [
+    {
+      "uuid": "stage-cover-explorateur-cosmos",
+      "squareOne": true,
+      "name": "Couverture",
+      "type": "cover",
+      "image": "cover.bmp",
+      "audio": "cover-welcome.mp3",
+      "okTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": true,
+        "home": false,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-hub-menu",
+      "name": "Menu Hub — Choix de Destination",
+      "type": "menu.questionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "hub-menu.bmp",
+      "audio": "hub-menu.mp3",
+      "okTransition": {
+        "actionNode": "action-menu-choice",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-option-soleil",
+      "name": "Option Menu — Le Soleil",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-soleil.bmp",
+      "audio": "option-soleil.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-01",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-anneaux-saturne",
+      "name": "Option Menu — Saturne",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-anneaux-saturne.bmp",
+      "audio": "option-anneaux-saturne.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-02",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-trous-noirs",
+      "name": "Option Menu — Trous Noirs",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-trous-noirs.bmp",
+      "audio": "option-trous-noirs.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-03",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-tache-jupiter",
+      "name": "Option Menu — Jupiter",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-tache-jupiter.bmp",
+      "audio": "option-tache-jupiter.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-04",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-volcans-io",
+      "name": "Option Menu — Io",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-volcans-io.bmp",
+      "audio": "option-volcans-io.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-05",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-naissance-etoiles",
+      "name": "Option Menu — Nébuleuse",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-naissance-etoiles.bmp",
+      "audio": "option-naissance-etoiles.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-06",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-comete-voyageuse",
+      "name": "Option Menu — Comète",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-comete-voyageuse.bmp",
+      "audio": "option-comete-voyageuse.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-07",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-mars-mysteres",
+      "name": "Option Menu — Mars",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-mars-mysteres.bmp",
+      "audio": "option-mars-mysteres.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-08",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-lunes-glacees",
+      "name": "Option Menu — Europa",
+      "type": "menu.optionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": "option-lunes-glacees.bmp",
+      "audio": "option-lunes-glacees.mp3",
+      "okTransition": {
+        "actionNode": "action-to-story-09",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-story-01-soleil",
+      "name": "Histoire 1 — Le Gardien de Lumière",
+      "type": "story",
+      "groupId": "stage-story-01-soleil",
+      "image": "story-01-soleil.bmp",
+      "audio": "story-01-soleil.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-02-anneaux-saturne",
+      "name": "Histoire 2 — La Danse des Anneaux",
+      "type": "story",
+      "groupId": "stage-story-02-anneaux-saturne",
+      "image": "story-02-anneaux-saturne.bmp",
+      "audio": "story-02-anneaux-saturne.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-03-trous-noirs",
+      "name": "Histoire 3 — Le Mangeur de Lumière",
+      "type": "story",
+      "groupId": "stage-story-03-trous-noirs",
+      "image": "story-03-trous-noirs.bmp",
+      "audio": "story-03-trous-noirs.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-04-tache-jupiter",
+      "name": "Histoire 4 — La Tempête Éternelle",
+      "type": "story",
+      "groupId": "stage-story-04-tache-jupiter",
+      "image": "story-04-tache-jupiter.bmp",
+      "audio": "story-04-tache-jupiter.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-05-volcans-io",
+      "name": "Histoire 5 — Le Monde en Feu",
+      "type": "story",
+      "groupId": "stage-story-05-volcans-io",
+      "image": "story-05-volcans-io.bmp",
+      "audio": "story-05-volcans-io.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-06-naissance-etoiles",
+      "name": "Histoire 6 — La Pouponnière des Étoiles",
+      "type": "story",
+      "groupId": "stage-story-06-naissance-etoiles",
+      "image": "story-06-naissance-etoiles.bmp",
+      "audio": "story-06-naissance-etoiles.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-07-comete-voyageuse",
+      "name": "Histoire 7 — La Voyageuse de Glace",
+      "type": "story",
+      "groupId": "stage-story-07-comete-voyageuse",
+      "image": "story-07-comete-voyageuse.bmp",
+      "audio": "story-07-comete-voyageuse.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-08-mars-mysteres",
+      "name": "Histoire 8 — Les Secrets de la Planète Rouge",
+      "type": "story",
+      "groupId": "stage-story-08-mars-mysteres",
+      "image": "story-08-mars-mysteres.bmp",
+      "audio": "story-08-mars-mysteres.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-09-lunes-glacees",
+      "name": "Histoire 9 — L'Océan Sous la Glace",
+      "type": "story",
+      "groupId": "stage-story-09-lunes-glacees",
+      "image": "story-09-lunes-glacees.bmp",
+      "audio": "story-09-lunes-glacees.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-hub-welcome-back",
+      "name": "Retour au Hub",
+      "type": "menu.questionstage",
+      "groupId": "menu-explorateur-cosmos",
+      "image": null,
+      "audio": "hub-welcome-back.mp3",
+      "okTransition": {
+        "actionNode": "action-menu-choice",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    }
+  ],
+
+  "actionNodes": [
+    {
+      "id": "action-to-hub",
+      "name": "Vers le Menu",
+      "type": "menu.questionaction",
+      "groupId": "menu-explorateur-cosmos",
+      "options": ["stage-hub-menu"]
+    },
+    {
+      "id": "action-menu-choice",
+      "name": "Choix du Menu",
+      "type": "menu.optionsaction",
+      "groupId": "menu-explorateur-cosmos",
+      "options": [
+        "stage-option-soleil",
+        "stage-option-anneaux-saturne",
+        "stage-option-trous-noirs",
+        "stage-option-tache-jupiter",
+        "stage-option-volcans-io",
+        "stage-option-naissance-etoiles",
+        "stage-option-comete-voyageuse",
+        "stage-option-mars-mysteres",
+        "stage-option-lunes-glacees"
+      ]
+    },
+    {
+      "id": "action-to-story-01",
+      "name": "Vers Histoire 1 — Soleil",
+      "type": "story.storyaction",
+      "groupId": "stage-story-01-soleil",
+      "options": ["stage-story-01-soleil"]
+    },
+    {
+      "id": "action-to-story-02",
+      "name": "Vers Histoire 2 — Saturne",
+      "type": "story.storyaction",
+      "groupId": "stage-story-02-anneaux-saturne",
+      "options": ["stage-story-02-anneaux-saturne"]
+    },
+    {
+      "id": "action-to-story-03",
+      "name": "Vers Histoire 3 — Trous Noirs",
+      "type": "story.storyaction",
+      "groupId": "stage-story-03-trous-noirs",
+      "options": ["stage-story-03-trous-noirs"]
+    },
+    {
+      "id": "action-to-story-04",
+      "name": "Vers Histoire 4 — Jupiter",
+      "type": "story.storyaction",
+      "groupId": "stage-story-04-tache-jupiter",
+      "options": ["stage-story-04-tache-jupiter"]
+    },
+    {
+      "id": "action-to-story-05",
+      "name": "Vers Histoire 5 — Io",
+      "type": "story.storyaction",
+      "groupId": "stage-story-05-volcans-io",
+      "options": ["stage-story-05-volcans-io"]
+    },
+    {
+      "id": "action-to-story-06",
+      "name": "Vers Histoire 6 — Nébuleuse",
+      "type": "story.storyaction",
+      "groupId": "stage-story-06-naissance-etoiles",
+      "options": ["stage-story-06-naissance-etoiles"]
+    },
+    {
+      "id": "action-to-story-07",
+      "name": "Vers Histoire 7 — Comète",
+      "type": "story.storyaction",
+      "groupId": "stage-story-07-comete-voyageuse",
+      "options": ["stage-story-07-comete-voyageuse"]
+    },
+    {
+      "id": "action-to-story-08",
+      "name": "Vers Histoire 8 — Mars",
+      "type": "story.storyaction",
+      "groupId": "stage-story-08-mars-mysteres",
+      "options": ["stage-story-08-mars-mysteres"]
+    },
+    {
+      "id": "action-to-story-09",
+      "name": "Vers Histoire 9 — Europa",
+      "type": "story.storyaction",
+      "groupId": "stage-story-09-lunes-glacees",
+      "options": ["stage-story-09-lunes-glacees"]
+    },
+    {
+      "id": "action-back-to-hub",
+      "name": "Retour au Hub",
+      "type": "menu.questionaction",
+      "groupId": "menu-explorateur-cosmos",
+      "options": ["stage-hub-welcome-back"]
+    }
+  ]
+}

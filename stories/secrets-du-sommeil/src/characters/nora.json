@@ -1,0 +1,27 @@
+{
+  "name": "Nora",
+  "role": "Protagoniste principale",
+  "age": 10,
+  "gender": "female",
+  "personality": [
+    "Curieuse",
+    "Passionnée de sciences",
+    "Un peu anxieuse le soir",
+    "Courageuse",
+    "Pose des questions précises",
+    "Enthousiaste quand elle apprend"
+  ],
+  "voice": {
+    "name": "Leda",
+    "characteristic": "Youthful"
+  },
+  "description": "Nora est une fille de 10 ans qui adore les sciences et se pose mille questions. Ce soir-là, elle n'arrive pas à dormir — son esprit tourne trop vite. Elle est frustrée mais aussi secrètement fascinée quand elle découvre que le sommeil est bien plus qu'une simple pause. Elle a parfois des cauchemars qui l'inquiètent, mais elle apprendra qu'ils ne sont pas ses ennemis.",
+  "character_arc": "Nora passe de la frustration et l'incompréhension face à l'insomnie à un émerveillement scientifique devant les mécanismes du sommeil. Elle surmonte sa peur des cauchemars en comprenant leur rôle, et termine l'histoire en se sentant capable et confiante — une vraie 'gardienne de la nuit'.",
+  "typical_lines": [
+    "Mais pourquoi mon cerveau ne veut pas s'éteindre ?",
+    "Attends... tu veux dire que mon corps travaille PENDANT que je dors ?",
+    "C'est comme un super-pouvoir qu'on a tous !",
+    "Alors dormir peut me rendre plus intelligente ?",
+    "En fait... c'est mon cerveau qui essaie de m'aider ?"
+  ]
+}

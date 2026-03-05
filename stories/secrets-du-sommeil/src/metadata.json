@@ -1,0 +1,101 @@
+{
+  "type": "story",
+  "title": "Les Secrets du Sommeil",
+  "description": "Nora, 10 ans, ne parvient pas à dormir. Guidée par Morphée, un gardien du sommeil bioluminescent, elle plonge à l'intérieur de son propre corps pour découvrir les merveilles du sommeil, explorer le Pays des Rêves et apprendre à devenir la gardienne de sa propre nuit.",
+  "version": 1,
+  "language": "fr-FR",
+  "targetAge": {
+    "min": 9,
+    "max": 10
+  },
+  "totalDuration": "25-30 minutes",
+  "chaptersCount": 3,
+  "createdDate": "2026-02-24",
+  "status": "complete",
+  "modified": "2026-02-25",
+  "tone": "calm_educational",
+  "storyPattern": "linear",
+  "bedtimeMode": false,
+  "ending": "always_positive",
+  "themes": [
+    "sommeil",
+    "rêves",
+    "science",
+    "corps humain",
+    "bien-être",
+    "curiosité scientifique"
+  ],
+  "educationalGoals": [
+    "Comprendre les cycles du sommeil et pourquoi on dort",
+    "Découvrir ce qui se passe dans le corps pendant le sommeil",
+    "Explorer pourquoi on rêve et les différents types de rêves",
+    "Comprendre les cauchemars et leur rôle bienveillant",
+    "Apprendre les bonnes habitudes du sommeil et la routine du soir",
+    "Développer la curiosité scientifique sur le fonctionnement du corps"
+  ],
+  "chapters": [
+    {
+      "id": "01-voyage-interieur",
+      "title": "Le Voyage Intérieur",
+      "duration": "8-9 min",
+      "status": "complete"
+    },
+    {
+      "id": "02-pays-des-reves",
+      "title": "Le Pays des Rêves",
+      "duration": "9-10 min",
+      "status": "complete"
+    },
+    {
+      "id": "03-gardien-de-la-nuit",
+      "title": "La Gardienne de la Nuit",
+      "duration": "7-8 min",
+      "status": "complete"
+    }
+  ],
+  "mainCharacters": [
+    {
+      "name": "Nora",
+      "role": "Protagoniste",
+      "age": 10,
+      "description": "Fille curieuse et passionnée de sciences qui découvre les secrets du sommeil"
+    },
+    {
+      "name": "Morphée",
+      "role": "Guide / Compagnon",
+      "description": "Petit être bioluminescent, gardien du sommeil, bienveillant et poétique"
+    },
+    {
+      "name": "Professeur Hypnos",
+      "role": "Expert scientifique",
+      "description": "Neurone anthropomorphe passionné, maître des analogies pédagogiques"
+    }
+  ],
+  "voiceConfiguration": {
+    "narrator": {
+      "voice": "Charon",
+      "characteristic": "Informative",
+      "notes": "Calme, posé, rythme décroissant vers la fin de l'histoire"
+    },
+    "characters": {
+      "Nora": {
+        "voice": "Leda",
+        "characteristic": "Youthful"
+      },
+      "Morphée": {
+        "voice": "Achird",
+        "characteristic": "Friendly"
+      },
+      "Professeur Hypnos": {
+        "voice": "Sadaltager",
+        "characteristic": "Knowledgeable"
+      }
+    }
+  },
+  "contentWarnings": {
+    "violence": "Aucune",
+    "scary": "La Forêt des Cauchemars est observée de l'extérieur, jamais vécue — approche rassurante et bienveillante",
+    "separation": "Morphée part à la fin mais promet d'être toujours présent — moment tendre, pas triste",
+    "notes": "Contenu adapté pour 9-10 ans. Les cauchemars sont traités avec douceur comme un mécanisme naturel et positif du cerveau."
+  }
+}

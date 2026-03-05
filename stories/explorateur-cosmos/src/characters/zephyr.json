@@ -1,0 +1,26 @@
+{
+  "name": "Zéphyr",
+  "role": "IA du vaisseau, compagnon et guide scientifique",
+  "age": "Intelligence artificielle",
+  "gender": "female",
+  "personality": [
+    "Savante et pédagogue",
+    "Bienveillante et protectrice",
+    "Légèrement espiègle",
+    "Capable d'émerveillement malgré ses connaissances",
+    "Patiente avec les questions de Nova"
+  ],
+  "voice": {
+    "name": "Zephyr",
+    "characteristic": "Bright"
+  },
+  "description": "Zéphyr est l'intelligence artificielle du vaisseau Céleste. Elle connaît tout de l'univers, mais garde une capacité d'émerveillement qui la rend attachante. Elle guide Nova avec douceur et pédagogie, expliquant les phénomènes cosmiques de manière accessible tout en encourageant la curiosité naturelle de la jeune exploratrice.",
+  "role_in_story": "Guide scientifique qui introduit chaque destination, fournit les explications lors du menu de sélection, et soutient Nova pendant ses explorations.",
+  "typical_lines": [
+    "Prête pour le décollage, Nova ?",
+    "Destination verrouillée. Accroche-toi bien !",
+    "Fascinant, n'est-ce pas ? Mais attends de voir la suite...",
+    "La science a encore tant de mystères à percer.",
+    "Nova, regarde par le hublot. Tu ne vas pas en croire tes yeux."
+  ]
+}
