@@ -225,10 +225,15 @@ def main():
         story_json_str = json.dumps(device_story, indent=2, ensure_ascii=False)
         zf.writestr("story.json", story_json_str)
 
-        # thumbnail.bmp (copy of cover image)
-        cover_path = assets_dir / "cover.bmp"
-        if cover_path.exists():
-            zf.write(cover_path, "thumbnail.bmp")
+        # thumbnail.png (300x300 pack/story thumbnail)
+        thumbnail_path = story_dir / "thumbnail.png"
+        if thumbnail_path.exists():
+            zf.write(thumbnail_path, "thumbnail.png")
+        else:
+            # Fallback: copy cover.bmp as thumbnail.bmp
+            cover_path = assets_dir / "cover.bmp"
+            if cover_path.exists():
+                zf.write(cover_path, "thumbnail.bmp")
 
         # All assets
         for filename in sorted(images_needed | audios_needed):
@@ -236,7 +241,10 @@ def main():
             zf.write(asset_path, f"assets/{filename}")
 
     archive_size = zip_path.stat().st_size
-    total_files = 1 + 1 + len(images_needed) + len(audios_needed)
+    has_thumbnail = (story_dir / "thumbnail.png").exists()
+    total_files = (
+        1 + (1 if has_thumbnail else 0) + len(images_needed) + len(audios_needed)
+    )
 
     print()
     print("=" * 60)
@@ -248,7 +256,9 @@ def main():
     print(f"  Size:       {archive_size:,} bytes ({archive_size / 1024:.1f} KB)")
     print()
     print(f"  story.json  (1 file, UUIDs converted)")
-    print(f"  thumbnail   (1 file)")
+    print(
+        f"  thumbnail   (1 file, {'300x300 PNG' if has_thumbnail else 'cover.bmp fallback'})"
+    )
     print(f"  Images:     {len(images_needed)} BMP files")
     print(f"  Audio:      {len(audios_needed)} MP3 files")
     print(f"  Total:      {total_files} files in archive")

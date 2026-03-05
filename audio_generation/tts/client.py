@@ -10,28 +10,32 @@ from audio_generation.domain.constants import MAX_RETRIES
 
 
 class TTSClient:
-    """Wrapper for Vertex AI TTS API with retry logic.
+    """Wrapper for Gemini TTS API with retry logic.
 
-    Handles API calls to Vertex AI Gemini TTS with automatic retry on failure,
-    exponential backoff, and proper error handling.
+    Uses Vertex AI authentication. Handles API calls with automatic retry
+    on failure, exponential backoff, and proper error handling.
     """
 
     def __init__(
         self,
-        project: str,
-        location: str,
         model: str,
         max_retries: int = MAX_RETRIES,
+        *,
+        project: str,
+        location: str | None = None,
     ):
-        """Initialize TTS client using Vertex AI.
+        """Initialize TTS client.
 
         Args:
-            project: Google Cloud project ID
-            location: Google Cloud region (e.g., 'us-central1')
             model: TTS model name
             max_retries: Maximum retry attempts per request
+            project: Google Cloud project ID
+            location: Google Cloud region (default: us-central1)
         """
-        self._client = genai.Client(vertexai=True, project=project, location=location)
+        self._client = genai.Client(
+            vertexai=True, project=project, location=location
+        )
+        self._backend = "Vertex AI"
         self._model = model
         self._max_retries = max_retries
 
@@ -66,11 +70,30 @@ class TTSClient:
                 return self._make_request(prompt, speech_config, system_instruction)
             except Exception as e:
                 if attempt < self._max_retries - 1:
-                    logging.warning(
-                        f"Batch {batch_num} generation failed "
-                        f"(attempt {attempt + 1}/{self._max_retries}): {e}"
-                    )
-                    time.sleep(1 * (attempt + 1))  # Exponential backoff
+                    error_str = str(e)
+                    # Rate limit: wait longer (parse retry delay or default 20s)
+                    if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                        wait_time = 20
+                        # Try to extract suggested retry delay
+                        import re
+
+                        match = re.search(
+                            r"retry in (\d+(?:\.\d+)?)s", error_str, re.IGNORECASE
+                        )
+                        if match:
+                            wait_time = max(int(float(match.group(1))) + 2, 20)
+                        logging.warning(
+                            f"Batch {batch_num} rate limited "
+                            f"(attempt {attempt + 1}/{self._max_retries}), "
+                            f"waiting {wait_time}s..."
+                        )
+                        time.sleep(wait_time)
+                    else:
+                        logging.warning(
+                            f"Batch {batch_num} generation failed "
+                            f"(attempt {attempt + 1}/{self._max_retries}): {e}"
+                        )
+                        time.sleep(2 * (attempt + 1))  # Exponential backoff
                 else:
                     logging.error(
                         f"Batch {batch_num} failed after {self._max_retries} attempts: {e}"
@@ -104,12 +127,18 @@ class TTSClient:
             response_modalities=["AUDIO"],
             speech_config=speech_config,
         )
+
+        # TTS-specific models (e.g. gemini-2.5-flash-preview-tts) don't support
+        # system_instruction — it causes 500 INTERNAL errors. Fold it into the
+        # prompt instead.
         if system_instruction:
-            config.system_instruction = system_instruction
+            full_prompt = f"{system_instruction}\n\n{prompt}"
+        else:
+            full_prompt = prompt
 
         response = self._client.models.generate_content(
             model=self._model,
-            contents=prompt,
+            contents=full_prompt,
             config=config,
         )
 

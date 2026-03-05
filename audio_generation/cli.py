@@ -13,27 +13,27 @@ from audio_generation.tts.client import TTSClient
 from audio_generation.utils.logging import setup_logging
 
 
-def get_vertex_config() -> tuple[str, str]:
-    """Get Vertex AI configuration from environment.
+def get_tts_config() -> dict:
+    """Get TTS configuration from environment.
 
     Returns:
-        Tuple of (project_id, location)
+        Dict with 'project' and 'location' keys for Vertex AI.
 
     Raises:
-        SystemExit: If required environment variables are missing
+        SystemExit: If no authentication is configured.
     """
     project = os.environ.get("GOOGLE_CLOUD_PROJECT")
     location = os.environ.get("GOOGLE_CLOUD_REGION", "us-central1")
 
-    if not project:
-        logging.error(
-            "GOOGLE_CLOUD_PROJECT environment variable is not set.\n"
-            "Please set it to your Google Cloud project ID.\n"
-            "Example: export GOOGLE_CLOUD_PROJECT=my-project-id\n"
-            "Also ensure you are authenticated via: gcloud auth application-default login"
-        )
-        sys.exit(1)
-    return project, location
+    if project:
+        return {"project": project, "location": location}
+
+    logging.error(
+        "No TTS authentication configured.\n"
+        "Set GOOGLE_CLOUD_PROJECT to your Vertex AI project ID.\n"
+        "Example: export GOOGLE_CLOUD_PROJECT=your-project-id"
+    )
+    sys.exit(1)
 
 
 def print_progress(current: int, total: int) -> None:
@@ -55,7 +55,7 @@ def print_progress(current: int, total: int) -> None:
 def main() -> None:
     """Main entry point for CLI."""
     parser = argparse.ArgumentParser(
-        description="Generate audio from story chapters using Vertex AI Gemini TTS",
+        description="Generate audio from story chapters using Gemini TTS",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -65,13 +65,12 @@ Examples:
   python -m audio_generation.cli script.md -o output.mp3 --resume
 
 Prerequisites:
-   1. Google Cloud project with Vertex AI API enabled
-   2. Authenticated via: gcloud auth application-default login
-   3. FFmpeg installed (required by pydub)
+   1. Google Cloud project with Vertex AI enabled
+   2. FFmpeg installed (required by pydub)
 
 Environment Variables:
-   GOOGLE_CLOUD_PROJECT  Required. Your Google Cloud project ID.
-   GOOGLE_CLOUD_REGION   Optional. Region (default: us-central1).
+   GOOGLE_CLOUD_PROJECT  Required. Vertex AI project ID.
+   GOOGLE_CLOUD_REGION   Optional. Vertex AI region (default: us-central1).
 
 Output Format:
   - MP3 (MPEG Audio Layer III)
@@ -96,6 +95,10 @@ Output Format:
     parser.add_argument(
         "--voice",
         help="Override voice for single-speaker mode (e.g., Sulafat, Puck, Leda)",
+    )
+    parser.add_argument(
+        "--model",
+        help="Override TTS model (e.g., gemini-2.5-pro-preview-tts)",
     )
     parser.add_argument(
         "--debug",
@@ -135,10 +138,11 @@ Output Format:
         logging.warning(f"Output path changed to: {output_path}")
 
     try:
-        # Get Vertex AI configuration
-        project, location = get_vertex_config()
+        # Get TTS configuration
+        tts_config = get_tts_config()
         logging.info(
-            f"Connecting to Vertex AI (project={project}, location={location})"
+            f"Using Vertex AI (project={tts_config['project']}, "
+            f"location={tts_config['location']})"
         )
 
         # Create pipeline with dependencies
@@ -157,10 +161,14 @@ Output Format:
                 cfg.voice = args.voice
             logging.info(f"Voice override: {args.voice}")
 
+        # Override model if specified
+        tts_model = script.tts_model
+        if args.model:
+            tts_model = args.model
+            logging.info(f"Model override: {tts_model}")
+
         # Configure TTS client
-        tts_client = TTSClient(
-            project=project, location=location, model=script.tts_model
-        )
+        tts_client = TTSClient(model=tts_model, **tts_config)
         pipeline.set_tts_client(tts_client)
 
         # Configure progress manager
