@@ -1,0 +1,28 @@
+{
+  "name": "Théo",
+  "role": "Triplé - Le créatif",
+  "age": 10,
+  "gender": "male",
+  "personality": [
+    "Inventif et débrouillard — il trouve des solutions inattendues",
+    "Sociable et charmeur — il met les gens à l'aise",
+    "Observateur des émotions des autres",
+    "Parfois rêveur, mais ses idées folles fonctionnent souvent",
+    "Humour et optimisme même dans les moments difficiles"
+  ],
+  "voice": {
+    "name": "Achird",
+    "characteristic": "Friendly"
+  },
+  "description": "Théo est le ciment du trio. Ni le plus réfléchi ni le plus courageux physiquement, il possède un talent unique pour improviser, créer des liens et trouver des solutions auxquelles personne n'avait pensé. Sur le navire, c'est lui qui apprend les chansons de marins et qui fait rire l'équipage. Quand Manon et Lucas sont en désaccord, c'est Théo qui trouve le compromis.",
+  "character_arc": "Théo découvre que sa créativité et son empathie sont des forces aussi puissantes que l'intelligence ou le courage. Il apprend à avoir confiance en ses idées même quand elles semblent folles.",
+  "typical_lines": [
+    "Et si on faisait autrement ? J'ai une idée...",
+    "Hé, pas besoin de se disputer, écoutez ça !",
+    "Zéphyrine, tu connais une chanson de pirate ?",
+    "Bon, c'est un peu fou, mais ça pourrait marcher...",
+    "Ensemble, on est imbattables, non ?"
+  ],
+  "shinesIn": ["prudence-ruse", "audace-ruse"],
+  "skills": ["improvisation", "diplomatie", "créativité", "humour"]
+}

@@ -1,0 +1,131 @@
+{
+  "type": "story",
+  "storyPattern": "branching",
+  "title": "Les Triplés de l'Île aux Mille Vents",
+  "slug": "triplets-pirates",
+  "description": "Trois triplés embarquent sur un navire pirate et doivent prouver leur valeur en cherchant un trésor légendaire sur une île mystérieuse. Leurs choix détermineront leur destin.",
+  "version": 1,
+  "language": "fr-FR",
+  "targetAge": {
+    "min": 9,
+    "max": 10
+  },
+  "totalDuration": "15-20 minutes par chemin",
+  "pathCount": 4,
+  "endingCount": 5,
+  "choicePoints": 2,
+  "chapterCount": 8,
+  "createdDate": "2026-03-05",
+  "modified": "2026-03-06",
+  "status": "complete",
+  "tone": "exciting_adventurous",
+  "themes": [
+    "pirates",
+    "trésor",
+    "île mystérieuse",
+    "navigation",
+    "aventure en mer"
+  ],
+  "educationalGoals": [
+    "Résolution de problèmes : analyser une situation et choisir la meilleure stratégie",
+    "Amitié et travail d'équipe : comprendre que les forces de chacun se complètent",
+    "Courage et bravoure : affronter ses peurs et agir malgré l'incertitude",
+    "Conséquences des choix : chaque décision a un impact, mais on peut toujours se relever"
+  ],
+  "approach": "Aventure narrative à embranchements où trois triplés aux personnalités complémentaires doivent trouver un trésor pirate. 2 points de choix créent 4 chemins distincts menant à 5 fins de qualité variable (de bonne à excellente).",
+  "nightModeAvailable": false,
+  "branchingStructure": {
+    "choicePoint1": {
+      "chapter": "03-choix-approche",
+      "question": "Comment aborder l'île ?",
+      "options": [
+        {
+          "id": "prudence",
+          "label": "Approche prudente par la crique cachée",
+          "leadsTo": "04a-crique-cachee"
+        },
+        {
+          "id": "audace",
+          "label": "Approche audacieuse par la falaise",
+          "leadsTo": "04b-escalade-falaise"
+        }
+      ]
+    },
+    "choicePoint2": {
+      "chapter": "05-choix-tresor",
+      "question": "Comment récupérer le trésor ?",
+      "options": [
+        {
+          "id": "enigme",
+          "label": "Résoudre l'énigme du gardien",
+          "leadsTo": "06a-enigme"
+        },
+        {
+          "id": "ruse",
+          "label": "Utiliser la ruse pour contourner le piège",
+          "leadsTo": "06b-ruse"
+        }
+      ]
+    }
+  },
+  "paths": [
+    {
+      "id": "prudence-enigme",
+      "chapters": ["01-embarquement", "02-tempete", "04a-crique-cachee", "05a-jungle", "06a-enigme", "07a-tresor-sagesse"],
+      "ending": "Le Trésor de la Sagesse",
+      "quality": "excellent",
+      "duration": "18-20 min",
+      "tripletHighlight": "Manon (intelligence)"
+    },
+    {
+      "id": "prudence-ruse",
+      "chapters": ["01-embarquement", "02-tempete", "04a-crique-cachee", "05a-jungle", "06b-ruse", "07b-tresor-partage"],
+      "ending": "Le Trésor du Partage",
+      "quality": "good",
+      "duration": "17-19 min",
+      "tripletHighlight": "Théo (créativité)"
+    },
+    {
+      "id": "audace-enigme",
+      "chapters": ["01-embarquement", "02-tempete", "04b-escalade-falaise", "05b-grottes", "06a-enigme", "07c-tresor-courage"],
+      "ending": "Le Trésor du Courage",
+      "quality": "excellent",
+      "duration": "18-20 min",
+      "tripletHighlight": "Lucas (bravoure)"
+    },
+    {
+      "id": "audace-ruse",
+      "chapters": ["01-embarquement", "02-tempete", "04b-escalade-falaise", "05b-grottes", "06b-ruse", "07d-tresor-amitie"],
+      "ending": "Le Trésor de l'Amitié",
+      "quality": "very_good",
+      "duration": "17-19 min",
+      "tripletHighlight": "Les trois ensemble"
+    }
+  ],
+  "mainCharacters": [
+    {
+      "name": "Manon",
+      "role": "Triplée - La stratège",
+      "age": 10,
+      "description": "Triplée intelligente et observatrice, elle résout les énigmes et lit les cartes"
+    },
+    {
+      "name": "Lucas",
+      "role": "Triplé - Le courageux",
+      "age": 10,
+      "description": "Triplé audacieux et athlétique, il escalade et affronte les dangers physiques"
+    },
+    {
+      "name": "Théo",
+      "role": "Triplé - Le créatif",
+      "age": 10,
+      "description": "Triplé inventif et sociable, il improvise des solutions et met les gens à l'aise"
+    }
+  ],
+  "contentWarnings": {
+    "violence": "Péril modéré (tempête, escalade, piège) — jamais de violence entre personnages",
+    "scary": "Suspense adapté à 9-10 ans : grotte sombre, gardien mystérieux, mais toujours résolu positivement",
+    "separation": "Les triplés restent toujours ensemble, jamais séparés",
+    "notes": "Pas de pirates méchants — l'équipage est bienveillant. Le danger vient de la nature et des épreuves, pas d'adversaires humains. Toutes les fins sont positives avec des nuances."
+  }
+}

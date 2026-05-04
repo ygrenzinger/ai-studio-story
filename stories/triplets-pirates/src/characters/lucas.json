@@ -1,0 +1,28 @@
+{
+  "name": "Lucas",
+  "role": "Triplé - Le courageux",
+  "age": 10,
+  "gender": "male",
+  "personality": [
+    "Audacieux et intrépide — il fonce là où les autres hésitent",
+    "Athlétique et agile — excellent grimpeur et nageur",
+    "Impulsif mais avec un grand cœur",
+    "Protège ses frère et sœur avec férocité",
+    "Admire secrètement le courage de Capitaine Corail"
+  ],
+  "voice": {
+    "name": "Puck",
+    "characteristic": "Upbeat"
+  },
+  "description": "Lucas est le plus téméraire des triplés. Toujours le premier à grimper aux arbres, à plonger dans l'eau froide et à relever les défis. Sur le navire pirate, il impressionne l'équipage par son agilité dans le gréement. Son impulsivité lui joue parfois des tours, mais son courage inspire les autres. Il rêve de devenir un vrai pirate et s'entraîne à l'épée avec des bâtons.",
+  "character_arc": "Lucas apprend que le vrai courage n'est pas de foncer sans réfléchir, mais de savoir quand agir et quand écouter les autres. Il comprend que la bravoure, c'est aussi accepter l'aide.",
+  "typical_lines": [
+    "Allez, on y va ! C'est maintenant ou jamais !",
+    "Poussez-vous, je passe devant !",
+    "Peur ? Moi ? Jamais de la vie !",
+    "Hé, Capitaine, je peux grimper en haut du mât ?",
+    "D'accord Manon, cette fois on fait à ta façon."
+  ],
+  "shinesIn": ["audace-enigme"],
+  "skills": ["escalade", "natation", "agilité", "courage physique"]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Manon",
+  "role": "Triplée - La stratège",
+  "age": 10,
+  "gender": "female",
+  "personality": [
+    "Intelligente et réfléchie — elle analyse avant d'agir",
+    "Passionnée de cartes et d'étoiles — elle sait s'orienter",
+    "Parfois trop prudente, mais son intuition est souvent juste",
+    "Protectrice envers ses frères, elle veille sur le groupe",
+    "Curieuse et tenace face aux énigmes"
+  ],
+  "voice": {
+    "name": "Kore",
+    "characteristic": "Firm"
+  },
+  "description": "Manon est la plus réfléchie des trois triplés. Passionnée d'astronomie et de cartographie, c'est elle qui a déchiffré la carte au trésor trouvée dans le grenier de leur grand-père marin. Elle porte toujours un carnet où elle note ses observations. Si ses frères foncent tête baissée, Manon préfère observer et planifier. Mais quand la situation l'exige, elle sait prendre des décisions rapides et décisives.",
+  "character_arc": "Manon apprend que la prudence est une force, mais qu'il faut aussi savoir faire confiance aux autres et accepter l'imprévu. Elle découvre que les meilleures stratégies naissent de la collaboration.",
+  "typical_lines": [
+    "Attendez, j'ai vu quelque chose sur la carte...",
+    "Si on réfléchit bien, il doit y avoir un passage quelque part.",
+    "Lucas, ne fonce pas comme ça ! Laisse-moi d'abord vérifier.",
+    "Regardez les étoiles — on est sur la bonne route !",
+    "J'ai une idée, mais il va falloir qu'on travaille ensemble."
+  ],
+  "shinesIn": ["prudence-enigme"],
+  "skills": ["navigation", "cartographie", "résolution d'énigmes", "observation"]
+}

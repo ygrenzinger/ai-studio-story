@@ -1,0 +1,668 @@
+{
+  "format": "v1",
+  "title": "Les Triplés de l'Île aux Mille Vents",
+  "description": "Trois triplés embarquent sur un navire pirate et doivent prouver leur valeur en cherchant un trésor légendaire sur une île mystérieuse. Leurs choix détermineront leur destin.",
+  "version": 1,
+  "nightModeAvailable": false,
+
+  "stageNodes": [
+    {
+      "uuid": "stage-cover-triplets-pirates",
+      "squareOne": true,
+      "name": "Couverture",
+      "type": "cover",
+      "image": "cover.bmp",
+      "audio": "cover-welcome.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch01",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": true,
+        "home": false,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+    {
+      "uuid": "stage-ch01-embarquement",
+      "name": "Chapitre 1 — L'Embarquement",
+      "type": "story",
+      "groupId": "stage-ch01-embarquement",
+      "image": "ch01-embarquement.bmp",
+      "audio": "ch01-embarquement.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch02",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch02-tempete",
+      "name": "Chapitre 2 — La Tempête",
+      "type": "story",
+      "groupId": "stage-ch02-tempete",
+      "image": "ch02-tempete.bmp",
+      "audio": "ch02-tempete.mp3",
+      "okTransition": {
+        "actionNode": "action-to-choix1-question",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-choix1-question",
+      "name": "Choix 1 — Comment aborder l'île ?",
+      "type": "menu.questionstage",
+      "groupId": "menu-choix1",
+      "image": null,
+      "audio": "choix1-question.mp3",
+      "okTransition": {
+        "actionNode": "action-choix1-options",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-choix1-option-prudence",
+      "name": "Option — La crique cachée (Prudence)",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix1",
+      "image": "option-prudence.bmp",
+      "audio": "choix1-option-prudence.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch04a",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+    {
+      "uuid": "stage-choix1-option-audace",
+      "name": "Option — L'escalade de la falaise (Audace)",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix1",
+      "image": "option-audace.bmp",
+      "audio": "choix1-option-audace.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch04b",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+    {
+      "uuid": "stage-ch04a-crique-cachee",
+      "name": "Chapitre 4a — La Crique Cachée",
+      "type": "story",
+      "groupId": "stage-ch04a-crique-cachee",
+      "image": "ch04a-crique-cachee.bmp",
+      "audio": "ch04a-crique-cachee.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch05a",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch04b-escalade-falaise",
+      "name": "Chapitre 4b — L'Escalade de la Falaise",
+      "type": "story",
+      "groupId": "stage-ch04b-escalade-falaise",
+      "image": "ch04b-escalade-falaise.bmp",
+      "audio": "ch04b-escalade-falaise.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch05b",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch05a-jungle",
+      "name": "Chapitre 5a — La Jungle",
+      "type": "story",
+      "groupId": "stage-ch05a-jungle",
+      "image": "ch05a-jungle.bmp",
+      "audio": "ch05a-jungle.mp3",
+      "okTransition": {
+        "actionNode": "action-to-choix2a-question",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch05b-grottes",
+      "name": "Chapitre 5b — Les Grottes",
+      "type": "story",
+      "groupId": "stage-ch05b-grottes",
+      "image": "ch05b-grottes.bmp",
+      "audio": "ch05b-grottes.mp3",
+      "okTransition": {
+        "actionNode": "action-to-choix2b-question",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+
+
+    {
+      "uuid": "stage-choix2a-question",
+      "name": "Choix 2 (branche Prudence) — Comment récupérer le trésor ?",
+      "type": "menu.questionstage",
+      "groupId": "menu-choix2a",
+      "image": null,
+      "audio": "choix2-question.mp3",
+      "okTransition": {
+        "actionNode": "action-choix2a-options",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-choix2a-option-enigme",
+      "name": "Option (Prudence) — Résoudre l'énigme",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix2a",
+      "image": "option-enigme.bmp",
+      "audio": "choix2-option-enigme.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch06a-prudence",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+    {
+      "uuid": "stage-choix2a-option-ruse",
+      "name": "Option (Prudence) — Utiliser la ruse",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix2a",
+      "image": "option-ruse.bmp",
+      "audio": "choix2-option-ruse.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch06b-prudence",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+
+
+    {
+      "uuid": "stage-choix2b-question",
+      "name": "Choix 2 (branche Audace) — Comment récupérer le trésor ?",
+      "type": "menu.questionstage",
+      "groupId": "menu-choix2b",
+      "image": null,
+      "audio": "choix2-question.mp3",
+      "okTransition": {
+        "actionNode": "action-choix2b-options",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-choix2b-option-enigme",
+      "name": "Option (Audace) — Résoudre l'énigme",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix2b",
+      "image": "option-enigme.bmp",
+      "audio": "choix2-option-enigme.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch06a-audace",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+    {
+      "uuid": "stage-choix2b-option-ruse",
+      "name": "Option (Audace) — Utiliser la ruse",
+      "type": "menu.optionstage",
+      "groupId": "menu-choix2b",
+      "image": "option-ruse.bmp",
+      "audio": "choix2-option-ruse.mp3",
+      "okTransition": {
+        "actionNode": "action-to-ch06b-audace",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+
+
+
+    {
+      "uuid": "stage-ch06a-enigme-prudence",
+      "name": "Chapitre 6a — L'Énigme du Gardien (via Prudence)",
+      "type": "story",
+      "groupId": "stage-ch06a-enigme-prudence",
+      "image": "ch06a-enigme.bmp",
+      "audio": "ch06a-enigme.mp3",
+      "okTransition": {
+        "actionNode": "action-to-fin-07a",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch06a-enigme-audace",
+      "name": "Chapitre 6a — L'Énigme du Gardien (via Audace)",
+      "type": "story",
+      "groupId": "stage-ch06a-enigme-audace",
+      "image": "ch06a-enigme.bmp",
+      "audio": "ch06a-enigme.mp3",
+      "okTransition": {
+        "actionNode": "action-to-fin-07c",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch06b-ruse-prudence",
+      "name": "Chapitre 6b — La Ruse de Théo (via Prudence)",
+      "type": "story",
+      "groupId": "stage-ch06b-ruse-prudence",
+      "image": "ch06b-ruse.bmp",
+      "audio": "ch06b-ruse.mp3",
+      "okTransition": {
+        "actionNode": "action-to-fin-07b",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch06b-ruse-audace",
+      "name": "Chapitre 6b — La Ruse de Théo (via Audace)",
+      "type": "story",
+      "groupId": "stage-ch06b-ruse-audace",
+      "image": "ch06b-ruse.bmp",
+      "audio": "ch06b-ruse.mp3",
+      "okTransition": {
+        "actionNode": "action-to-fin-07d",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+
+
+    {
+      "uuid": "stage-ch07a-tresor-sagesse",
+      "name": "Fin A — Le Trésor de la Sagesse (Prudence + Énigme)",
+      "type": "story",
+      "groupId": "stage-ch07a-tresor-sagesse",
+      "image": "ch07a-tresor-sagesse.bmp",
+      "audio": "ch07a-tresor-sagesse.mp3",
+      "okTransition": null,
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch07b-tresor-partage",
+      "name": "Fin B — Le Trésor du Partage (Prudence + Ruse)",
+      "type": "story",
+      "groupId": "stage-ch07b-tresor-partage",
+      "image": "ch07b-tresor-partage.bmp",
+      "audio": "ch07b-tresor-partage.mp3",
+      "okTransition": null,
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch07c-tresor-courage",
+      "name": "Fin C — Le Trésor du Courage (Audace + Énigme)",
+      "type": "story",
+      "groupId": "stage-ch07c-tresor-courage",
+      "image": "ch07c-tresor-courage.bmp",
+      "audio": "ch07c-tresor-courage.mp3",
+      "okTransition": null,
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+
+    {
+      "uuid": "stage-ch07d-tresor-amitie",
+      "name": "Fin D — Le Trésor de l'Amitié (Audace + Ruse)",
+      "type": "story",
+      "groupId": "stage-ch07d-tresor-amitie",
+      "image": "ch07d-tresor-amitie.bmp",
+      "audio": "ch07d-tresor-amitie.mp3",
+      "okTransition": null,
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    }
+  ],
+
+  "actionNodes": [
+    {
+      "id": "action-to-ch01",
+      "name": "Vers Chapitre 1",
+      "type": "story.storyaction",
+      "groupId": "stage-ch01-embarquement",
+      "options": ["stage-ch01-embarquement"]
+    },
+    {
+      "id": "action-to-ch02",
+      "name": "Vers Chapitre 2",
+      "type": "story.storyaction",
+      "groupId": "stage-ch02-tempete",
+      "options": ["stage-ch02-tempete"]
+    },
+
+    {
+      "id": "action-to-choix1-question",
+      "name": "Vers Choix 1 — Question",
+      "type": "menu.questionaction",
+      "groupId": "menu-choix1",
+      "options": ["stage-choix1-question"]
+    },
+    {
+      "id": "action-choix1-options",
+      "name": "Choix 1 — Prudence ou Audace",
+      "type": "menu.optionsaction",
+      "groupId": "menu-choix1",
+      "options": [
+        "stage-choix1-option-prudence",
+        "stage-choix1-option-audace"
+      ]
+    },
+
+    {
+      "id": "action-to-ch04a",
+      "name": "Vers Ch.4a — Crique Cachée",
+      "type": "story.storyaction",
+      "groupId": "stage-ch04a-crique-cachee",
+      "options": ["stage-ch04a-crique-cachee"]
+    },
+    {
+      "id": "action-to-ch04b",
+      "name": "Vers Ch.4b — Escalade Falaise",
+      "type": "story.storyaction",
+      "groupId": "stage-ch04b-escalade-falaise",
+      "options": ["stage-ch04b-escalade-falaise"]
+    },
+
+    {
+      "id": "action-to-ch05a",
+      "name": "Vers Ch.5a — Jungle",
+      "type": "story.storyaction",
+      "groupId": "stage-ch05a-jungle",
+      "options": ["stage-ch05a-jungle"]
+    },
+    {
+      "id": "action-to-ch05b",
+      "name": "Vers Ch.5b — Grottes",
+      "type": "story.storyaction",
+      "groupId": "stage-ch05b-grottes",
+      "options": ["stage-ch05b-grottes"]
+    },
+
+    {
+      "id": "action-to-choix2a-question",
+      "name": "Vers Choix 2 (branche Prudence) — Question",
+      "type": "menu.questionaction",
+      "groupId": "menu-choix2a",
+      "options": ["stage-choix2a-question"]
+    },
+    {
+      "id": "action-choix2a-options",
+      "name": "Choix 2 (branche Prudence) — Énigme ou Ruse",
+      "type": "menu.optionsaction",
+      "groupId": "menu-choix2a",
+      "options": [
+        "stage-choix2a-option-enigme",
+        "stage-choix2a-option-ruse"
+      ]
+    },
+
+    {
+      "id": "action-to-choix2b-question",
+      "name": "Vers Choix 2 (branche Audace) — Question",
+      "type": "menu.questionaction",
+      "groupId": "menu-choix2b",
+      "options": ["stage-choix2b-question"]
+    },
+    {
+      "id": "action-choix2b-options",
+      "name": "Choix 2 (branche Audace) — Énigme ou Ruse",
+      "type": "menu.optionsaction",
+      "groupId": "menu-choix2b",
+      "options": [
+        "stage-choix2b-option-enigme",
+        "stage-choix2b-option-ruse"
+      ]
+    },
+
+    {
+      "id": "action-to-ch06a-prudence",
+      "name": "Vers Ch.6a Énigme (via Prudence)",
+      "type": "story.storyaction",
+      "groupId": "stage-ch06a-enigme-prudence",
+      "options": ["stage-ch06a-enigme-prudence"]
+    },
+    {
+      "id": "action-to-ch06a-audace",
+      "name": "Vers Ch.6a Énigme (via Audace)",
+      "type": "story.storyaction",
+      "groupId": "stage-ch06a-enigme-audace",
+      "options": ["stage-ch06a-enigme-audace"]
+    },
+    {
+      "id": "action-to-ch06b-prudence",
+      "name": "Vers Ch.6b Ruse (via Prudence)",
+      "type": "story.storyaction",
+      "groupId": "stage-ch06b-ruse-prudence",
+      "options": ["stage-ch06b-ruse-prudence"]
+    },
+    {
+      "id": "action-to-ch06b-audace",
+      "name": "Vers Ch.6b Ruse (via Audace)",
+      "type": "story.storyaction",
+      "groupId": "stage-ch06b-ruse-audace",
+      "options": ["stage-ch06b-ruse-audace"]
+    },
+
+    {
+      "id": "action-to-fin-07a",
+      "name": "Vers Fin A — Trésor Sagesse",
+      "type": "story.storyaction",
+      "groupId": "stage-ch07a-tresor-sagesse",
+      "options": ["stage-ch07a-tresor-sagesse"]
+    },
+    {
+      "id": "action-to-fin-07b",
+      "name": "Vers Fin B — Trésor Partage",
+      "type": "story.storyaction",
+      "groupId": "stage-ch07b-tresor-partage",
+      "options": ["stage-ch07b-tresor-partage"]
+    },
+    {
+      "id": "action-to-fin-07c",
+      "name": "Vers Fin C — Trésor Courage",
+      "type": "story.storyaction",
+      "groupId": "stage-ch07c-tresor-courage",
+      "options": ["stage-ch07c-tresor-courage"]
+    },
+    {
+      "id": "action-to-fin-07d",
+      "name": "Vers Fin D — Trésor Amitié",
+      "type": "story.storyaction",
+      "groupId": "stage-ch07d-tresor-amitie",
+      "options": ["stage-ch07d-tresor-amitie"]
+    }
+  ]
+}

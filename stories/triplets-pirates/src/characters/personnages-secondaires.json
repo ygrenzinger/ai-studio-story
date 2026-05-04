@@ -1,0 +1,105 @@
+{
+  "characters": [
+    {
+      "name": "Capitaine Corail",
+      "role": "Capitaine du navire pirate Le Vent Sauvage",
+      "gender": "female",
+      "age": 45,
+      "personality": [
+        "Juste et respectée par son équipage",
+        "Dure mais bienveillante — elle teste les triplés pour les faire grandir",
+        "Ancienne exploratrice devenue pirate par amour de la liberté",
+        "Cache une sagesse profonde sous ses airs bourrus"
+      ],
+      "voice": {
+        "name": "Gacrux",
+        "characteristic": "Mature"
+      },
+      "description": "Capitaine Corail commande Le Vent Sauvage depuis vingt ans. Elle connaissait le grand-père des triplés et a accepté de les prendre à bord pour honorer sa mémoire. Sous ses ordres sévères, elle veut que les enfants découvrent leur propre force. Elle porte un pendentif de corail rouge qui appartenait à sa propre mère pirate.",
+      "typical_lines": [
+        "Sur mon navire, on gagne sa place. Montrez-moi ce que vous valez.",
+        "La mer ne pardonne pas les erreurs, mais elle récompense les braves.",
+        "Votre grand-père aurait été fier. Peut-être.",
+        "Un bon pirate sait quand attaquer et quand attendre."
+      ]
+    },
+    {
+      "name": "Zéphyrine",
+      "role": "Seconde (première mate) du Vent Sauvage",
+      "gender": "female",
+      "age": 30,
+      "personality": [
+        "Chaleureuse et protectrice envers les enfants",
+        "Excellente navigatrice et conteuse",
+        "Ancienne orpheline recueillie par Capitaine Corail",
+        "Courage tranquille — elle rassure sans minimiser le danger"
+      ],
+      "voice": {
+        "name": "Sulafat",
+        "characteristic": "Warm"
+      },
+      "description": "Zéphyrine est la seconde de Capitaine Corail et la grande sœur que les triplés n'ont jamais eue. Elle leur enseigne les nœuds marins, les chansons de pirates et les secrets de la navigation. Quand les choses deviennent difficiles, c'est elle qui rappelle aux enfants qu'ils peuvent compter les uns sur les autres.",
+      "typical_lines": [
+        "Allez les matelots, je vais vous montrer un truc.",
+        "Quand la mer gronde, on serre les rangs.",
+        "Votre grand-père m'a appris ce nœud. À votre tour.",
+        "Courage, petits. L'île est proche, je le sens."
+      ]
+    },
+    {
+      "name": "Barnabé",
+      "role": "Cuisinier du navire et ancien érudit",
+      "gender": "male",
+      "age": 55,
+      "personality": [
+        "Jovial et bavard — raconte des histoires en cuisinant",
+        "Ancien professeur d'histoire devenu pirate par accident",
+        "Connaît les légendes de l'Île aux Mille Vents",
+        "Gourmand et généreux — nourrit les triplés de galettes et de savoir"
+      ],
+      "voice": {
+        "name": "Sadaltager",
+        "characteristic": "Knowledgeable"
+      },
+      "description": "Barnabé était professeur d'histoire avant qu'une série de malentendus ne le fasse atterrir sur un navire pirate. Il ne regrette rien. Sa cuisine est étrange mais délicieuse, et ses connaissances sur les légendes et l'histoire sont inestimables. C'est lui qui connaît l'histoire du Gardien de l'Île.",
+      "typical_lines": [
+        "Goûtez ça, c'est ma spécialité — ragoût de pirate !",
+        "Ah, l'Île aux Mille Vents... j'ai lu des choses là-dessus...",
+        "Un bon repas et une bonne histoire, c'est tout ce qu'il faut dans la vie.",
+        "Le Gardien, dit la légende, ne laisse passer que ceux qui le méritent."
+      ]
+    },
+    {
+      "name": "Le Gardien",
+      "role": "Gardien mystérieux du trésor sur l'île",
+      "gender": "male",
+      "age": "indéterminé (semble très ancien)",
+      "personality": [
+        "Mystérieux et énigmatique",
+        "Ni hostile ni amical — il teste",
+        "Voix venue d'ailleurs, presque irréelle",
+        "Respecte ceux qui montrent courage, intelligence ou créativité"
+      ],
+      "voice": {
+        "name": "Enceladus",
+        "characteristic": "Breathy"
+      },
+      "description": "Le Gardien est une présence mystérieuse qui protège le trésor de l'Île aux Mille Vents depuis des siècles. Nul ne sait s'il est un fantôme, un esprit ou quelque chose d'autre. Il apparaît sous forme d'une voix portée par le vent et pose des épreuves à ceux qui cherchent le trésor. Il n'est jamais cruel — ses épreuves sont conçues pour révéler la vraie nature de ceux qui les affrontent.",
+      "typical_lines": [
+        "Qui ose fouler le sol de mon île ?",
+        "Le trésor n'appartient qu'à ceux qui le méritent...",
+        "Répondez, jeunes marins... si vous en avez le courage.",
+        "Intéressant... vous n'êtes pas comme les autres."
+      ]
+    }
+  ],
+  "narrator": {
+    "name": "Narrateur",
+    "voice": {
+      "name": "Fenrir",
+      "characteristic": "Excitable"
+    },
+    "description": "Voix de narrateur dynamique et passionnée, parfaite pour une aventure de pirates. Sait alterner entre excitation lors des scènes d'action, suspense dans les moments mystérieux, et chaleur dans les moments d'émotion entre les triplés.",
+    "style": "Narration vivante et immersive, rythme soutenu avec des pauses dramatiques. S'adresse parfois directement à l'auditeur pour créer la complicité."
+  }
+}
