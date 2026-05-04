@@ -1,0 +1,47 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "bd720a08a4333f860aee5b284fb93233ab7e835d",
+  "prompts": {
+    "a516b919855bb08b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3417242a9ffeVMGtFLgltaSWBi",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "Yannick Grenzinger",
+      "messages": [],
+      "total_additions": 1479,
+      "total_deletions": 61,
+      "accepted_lines": 1416,
+      "overriden_lines": 0
+    },
+    "a66c2d3792c1b29d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_34180429dffeD70dMS0Ql6kSgb",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "Yannick Grenzinger",
+      "messages": [],
+      "total_additions": 1251,
+      "total_deletions": 5,
+      "accepted_lines": 1245,
+      "overriden_lines": 0
+    },
+    "fed1fbf334e03564": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_33cce0e3dffe6GyHFM8QA0Qp7U",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "Yannick Grenzinger",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 3,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
