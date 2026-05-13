@@ -3,8 +3,17 @@
 import logging
 import time
 
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - without optional SDK
+    genai = None
+
+    class _Types:
+        class SpeechConfig:
+            pass
+
+    types = _Types()
 
 from audio_generation.domain.constants import MAX_RETRIES
 
@@ -32,6 +41,8 @@ class TTSClient:
             project: Google Cloud project ID
             location: Google Cloud region (default: us-central1)
         """
+        if genai is None:
+            raise RuntimeError("Google GenAI SDK is not installed")
         self._client = genai.Client(
             vertexai=True, project=project, location=location
         )

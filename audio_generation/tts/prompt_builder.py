@@ -55,7 +55,7 @@ class TTSPromptBuilder:
         if audio_profile:
             sections.append(audio_profile)
 
-        # Section 2: Director's Notes (if any emotions present)
+        # Section 2: Director's Notes (if any performance directions present)
         directors_notes = self._build_directors_notes(batch)
         if directors_notes:
             sections.append(directors_notes)
@@ -128,7 +128,7 @@ class TTSPromptBuilder:
         return header + "\n" + "\n".join(lines)
 
     def _build_directors_notes(self, batch: SegmentBatch) -> str:
-        """Build Director's Notes section from segment emotions.
+        """Build Director's Notes section from segment performance directions.
 
         Aggregates emotion markers per speaker and formats them as
         acting directions that the TTS model should interpret but
@@ -145,21 +145,46 @@ class TTSPromptBuilder:
         seen: set[tuple[str, str]] = set()
 
         for segment in batch.segments:
-            if not segment.emotion:
+            if not segment.emotion and not segment.direction.raw:
                 continue
 
-            key = (segment.speaker, segment.emotion)
+            note = self._format_direction_note(segment)
+            key = (segment.speaker, note)
             if key in seen:
                 continue
             seen.add(key)
 
-            notes.append(f"Make {segment.speaker} sound {segment.emotion}.")
+            notes.append(note)
 
         if not notes:
             return ""
 
         header = "=== DIRECTOR'S NOTES ==="
         return header + "\n" + "\n".join(notes)
+
+    def _format_direction_note(self, segment) -> str:
+        direction = segment.direction
+        canonical: list[str] = []
+        canonical.extend(direction.emotion)
+        canonical.extend(direction.delivery)
+
+        phrases: list[str] = []
+        if canonical:
+            phrases.append(" and ".join(canonical) if len(canonical) == 2 else ", ".join(canonical))
+        if direction.vocal_events:
+            phrases.append("with " + ", ".join(direction.vocal_events))
+        if direction.pace:
+            phrases.append(f"with a {direction.pace} pace")
+        if direction.volume:
+            phrases.append(f"at a {direction.volume} volume")
+        if direction.pitch:
+            phrases.append(f"with a {direction.pitch} pitch")
+        if direction.intensity:
+            phrases.append(f"with {direction.intensity} intensity")
+
+        if phrases:
+            return f"Make {segment.speaker} sound {', '.join(phrases)}."
+        return f"Make {segment.speaker} sound {segment.emotion}."
 
     def _build_transcript(self, batch: SegmentBatch) -> str:
         """Build clean Transcript section with only spoken text.

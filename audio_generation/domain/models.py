@@ -1,6 +1,7 @@
 """Domain models for audio generation pipeline."""
 
 from dataclasses import dataclass, field
+from typing import Any
 
 from audio_generation.domain.constants import (
     COMFORT_NOISE_LEVEL_DB,
@@ -53,11 +54,33 @@ class SpeakerConfig:
 
     Attributes:
         name: Speaker identifier (e.g., "Narrator", "Emma")
-        voice: Gemini TTS voice name (e.g., "Sulafat", "Puck")
+        voice: Legacy/default provider voice name (e.g., "Sulafat", "Puck")
+        voice_role: Portable voice role from the global voice registry
+        provider_voices: Provider-specific story voice overrides
+        provider_settings: Provider-specific story voice settings
     """
 
     name: str
     voice: str = DEFAULT_VOICE
+    voice_role: str | None = None
+    provider_voices: dict[str, str] = field(default_factory=dict)
+    provider_settings: dict[str, dict[str, Any]] = field(default_factory=dict)
+
+
+@dataclass
+class PerformanceDirection:
+    """Structured performance direction parsed from script markers."""
+
+    raw: str = ""
+    emotion: list[str] = field(default_factory=list)
+    delivery: list[str] = field(default_factory=list)
+    vocal_events: list[str] = field(default_factory=list)
+    pace: str | None = None
+    volume: str | None = None
+    pitch: str | None = None
+    intensity: str | None = None
+    pause_before_ms: int | None = None
+    pause_after_ms: int | None = None
 
 
 @dataclass
@@ -67,12 +90,14 @@ class Segment:
     Attributes:
         speaker: Speaker name matching SpeakerConfig.name
         text: The text content to be spoken
-        emotion: Emotion descriptor (e.g., "warm", "tense")
+        emotion: Raw emotion descriptor for backward compatibility
+        direction: Structured normalized performance direction
     """
 
     speaker: str
     text: str
     emotion: str = ""
+    direction: PerformanceDirection = field(default_factory=PerformanceDirection)
 
 
 @dataclass

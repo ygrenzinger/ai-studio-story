@@ -4,20 +4,14 @@ from audio_generation.domain.models import Segment, SegmentBatch
 
 
 class SegmentBatcher:
-    """Batches segments for TTS API calls (max 2 speakers per batch).
+    """Batches segments into single-speaker TTS requests.
 
-    Gemini TTS API supports maximum 2 speakers per call. This batcher
-    optimizes batching to minimize API calls while maintaining
-    narrative flow.
-
-    Strategy:
-    - Each character segment batches with preceding narrator segments
-    - Narrator-only sequences batch with the following character if one exists
-    - Character-to-character transitions create separate single-speaker batches
+    Consecutive segments from the same speaker are grouped together.
+    Speaker changes always create a new request, regardless of provider.
     """
 
     def batch(self, segments: list[Segment]) -> list[SegmentBatch]:
-        """Batch segments for TTS generation (max 2 speakers per batch).
+        """Batch segments for TTS generation.
 
         Args:
             segments: List of parsed segments in order
@@ -28,35 +22,18 @@ class SegmentBatcher:
         if not segments:
             return []
 
-        batches = []
-        pending_narrator: list[Segment] = []
+        batches: list[SegmentBatch] = []
+        current_segments = [segments[0]]
+        current_speaker = segments[0].speaker
 
-        for segment in segments:
-            if segment.speaker == "Narrator":
-                pending_narrator.append(segment)
-            else:
-                # Character segment - batch with pending narrator
-                if pending_narrator:
-                    batch = SegmentBatch(
-                        segments=pending_narrator + [segment],
-                        speakers=["Narrator", segment.speaker],
-                    )
-                    pending_narrator = []
-                else:
-                    # No preceding narrator - single speaker batch
-                    batch = SegmentBatch(
-                        segments=[segment],
-                        speakers=[segment.speaker],
-                    )
-                batches.append(batch)
+        for segment in segments[1:]:
+            if segment.speaker == current_speaker:
+                current_segments.append(segment)
+                continue
+            batches.append(SegmentBatch(current_segments, [current_speaker]))
+            current_segments = [segment]
+            current_speaker = segment.speaker
 
-        # Handle trailing narrator segments
-        if pending_narrator:
-            batches.append(
-                SegmentBatch(
-                    segments=pending_narrator,
-                    speakers=["Narrator"],
-                )
-            )
+        batches.append(SegmentBatch(current_segments, [current_speaker]))
 
         return batches

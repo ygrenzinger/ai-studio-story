@@ -12,6 +12,7 @@ from audio_generation.domain.models import (
     SpeakerConfig,
 )
 from audio_generation.domain.constants import DEFAULT_TTS_MODEL, DEFAULT_VOICE
+from audio_generation.emotion.normalizer import normalize_performance_direction
 
 
 class AudioScriptParser:
@@ -99,6 +100,9 @@ class AudioScriptParser:
                     SpeakerConfig(
                         name=speaker_data.get("name", "Narrator"),
                         voice=speaker_data.get("voice", DEFAULT_VOICE),
+                        voice_role=speaker_data.get("voiceRole"),
+                        provider_voices=speaker_data.get("voices", {}) or {},
+                        provider_settings=speaker_data.get("providerSettings", {}) or {},
                     )
                 )
 
@@ -160,7 +164,12 @@ class AudioScriptParser:
                     continue
 
                 segments.append(
-                    Segment(speaker=speaker, text=segment_text, emotion=emotion)
+                    Segment(
+                        speaker=speaker,
+                        text=segment_text,
+                        emotion=emotion,
+                        direction=normalize_performance_direction(emotion),
+                    )
                 )
 
         return segments

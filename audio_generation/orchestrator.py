@@ -1,20 +1,26 @@
 """Audio generation pipeline orchestrator."""
 
+from __future__ import annotations
+
 import logging
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
-from google.genai import errors as genai_errors
+try:
+    from google.genai import errors as genai_errors
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - without optional SDK
+    class _GenAIErrors:
+        class APIError(Exception):
+            code = "unknown"
+            message = "Google GenAI SDK is not installed"
 
-from audio_generation.audio.concatenator import SegmentConcatenator
-from audio_generation.audio.effects import AudioEffects
-from audio_generation.audio.exporter import MP3Exporter
-from audio_generation.audio.processor import AudioProcessor
+    genai_errors = _GenAIErrors()
+
 from audio_generation.batching.segment_batcher import SegmentBatcher
 from audio_generation.domain.character_loader import CharacterLoader
-from audio_generation.domain.constants import API_CALL_DELAY_SEC, TTS_SYSTEM_INSTRUCTION
+from audio_generation.domain.constants import API_CALL_DELAY_SEC
 from audio_generation.domain.models import (
     AudioScript,
     CharacterProfile,
@@ -26,10 +32,13 @@ from audio_generation.domain.models import (
 )
 from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.progress.progress_manager import ProgressManager
+from audio_generation.providers.base import AudioFormat, SynthesisRequest, TTSProvider
+from audio_generation.providers.gemini import GeminiProvider
 from audio_generation.tts.client import TTSClient
 from audio_generation.tts.config_builder import SpeechConfigBuilder
 from audio_generation.tts.prompt_builder import TTSPromptBuilder
-from audio_generation.verification.mp3_verifier import MP3Verifier
+from audio_generation.voices.registry import VoiceRegistry
+from audio_generation.voices.resolver import resolve_voice
 
 
 class AudioGenerationPipeline:
@@ -43,6 +52,7 @@ class AudioGenerationPipeline:
         self,
         parser: AudioScriptParser | None = None,
         batcher: SegmentBatcher | None = None,
+        provider: TTSProvider | None = None,
         tts_client: TTSClient | None = None,
         config_builder: SpeechConfigBuilder | None = None,
         prompt_builder: TTSPromptBuilder | None = None,
@@ -71,13 +81,25 @@ class AudioGenerationPipeline:
         """
         self._parser = parser or AudioScriptParser()
         self._batcher = batcher or SegmentBatcher()
-        self._tts_client = tts_client  # Must be set before execute()
+        self._provider = provider
+        self._tts_client = tts_client
         self._config_builder = config_builder or SpeechConfigBuilder()
         self._prompt_builder = prompt_builder or TTSPromptBuilder()
+        if self._provider is None and self._tts_client is not None:
+            self._provider = GeminiProvider(
+                self._tts_client, self._config_builder, self._prompt_builder
+            )
+
+        if concatenator is None or exporter is None or verifier is None:
+            from audio_generation.audio.concatenator import SegmentConcatenator
+            from audio_generation.audio.effects import AudioEffects
+            from audio_generation.audio.exporter import MP3Exporter
+            from audio_generation.audio.processor import AudioProcessor
+            from audio_generation.verification.mp3_verifier import MP3Verifier
 
         # Audio processing chain
-        effects = AudioEffects()
-        processor = AudioProcessor(effects)
+        effects = AudioEffects() if concatenator is None else None
+        processor = AudioProcessor(effects) if concatenator is None else None
         self._pause_config = pause_config or PauseConfig()
         self._concatenator = concatenator or SegmentConcatenator(
             processor, effects, self._pause_config
@@ -93,6 +115,12 @@ class AudioGenerationPipeline:
             client: Configured TTS client
         """
         self._tts_client = client
+        self._provider = GeminiProvider(client, self._config_builder, self._prompt_builder)
+
+    def set_provider(self, provider: TTSProvider) -> None:
+        """Set TTS provider (required before execute)."""
+
+        self._provider = provider
 
     def set_progress_manager(self, manager: ProgressManager) -> None:
         """Set progress manager for resume capability.
@@ -110,6 +138,8 @@ class AudioGenerationPipeline:
         verify: bool = True,
         progress_callback: Callable[[int, int], None] | None = None,
         delay_seconds: float = API_CALL_DELAY_SEC,
+        voice_override: str | None = None,
+        strict_voices: bool = False,
     ) -> bytes:
         """Execute the full audio generation pipeline.
 
@@ -138,8 +168,8 @@ class AudioGenerationPipeline:
             ValueError: If TTS client not configured
             RuntimeError: If generation fails
         """
-        if self._tts_client is None:
-            raise ValueError("TTS client must be configured before execute()")
+        if self._provider is None:
+            raise ValueError("TTS provider must be configured before execute()")
 
         # Ensure progress manager is set
         if self._progress_manager is None:
@@ -148,6 +178,7 @@ class AudioGenerationPipeline:
         # Stage 1: Parse script
         logging.info(f"Parsing audio script: {input_file}")
         script = self._parser.parse(input_file)
+        self._resolve_script_voices(script, voice_override, strict=strict_voices)
         logging.info(f"Stage UUID: {script.stage_uuid}")
         logging.info(f"Speakers: {[cfg.name for cfg in script.speaker_configs]}")
         logging.info(f"Segments: {len(script.segments)}")
@@ -161,7 +192,7 @@ class AudioGenerationPipeline:
             )
 
         # Stage 2: Batch segments
-        batches = self._batcher.batch(script.segments)
+        batches = self._batch_segments(script)
         logging.info(
             f"Processing {len(script.segments)} segments in {len(batches)} batches"
         )
@@ -172,6 +203,7 @@ class AudioGenerationPipeline:
         # Stage 4: Generate audio for all batches
         audio_segments = self._generate_batches(
             batches=batches,
+            script=script,
             speaker_configs_map=speaker_configs_map,
             character_profiles=character_profiles,
             input_file=input_file,
@@ -212,6 +244,7 @@ class AudioGenerationPipeline:
     def _generate_batches(
         self,
         batches: list[SegmentBatch],
+        script: AudioScript,
         speaker_configs_map: dict[str, SpeakerConfig],
         character_profiles: dict[str, CharacterProfile],
         input_file: Path,
@@ -238,8 +271,8 @@ class AudioGenerationPipeline:
         Raises:
             RuntimeError: If generation fails
         """
-        if self._tts_client is None:
-            raise ValueError("TTS client not configured")
+        if self._provider is None:
+            raise ValueError("TTS provider not configured")
 
         total_batches = len(batches)
 
@@ -303,21 +336,18 @@ class AudioGenerationPipeline:
             batch_num = i + 1
 
             try:
-                # Build prompt and config
-                prompt = self._prompt_builder.build(
-                    batch, speaker_configs_map, character_profiles
+                result = self._provider.synthesize(
+                    SynthesisRequest(
+                        script=script,
+                        batch=batch,
+                        speaker_configs=speaker_configs_map,
+                        character_profiles=character_profiles,
+                        locale=script.locale,
+                        output_format=AudioFormat(codec="mp3"),
+                        batch_num=batch_num,
+                    )
                 )
-                speech_config = self._config_builder.build_for_batch(
-                    batch, speaker_configs_map
-                )
-
-                # Generate audio
-                audio_data = self._tts_client.generate(
-                    prompt,
-                    speech_config,
-                    system_instruction=TTS_SYSTEM_INSTRUCTION,
-                    batch_num=batch_num,
-                )
+                audio_data = result.audio_bytes
 
                 # Save immediately to disk
                 if self._progress_manager and progress:
@@ -391,6 +421,25 @@ class AudioGenerationPipeline:
             Parsed AudioScript
         """
         return self._parser.parse(file_path)
+
+    def _batch_segments(self, script: AudioScript) -> list[SegmentBatch]:
+        return self._batcher.batch(script.segments)
+
+    def _resolve_script_voices(
+        self, script: AudioScript, voice_override: str | None = None, *, strict: bool = False
+    ) -> None:
+        if voice_override:
+            for cfg in script.speaker_configs:
+                cfg.voice = voice_override
+                cfg.voice_role = None
+                cfg.provider_voices.clear()
+            return
+        if self._provider is None:
+            return
+        registry = VoiceRegistry.load()
+        for cfg in script.speaker_configs:
+            resolved = resolve_voice(cfg, self._provider.name, registry, strict=strict)
+            cfg.voice = resolved.voice_id
 
     def verify_mp3(self, mp3_data: bytes) -> VerificationResult:
         """Verify MP3 format meets requirements.

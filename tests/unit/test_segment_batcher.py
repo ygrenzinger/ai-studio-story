@@ -36,9 +36,9 @@ class TestSegmentBatcher:
         ]
         batches = batcher.batch(segments)
 
-        assert len(batches) == 1
-        assert batches[0].speakers == ["Narrator", "Emma"]
-        assert len(batches[0].segments) == 2
+        assert len(batches) == 2
+        assert batches[0].speakers == ["Narrator"]
+        assert batches[1].speakers == ["Emma"]
 
     def test_batch_multiple_narrator_then_character(self, batcher: SegmentBatcher):
         """Test batching multiple narrator segments before character."""
@@ -49,9 +49,10 @@ class TestSegmentBatcher:
         ]
         batches = batcher.batch(segments)
 
-        assert len(batches) == 1
-        assert batches[0].speakers == ["Narrator", "Emma"]
-        assert len(batches[0].segments) == 3
+        assert len(batches) == 2
+        assert batches[0].speakers == ["Narrator"]
+        assert len(batches[0].segments) == 2
+        assert batches[1].speakers == ["Emma"]
 
     def test_batch_character_without_narrator(self, batcher: SegmentBatcher):
         """Test batching character segment without preceding narrator."""
@@ -72,9 +73,13 @@ class TestSegmentBatcher:
         ]
         batches = batcher.batch(segments)
 
-        # Should create 2 batches: [Narrator, Emma], [Narrator, Emma]
-        assert len(batches) == 2
-        assert all(b.speakers == ["Narrator", "Emma"] for b in batches)
+        assert len(batches) == 4
+        assert [b.speakers for b in batches] == [
+            ["Narrator"],
+            ["Emma"],
+            ["Narrator"],
+            ["Emma"],
+        ]
 
     def test_batch_trailing_narrator(self, batcher: SegmentBatcher):
         """Test batching with trailing narrator segments."""
@@ -98,10 +103,8 @@ class TestSegmentBatcher:
         ]
         batches = batcher.batch(segments)
 
-        # Should create 2 batches: [Narrator, Emma], [Bob]
-        assert len(batches) == 2
-        assert batches[0].speakers == ["Narrator", "Emma"]
-        assert batches[1].speakers == ["Bob"]
+        assert len(batches) == 3
+        assert [b.speakers for b in batches] == [["Narrator"], ["Emma"], ["Bob"]]
 
     def test_batch_preserves_segment_order(self, batcher: SegmentBatcher):
         """Test that batching preserves segment order."""
@@ -112,7 +115,8 @@ class TestSegmentBatcher:
         ]
         batches = batcher.batch(segments)
 
-        assert len(batches) == 1
+        assert len(batches) == 2
         assert batches[0].segments[0].text == "First."
         assert batches[0].segments[1].text == "Second."
-        assert batches[0].segments[2].text == "Third."
+        assert batches[1].segments[0].text == "Third."
+        assert all(len(batch.speakers) == 1 for batch in batches)
