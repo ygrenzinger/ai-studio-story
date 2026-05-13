@@ -65,6 +65,34 @@ speakers:
         assert emma.name == "Emma"
         assert emma.voice == "Leda"
 
+    def test_parse_speaker_voice_role_and_provider_overrides(
+        self, parser: AudioScriptParser, tmp_path: Path
+    ):
+        content = """---
+stageUuid: "test"
+speakers:
+  - name: Narrator
+    voiceRole: warm_narrator
+    voices:
+      gemini: Puck
+    providerSettings:
+      elevenlabs:
+        voice_settings:
+          stability: 0.6
+---
+
+**Narrator:** Hello world.
+"""
+        script_path = tmp_path / "voice_role.md"
+        script_path.write_text(content)
+
+        script = parser.parse(script_path)
+        speaker = script.speaker_configs[0]
+
+        assert speaker.voice_role == "warm_narrator"
+        assert speaker.provider_voices == {"gemini": "Puck"}
+        assert speaker.provider_settings["elevenlabs"]["voice_settings"]["stability"] == 0.6
+
     def test_parse_segments_with_emotions(
         self, parser: AudioScriptParser, sample_script: Path
     ):
@@ -74,6 +102,8 @@ speakers:
         # First segment: Narrator with warm emotion
         assert script.segments[0].speaker == "Narrator"
         assert script.segments[0].emotion == "warm"
+        assert script.segments[0].direction.raw == "warm"
+        assert script.segments[0].direction.emotion == ["warm"]
         assert "Once upon a time" in script.segments[0].text
 
         # Second segment: Emma with curious emotion

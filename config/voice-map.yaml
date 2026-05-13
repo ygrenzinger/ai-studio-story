@@ -1,0 +1,73 @@
+roles:
+  warm_narrator:
+    description: Warm story narrator
+    tone: warm
+    providers:
+      gemini: {voice: Sulafat}
+      grok: {voice: ara}
+      elevenlabs: {voice: placeholder_warm_narrator}
+  clear_narrator:
+    description: Clear neutral narrator
+    tone: clear
+    providers:
+      gemini: {voice: Charon}
+      grok: {voice: rex}
+      elevenlabs: {voice: placeholder_clear_narrator}
+  playful_child:
+    description: Playful child voice
+    age: child
+    tone: playful
+    providers:
+      gemini: {voice: Leda}
+      grok: {voice: eva}
+      elevenlabs: {voice: placeholder_playful_child}
+  gentle_child:
+    description: Gentle child voice
+    age: child
+    tone: gentle
+    providers:
+      gemini: {voice: Aoede}
+      grok: {voice: eva}
+      elevenlabs: {voice: placeholder_gentle_child}
+  wise_mentor:
+    description: Wise mentor voice
+    tone: wise
+    providers:
+      gemini: {voice: Rasalgethi}
+      grok: {voice: rex}
+      elevenlabs: {voice: placeholder_wise_mentor}
+  mysterious_guide:
+    description: Mysterious guide voice
+    tone: mysterious
+    providers:
+      gemini: {voice: Kore}
+      grok: {voice: ara}
+      elevenlabs: {voice: placeholder_mysterious_guide}
+  gruff_creature:
+    description: Gruff creature voice
+    tone: gruff
+    providers:
+      gemini: {voice: Fenrir}
+      grok: {voice: rex}
+      elevenlabs: {voice: placeholder_gruff_creature}
+  energetic_adventurer:
+    description: Energetic adventurer voice
+    tone: energetic
+    providers:
+      gemini: {voice: Puck}
+      grok: {voice: eva}
+      elevenlabs: {voice: placeholder_energetic_adventurer}
+  calm_teacher:
+    description: Calm teacher voice
+    tone: calm
+    providers:
+      gemini: {voice: Achernar}
+      grok: {voice: ara}
+      elevenlabs: {voice: placeholder_calm_teacher}
+  soft_bedtime:
+    description: Soft bedtime narrator
+    tone: soft
+    providers:
+      gemini: {voice: Laomedeia}
+      grok: {voice: ara}
+      elevenlabs: {voice: placeholder_soft_bedtime}

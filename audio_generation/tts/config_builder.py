@@ -1,6 +1,20 @@
 """Speech configuration builder for Gemini TTS API."""
 
-from google.genai import types
+try:
+    from google.genai import types
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - without optional SDK
+    class _SimpleType:
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
+    class _Types:
+        SpeechConfig = _SimpleType
+        VoiceConfig = _SimpleType
+        PrebuiltVoiceConfig = _SimpleType
+        SpeakerVoiceConfig = _SimpleType
+        MultiSpeakerVoiceConfig = _SimpleType
+
+    types = _Types()
 
 from audio_generation.domain.models import SegmentBatch, SpeakerConfig
 

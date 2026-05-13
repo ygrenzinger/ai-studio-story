@@ -146,6 +146,28 @@ class TestTTSPromptBuilder:
         assert "=== DIRECTOR'S NOTES ===" in prompt
         assert "Make Narrator sound tense, mysterious." in prompt
 
+    def test_directors_notes_use_structured_directions(
+        self, builder: TTSPromptBuilder, speaker_configs_map
+    ):
+        batch = SegmentBatch(
+            segments=[
+                Segment(
+                    speaker="Narrator",
+                    text="The room fell silent.",
+                    emotion="whispered, nervous, slow",
+                ),
+            ],
+            speakers=["Narrator"],
+        )
+        from audio_generation.emotion.normalizer import normalize_performance_direction
+
+        batch.segments[0].direction = normalize_performance_direction(batch.segments[0].emotion)
+
+        prompt = builder.build(batch, speaker_configs_map)
+
+        assert "Make Narrator sound nervous and whispering, with a slow pace." in prompt
+        assert "<emotion:" not in prompt
+
     def test_no_emotions_omits_directors_notes(
         self, builder: TTSPromptBuilder, speaker_configs_map
     ):

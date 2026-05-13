@@ -8,9 +8,12 @@ from pathlib import Path
 
 from audio_generation.domain.constants import AVAILABLE_VOICES
 from audio_generation.orchestrator import AudioGenerationPipeline
+from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.progress.progress_manager import ProgressManager
-from audio_generation.tts.client import TTSClient
+from audio_generation.providers.registry import create_provider
 from audio_generation.utils.logging import setup_logging
+from audio_generation.voices.registry import VoiceRegistry
+from audio_generation.voices.resolver import resolve_voice
 
 
 def get_tts_config() -> dict:
@@ -52,10 +55,31 @@ def print_progress(current: int, total: int) -> None:
         print()  # Newline at completion
 
 
+def print_voice_dry_run(input_path: Path, provider: str, voice_override: str | None) -> None:
+    """Print provider voice resolution without making network calls."""
+
+    script = AudioScriptParser().parse(input_path)
+    registry = VoiceRegistry.load()
+
+    print(f"Selected provider: {provider}")
+    print()
+    print("Speaker resolution:")
+    for cfg in script.speaker_configs:
+        if voice_override:
+            cfg.voice = voice_override
+            cfg.voice_role = None
+            cfg.provider_voices.clear()
+        resolved = resolve_voice(cfg, provider, registry, strict=False)
+        print(f"  {resolved.speaker}")
+        print(f"    role: {resolved.role or '-'}")
+        print(f"    voice: {resolved.voice_id}")
+        print(f"    source: {resolved.source}")
+
+
 def main() -> None:
     """Main entry point for CLI."""
     parser = argparse.ArgumentParser(
-        description="Generate audio from story chapters using Gemini TTS",
+        description="Generate audio from story chapters using a TTS provider",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -88,9 +112,14 @@ Output Format:
     parser.add_argument(
         "-o",
         "--output",
-        required=True,
         type=Path,
-        help="Output MP3 file path (required)",
+        help="Output MP3 file path (required unless --dry-run-voices)",
+    )
+    parser.add_argument(
+        "--provider",
+        choices=["gemini"],
+        default="gemini",
+        help="TTS provider to use (default: gemini)",
     )
     parser.add_argument(
         "--voice",
@@ -120,6 +149,11 @@ Output Format:
         action="store_true",
         help="Resume from saved progress (use after rate limit or other failure)",
     )
+    parser.add_argument(
+        "--dry-run-voices",
+        action="store_true",
+        help="Print speaker voice resolution without generating audio",
+    )
 
     args = parser.parse_args()
 
@@ -129,6 +163,14 @@ Output Format:
     # Validate input file
     if not args.input.exists():
         logging.error(f"Input file not found: {args.input}")
+        sys.exit(1)
+
+    if args.dry_run_voices:
+        print_voice_dry_run(args.input, args.provider, args.voice)
+        return
+
+    if args.output is None:
+        logging.error("Output MP3 file path is required unless --dry-run-voices is used")
         sys.exit(1)
 
     # Ensure output has .mp3 extension
@@ -145,31 +187,19 @@ Output Format:
             f"location={tts_config['location']})"
         )
 
-        # Create pipeline with dependencies
         pipeline = AudioGenerationPipeline()
 
-        # Parse script first to get model
         script = pipeline.parse_script(args.input)
-
-        # Override voice if specified
+        tts_model = args.model or script.tts_model
+        if args.model:
+            logging.info(f"Model override: {tts_model}")
         if args.voice:
             if args.voice not in AVAILABLE_VOICES:
-                logging.warning(
-                    f"Voice '{args.voice}' not in known voices, using anyway"
-                )
-            for cfg in script.speaker_configs:
-                cfg.voice = args.voice
+                logging.warning(f"Voice '{args.voice}' not in known voices, using anyway")
             logging.info(f"Voice override: {args.voice}")
 
-        # Override model if specified
-        tts_model = script.tts_model
-        if args.model:
-            tts_model = args.model
-            logging.info(f"Model override: {tts_model}")
-
-        # Configure TTS client
-        tts_client = TTSClient(model=tts_model, **tts_config)
-        pipeline.set_tts_client(tts_client)
+        provider = create_provider(args.provider, model=tts_model, **tts_config)
+        pipeline.set_provider(provider)
 
         # Configure progress manager
         progress_manager = ProgressManager(output_path.parent)
@@ -184,6 +214,7 @@ Output Format:
             resume=args.resume,
             verify=not args.no_verify,
             progress_callback=progress_callback,
+            voice_override=args.voice,
         )
 
         logging.info(f"Audio saved to: {output_path}")
