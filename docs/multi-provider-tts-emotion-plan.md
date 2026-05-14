@@ -1257,10 +1257,10 @@ Recommended initial roles:
 | `gentle_child` | Shy or sensitive child | `Achird`, `Vindemiatrix` | `ara` |
 | `wise_mentor` | Grandparent, teacher, guide | `Gacrux`, `Sadaltager`, `Charon` | `leo` |
 | `mysterious_guide` | Magical helper, secretive guide | `Enceladus`, `Despina` | `sal` |
-| `gruff_creature` | Dragon, troll, pirate, monster | `Algenib`, `Fenrir` | `rex`, `leo` |
+| `gruff_creature` | Dragon, troll, pirate, monster | `Algenib`, `Fenrir` | `leo` |
 | `energetic_adventurer` | Action character | `Fenrir`, `Laomedeia`, `Sadachbia` | `eve` |
-| `calm_teacher` | Pedagogical voice | `Erinome`, `Charon`, `Schedar` | `rex`, `ara` |
-| `soft_bedtime` | Sleep stories | `Achernar`, `Vindemiatrix`, `Despina` | `ara`, `sal` |
+| `calm_teacher` | Pedagogical voice | `Erinome`, `Charon`, `Schedar` | `leo` |
+| `soft_bedtime` | Sleep stories | `Achernar`, `Vindemiatrix`, `Despina` | `ara` |
 
 ElevenLabs candidates should not be hardcoded in docs unless the account has known voice IDs. Instead, keep placeholders in the registry and fill them from the workspace voice library.
 
@@ -1426,7 +1426,7 @@ providers:
 
   grok:
     api_key_env: XAI_API_KEY
-    default_voice: ara
+    default_voice: eve
     language: auto
     output_format:
       codec: mp3

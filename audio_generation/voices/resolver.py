@@ -7,7 +7,7 @@ from audio_generation.voices.registry import VoiceRegistry
 
 PROVIDER_DEFAULT_VOICES = {
     "gemini": DEFAULT_VOICE,
-    "grok": "ara",
+    "grok": "eve",
 }
 
 PROVIDER_VOICE_ALLOWLISTS = {
