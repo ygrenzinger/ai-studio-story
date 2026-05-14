@@ -50,6 +50,20 @@ The `/kidstory` command uses Google's Gemini 2.5 TTS for high-quality, expressiv
 
 ---
 
+## Grok TTS Voice Options
+
+When using `--provider grok`, the built-in voice IDs are smaller and map to broad role archetypes:
+
+| Voice ID | Characteristic | Best For |
+|----------|----------------|----------|
+| **eve** | Female; energetic, upbeat; engaging and enthusiastic; default voice | Playful children, energetic adventurers |
+| **ara** | Female; warm, friendly; balanced and conversational | Warm narrators, gentle children, bedtime stories |
+| **rex** | Male; confident, clear; professional and articulate | Clear narration, business-like explanations |
+| **leo** | Male; authoritative, strong; decisive and commanding | Wise mentors, teachers, commanding creatures |
+| **sal** | Neutral; smooth, balanced; versatile | Mysterious guides, neutral supporting roles |
+
+---
+
 ## Voice Selection by Story Tone
 
 The command automatically selects voices based on your chosen story tone:
