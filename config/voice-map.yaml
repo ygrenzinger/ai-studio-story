@@ -5,14 +5,18 @@ roles:
     providers:
       gemini: {voice: Sulafat}
       grok: {voice: ara}
-      elevenlabs: {voice: placeholder_warm_narrator}
+      elevenlabs:
+        voice: placeholder_warm_narrator
+        voice_settings: {stability: 0.4, style: 0.3}
   clear_narrator:
     description: Clear neutral narrator
     tone: clear
     providers:
       gemini: {voice: Charon}
       grok: {voice: rex}
-      elevenlabs: {voice: placeholder_clear_narrator}
+      elevenlabs:
+        voice: placeholder_clear_narrator
+        voice_settings: {stability: 0.45, style: 0.2}
   playful_child:
     description: Playful child voice
     age: child

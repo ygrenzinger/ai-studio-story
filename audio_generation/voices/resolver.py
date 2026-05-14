@@ -8,6 +8,7 @@ from audio_generation.voices.registry import VoiceRegistry
 PROVIDER_DEFAULT_VOICES = {
     "gemini": DEFAULT_VOICE,
     "grok": "eve",
+    "elevenlabs": "placeholder_elevenlabs_default",
 }
 
 PROVIDER_VOICE_ALLOWLISTS = {
@@ -54,6 +55,11 @@ def resolve_voice(
         role = registry.get(speaker.voice_role)
         provider_config = role.providers.get(provider_name) if role else None
         if provider_config:
+            if strict and provider_name == "elevenlabs" and provider_config.voice.startswith("placeholder_"):
+                raise ValueError(
+                    f"ElevenLabs role '{speaker.voice_role}' uses placeholder voice "
+                    f"'{provider_config.voice}' for speaker '{speaker.name}'"
+                )
             return ResolvedVoice(
                 speaker=speaker.name,
                 role=speaker.voice_role,

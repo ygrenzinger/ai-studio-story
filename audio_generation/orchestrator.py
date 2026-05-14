@@ -443,6 +443,10 @@ class AudioGenerationPipeline:
         for cfg in script.speaker_configs:
             resolved = resolve_voice(cfg, self._provider.name, registry, strict=strict)
             cfg.voice = resolved.voice_id
+            if resolved.voice_settings:
+                cfg.provider_settings.setdefault(self._provider.name, {})[
+                    "voice_settings"
+                ] = resolved.voice_settings
 
     def verify_mp3(self, mp3_data: bytes) -> VerificationResult:
         """Verify MP3 format meets requirements.

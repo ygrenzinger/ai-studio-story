@@ -4,6 +4,7 @@ CANONICAL_EMOTIONS = {
     "angry",
     "brave",
     "calm",
+    "crying",
     "curious",
     "excited",
     "happy",
@@ -13,6 +14,7 @@ CANONICAL_EMOTIONS = {
     "sad",
     "scared",
     "surprised",
+    "sarcastic",
     "tense",
     "warm",
 }
@@ -24,7 +26,16 @@ CANONICAL_DELIVERY = {
     "whispering",
 }
 
-CANONICAL_VOCAL_EVENTS = {"chuckle", "giggle", "laugh", "long_pause", "pause", "sigh"}
+CANONICAL_VOCAL_EVENTS = {
+    "chuckle",
+    "exhale",
+    "giggle",
+    "inhale",
+    "laugh",
+    "long_pause",
+    "pause",
+    "sigh",
+}
 
 PACE_VALUES = {"fast", "normal", "slow"}
 VOLUME_VALUES = {"loud", "normal", "soft"}
@@ -50,6 +61,14 @@ DELIVERY_SYNONYMS = {
 VOCAL_EVENT_SYNONYMS = {
     "laughing": "laugh",
     "laughs": "laugh",
+    "chuckling": "chuckle",
+    "chuckles": "chuckle",
+    "giggling": "giggle",
+    "giggles": "giggle",
+    "inhales": "inhale",
+    "inhaling": "inhale",
+    "exhales": "exhale",
+    "exhaling": "exhale",
     "long pause": "long_pause",
     "long-pause": "long_pause",
     "sighing": "sigh",
