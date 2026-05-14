@@ -5,6 +5,16 @@ from audio_generation.domain.models import SpeakerConfig
 from audio_generation.voices.models import ResolvedVoice
 from audio_generation.voices.registry import VoiceRegistry
 
+PROVIDER_DEFAULT_VOICES = {
+    "gemini": DEFAULT_VOICE,
+    "grok": "ara",
+}
+
+PROVIDER_VOICE_ALLOWLISTS = {
+    "gemini": AVAILABLE_VOICES,
+    "grok": {"ara", "eve", "rex", "sal", "leo"},
+}
+
 
 def resolve_voice(
     speaker: SpeakerConfig,
@@ -27,7 +37,11 @@ def resolve_voice(
             source=f"speakers.{speaker.name}.voices.{provider_name}",
         )
 
-    if speaker.voice_role is None and speaker.voice:
+    if (
+        speaker.voice_role is None
+        and speaker.voice
+        and speaker.voice in PROVIDER_VOICE_ALLOWLISTS.get(provider_name, set())
+    ):
         return ResolvedVoice(
             speaker=speaker.name,
             role=None,
@@ -55,7 +69,7 @@ def resolve_voice(
                 f"on speaker '{speaker.name}'"
             )
 
-    if provider_name == "gemini" and speaker.voice in AVAILABLE_VOICES:
+    if speaker.voice in PROVIDER_VOICE_ALLOWLISTS.get(provider_name, set()):
         return ResolvedVoice(
             speaker=speaker.name,
             role=speaker.voice_role,
@@ -71,6 +85,6 @@ def resolve_voice(
         speaker=speaker.name,
         role=speaker.voice_role,
         provider=provider_name,
-        voice_id=DEFAULT_VOICE,
+        voice_id=PROVIDER_DEFAULT_VOICES.get(provider_name, DEFAULT_VOICE),
         source=f"providers.{provider_name}.default_voice",
     )

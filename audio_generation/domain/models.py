@@ -161,8 +161,10 @@ class GenerationProgress:
 
     input_file_hash: str
     total_batches: int
+    provider_name: str = ""
     completed_batches: list[int] = field(default_factory=list)
     audio_files: dict[int, str] = field(default_factory=dict)
+    audio_codecs: dict[int, str] = field(default_factory=dict)
     last_error: str | None = None
     last_error_batch: int | None = None
     last_error_time: str | None = None

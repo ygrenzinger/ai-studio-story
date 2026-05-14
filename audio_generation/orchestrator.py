@@ -32,7 +32,7 @@ from audio_generation.domain.models import (
 )
 from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.progress.progress_manager import ProgressManager
-from audio_generation.providers.base import AudioFormat, SynthesisRequest, TTSProvider
+from audio_generation.providers.base import AudioFormat, SynthesisRequest, SynthesisResult, TTSProvider
 from audio_generation.providers.gemini import GeminiProvider
 from audio_generation.tts.client import TTSClient
 from audio_generation.tts.config_builder import SpeechConfigBuilder
@@ -252,7 +252,7 @@ class AudioGenerationPipeline:
         resume: bool,
         progress_callback: Callable[[int, int], None] | None,
         delay_seconds: float,
-    ) -> list[bytes]:
+    ) -> list[SynthesisResult]:
         """Generate audio for all batches with resume capability.
 
         Args:
@@ -281,7 +281,7 @@ class AudioGenerationPipeline:
         if resume and self._progress_manager:
             progress = self._progress_manager.load()
             if progress and self._progress_manager.validate(
-                progress, input_file, total_batches
+                progress, input_file, total_batches, self._provider.name
             ):
                 logging.info(
                     f"Resuming: {len(progress.completed_batches)}/{total_batches} "
@@ -299,20 +299,22 @@ class AudioGenerationPipeline:
         # Initialize new progress if needed
         if progress is None and self._progress_manager:
             progress = self._progress_manager.create_initial_progress(
-                input_file, total_batches
+                input_file, total_batches, self._provider.name
             )
             self._progress_manager.save(progress)
 
-        results: list[bytes | None] = [None] * total_batches
+        results: list[SynthesisResult | None] = [None] * total_batches
 
         # Load already-completed batches from disk
         if progress and self._progress_manager:
             for batch_idx in progress.completed_batches:
                 filename = progress.audio_files.get(batch_idx)
                 if filename:
-                    results[batch_idx] = self._progress_manager.load_batch_audio(
-                        filename
+                    audio_data = self._progress_manager.load_batch_audio(filename)
+                    codec = progress.audio_codecs.get(
+                        batch_idx, Path(filename).suffix.lstrip(".") or "pcm"
                     )
+                    results[batch_idx] = SynthesisResult(audio_data, codec=codec)
                     logging.debug(f"Loaded cached batch {batch_idx + 1}")
 
         # Report initial progress for resumed batches
@@ -351,18 +353,19 @@ class AudioGenerationPipeline:
 
                 # Save immediately to disk
                 if self._progress_manager and progress:
-                    filename = self._progress_manager.save_batch_audio(i, audio_data)
-                    results[i] = audio_data
+                    filename = self._progress_manager.save_batch_audio(i, audio_data, result.codec)
+                    results[i] = result
 
                     # Update progress
                     progress.completed_batches.append(i)
                     progress.audio_files[i] = filename
+                    progress.audio_codecs[i] = result.codec
                     progress.last_error = None
                     progress.last_error_batch = None
                     progress.last_error_time = None
                     self._progress_manager.save(progress)
                 else:
-                    results[i] = audio_data
+                    results[i] = result
 
                 if progress_callback:
                     completed = (

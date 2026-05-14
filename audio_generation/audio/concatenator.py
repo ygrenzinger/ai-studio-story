@@ -12,6 +12,7 @@ from audio_generation.domain.constants import (
 )
 from audio_generation.audio.effects import AudioEffects
 from audio_generation.audio.processor import AudioProcessor
+from audio_generation.providers.base import SynthesisResult
 
 
 class SegmentConcatenator:
@@ -43,7 +44,7 @@ class SegmentConcatenator:
 
     def concatenate(
         self,
-        audio_segments: list[bytes],
+        audio_segments: list[bytes | SynthesisResult],
         segment_metadata: list[Segment] | None = None,
         pause_ms: int = INTER_SEGMENT_PAUSE_MS,
     ) -> AudioSegment:
@@ -92,10 +93,17 @@ class SegmentConcatenator:
                 f"({smoothing_mode})"
             )
 
-        # Step 1: Convert all PCM to AudioSegment
+        # Step 1: Convert all provider audio to AudioSegment
         raw_segments: list[AudioSegment] = []
-        for pcm_data in audio_segments:
-            audio = self._processor.pcm_to_segment(pcm_data)
+        for audio_data in audio_segments:
+            if isinstance(audio_data, SynthesisResult):
+                audio = self._processor.bytes_to_segment(
+                    audio_data.audio_bytes,
+                    codec=audio_data.codec,
+                    sample_rate=audio_data.sample_rate or TARGET_SAMPLE_RATE,
+                )
+            else:
+                audio = self._processor.pcm_to_segment(audio_data)
             raw_segments.append(audio)
 
         # Step 2: Analyze overall noise floor for consistency (if using comfort noise)
