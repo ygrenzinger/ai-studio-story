@@ -2,6 +2,7 @@
 
 from audio_generation.domain.constants import DEFAULT_TTS_MODEL
 from audio_generation.providers.base import TTSProvider
+from audio_generation.providers.elevenlabs import ElevenLabsProvider
 from audio_generation.providers.gemini import GeminiProvider
 from audio_generation.providers.grok import GrokProvider
 from audio_generation.tts.client import TTSClient
@@ -17,6 +18,8 @@ def create_provider(
     """Create a configured TTS provider by name."""
 
     provider_name = name.lower()
+    if provider_name == "elevenlabs":
+        return ElevenLabsProvider(model=model or "eleven_v3")
     if provider_name == "grok":
         return GrokProvider()
     if provider_name != "gemini":

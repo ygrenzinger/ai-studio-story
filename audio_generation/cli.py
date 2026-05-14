@@ -11,6 +11,7 @@ from audio_generation.orchestrator import AudioGenerationPipeline
 from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.progress.progress_manager import ProgressManager
 from audio_generation.providers.registry import create_provider
+from audio_generation.providers.elevenlabs import ELEVENLABS_V3_MODEL, validate_elevenlabs_model
 from audio_generation.utils.logging import setup_logging
 from audio_generation.voices.registry import VoiceRegistry
 from audio_generation.voices.resolver import resolve_voice
@@ -53,6 +54,14 @@ def print_progress(current: int, total: int) -> None:
     print(f"\rGenerating segments: [{bar}] {current}/{total}", end="", flush=True)
     if current == total:
         print()  # Newline at completion
+
+
+def validate_provider_model(provider: str, model: str | None) -> str | None:
+    """Validate provider-specific model options and return selected model."""
+
+    if provider == "elevenlabs":
+        return validate_elevenlabs_model(model or ELEVENLABS_V3_MODEL)
+    return model
 
 
 def print_voice_dry_run(input_path: Path, provider: str, voice_override: str | None) -> None:
@@ -117,7 +126,7 @@ Output Format:
     )
     parser.add_argument(
         "--provider",
-        choices=["gemini", "grok"],
+        choices=["gemini", "grok", "elevenlabs"],
         default="gemini",
         help="TTS provider to use (default: gemini)",
     )
@@ -165,6 +174,12 @@ Output Format:
         logging.error(f"Input file not found: {args.input}")
         sys.exit(1)
 
+    try:
+        selected_model = validate_provider_model(args.provider, args.model)
+    except ValueError as e:
+        logging.error(str(e))
+        sys.exit(1)
+
     if args.dry_run_voices:
         print_voice_dry_run(args.input, args.provider, args.voice)
         return
@@ -187,14 +202,16 @@ Output Format:
                 f"Using Vertex AI (project={tts_config['project']}, "
                 f"location={tts_config['location']})"
             )
-        else:
+        elif args.provider == "grok":
             logging.info("Using Grok TTS")
+        else:
+            logging.info("Using ElevenLabs TTS")
 
         pipeline = AudioGenerationPipeline()
 
         script = pipeline.parse_script(args.input)
-        tts_model = args.model or script.tts_model
-        if args.model:
+        tts_model = selected_model or script.tts_model
+        if selected_model:
             logging.info(f"Model override: {tts_model}")
         if args.voice:
             if args.voice not in AVAILABLE_VOICES:
