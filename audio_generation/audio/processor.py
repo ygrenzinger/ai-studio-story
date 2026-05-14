@@ -56,6 +56,15 @@ class AudioProcessor:
         wav_buffer.seek(0)
         return AudioSegment.from_wav(wav_buffer)
 
+    def bytes_to_segment(
+        self, audio_data: bytes, codec: str = "pcm", sample_rate: int = GEMINI_TTS_SAMPLE_RATE
+    ) -> AudioSegment:
+        """Convert provider audio bytes to AudioSegment."""
+
+        if codec == "pcm":
+            return self.pcm_to_segment(audio_data, sample_rate)
+        return AudioSegment.from_file(io.BytesIO(audio_data), format=codec)
+
     def normalize(
         self,
         audio: AudioSegment,

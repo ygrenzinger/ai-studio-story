@@ -43,8 +43,10 @@ class ProgressManager:
             return GenerationProgress(
                 input_file_hash=data["input_file_hash"],
                 total_batches=data["total_batches"],
+                provider_name=data.get("provider_name", ""),
                 completed_batches=data.get("completed_batches", []),
                 audio_files={int(k): v for k, v in data.get("audio_files", {}).items()},
+                audio_codecs={int(k): v for k, v in data.get("audio_codecs", {}).items()},
                 last_error=data.get("last_error"),
                 last_error_batch=data.get("last_error_batch"),
                 last_error_time=data.get("last_error_time"),
@@ -67,7 +69,7 @@ class ProgressManager:
         data["audio_files"] = {str(k): v for k, v in progress.audio_files.items()}
         self._progress_path.write_text(json.dumps(data, indent=2))
 
-    def save_batch_audio(self, batch_index: int, audio_data: bytes) -> str:
+    def save_batch_audio(self, batch_index: int, audio_data: bytes, codec: str = "pcm") -> str:
         """Save a single batch's audio data to disk immediately.
 
         Args:
@@ -78,7 +80,7 @@ class ProgressManager:
             Filename of saved audio file (relative to batches directory)
         """
         self._batch_dir.mkdir(parents=True, exist_ok=True)
-        filename = f"batch_{batch_index:04d}.pcm"
+        filename = f"batch_{batch_index:04d}.{codec}"
         filepath = self._batch_dir / filename
         filepath.write_bytes(audio_data)
         return filename
@@ -106,7 +108,11 @@ class ProgressManager:
             logging.debug("Removed batch directory")
 
     def validate(
-        self, progress: GenerationProgress, input_file: Path, total_batches: int
+        self,
+        progress: GenerationProgress,
+        input_file: Path,
+        total_batches: int,
+        provider_name: str = "",
     ) -> bool:
         """Check if saved progress is still valid for current run.
 
@@ -127,10 +133,13 @@ class ProgressManager:
         if progress.total_batches != total_batches:
             logging.warning("Batch count changed - progress invalidated")
             return False
+        if provider_name and progress.provider_name and progress.provider_name != provider_name:
+            logging.warning("Provider changed - progress invalidated")
+            return False
         return True
 
     def create_initial_progress(
-        self, input_file: Path, total_batches: int
+        self, input_file: Path, total_batches: int, provider_name: str = ""
     ) -> GenerationProgress:
         """Create a new progress tracking object.
 
@@ -144,8 +153,10 @@ class ProgressManager:
         return GenerationProgress(
             input_file_hash=self.calculate_file_hash(input_file),
             total_batches=total_batches,
+            provider_name=provider_name,
             completed_batches=[],
             audio_files={},
+            audio_codecs={},
             last_error=None,
             last_error_batch=None,
             last_error_time=None,

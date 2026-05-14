@@ -117,7 +117,7 @@ Output Format:
     )
     parser.add_argument(
         "--provider",
-        choices=["gemini"],
+        choices=["gemini", "grok"],
         default="gemini",
         help="TTS provider to use (default: gemini)",
     )
@@ -180,12 +180,15 @@ Output Format:
         logging.warning(f"Output path changed to: {output_path}")
 
     try:
-        # Get TTS configuration
-        tts_config = get_tts_config()
-        logging.info(
-            f"Using Vertex AI (project={tts_config['project']}, "
-            f"location={tts_config['location']})"
-        )
+        tts_config = {}
+        if args.provider == "gemini":
+            tts_config = get_tts_config()
+            logging.info(
+                f"Using Vertex AI (project={tts_config['project']}, "
+                f"location={tts_config['location']})"
+            )
+        else:
+            logging.info("Using Grok TTS")
 
         pipeline = AudioGenerationPipeline()
 

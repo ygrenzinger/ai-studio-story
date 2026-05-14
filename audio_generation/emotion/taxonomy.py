@@ -24,7 +24,7 @@ CANONICAL_DELIVERY = {
     "whispering",
 }
 
-CANONICAL_VOCAL_EVENTS = {"laugh", "sigh"}
+CANONICAL_VOCAL_EVENTS = {"chuckle", "giggle", "laugh", "long_pause", "pause", "sigh"}
 
 PACE_VALUES = {"fast", "normal", "slow"}
 VOLUME_VALUES = {"loud", "normal", "soft"}
@@ -50,6 +50,8 @@ DELIVERY_SYNONYMS = {
 VOCAL_EVENT_SYNONYMS = {
     "laughing": "laugh",
     "laughs": "laugh",
+    "long pause": "long_pause",
+    "long-pause": "long_pause",
     "sighing": "sigh",
     "sighs": "sigh",
 }
@@ -67,5 +69,10 @@ VOLUME_SYNONYMS = {
     "softly": "soft",
 }
 
-PITCH_SYNONYMS = {}
+PITCH_SYNONYMS = {
+    "higher pitch": "high",
+    "higher-pitch": "high",
+    "lower pitch": "low",
+    "lower-pitch": "low",
+}
 INTENSITY_SYNONYMS = {}

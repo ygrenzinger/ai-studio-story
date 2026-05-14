@@ -32,6 +32,26 @@ class ProviderCapabilities:
     supports_direct_mp3_44100: bool
 
 
+class TTSError(RuntimeError):
+    """Base provider-normalized TTS error."""
+
+
+class TTSAuthError(TTSError):
+    """Authentication or authorization failure."""
+
+
+class TTSRateLimitError(TTSError):
+    """Provider rate limit failure."""
+
+
+class TTSValidationError(TTSError):
+    """Provider rejected the synthesis request."""
+
+
+class TTSProviderError(TTSError):
+    """Generic provider-side failure."""
+
+
 @dataclass
 class SynthesisRequest:
     """A single provider synthesis request."""
