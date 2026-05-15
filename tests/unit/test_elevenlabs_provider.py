@@ -86,7 +86,7 @@ speakers:
 
     output = capsys.readouterr().out
     assert "Selected provider: elevenlabs" in output
-    assert "voice: placeholder_warm_narrator" in output
+    assert "voice: JBFqnCBsd6RMkjVDRZzb" in output
 
 
 def test_missing_api_key_fails_on_synthesize_only():

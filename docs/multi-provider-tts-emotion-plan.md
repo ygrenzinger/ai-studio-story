@@ -1124,7 +1124,7 @@ roles:
       gemini:
         voice: Charon
       elevenlabs:
-        voice: ELEVENLABS_WISE_MENTOR_ID
+        voice: onwK4e9ZLuTAKqWW03F9
         voice_settings:
           stability: 0.65
           similarity_boost: 0.8
@@ -1142,7 +1142,7 @@ roles:
       gemini:
         voice: Algenib
       elevenlabs:
-        voice: ELEVENLABS_GRUFF_CREATURE_ID
+        voice: N2lVS1w4EtoT3dr4eOWO
         voice_settings:
           stability: 0.45
           similarity_boost: 0.8
@@ -1181,7 +1181,7 @@ speakers:
     voiceRole: wise_mentor
     voices:
       gemini: Sulafat
-      elevenlabs: ELEVENLABS_GRANDMOTHER_VOICE_ID
+      elevenlabs: pFZP5JQG7iQjIQuC4Bku
       grok: ara
     providerSettings:
       elevenlabs:

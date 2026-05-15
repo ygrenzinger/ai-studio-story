@@ -64,6 +64,25 @@ When using `--provider grok`, the built-in voice IDs are smaller and map to broa
 
 ---
 
+## ElevenLabs TTS Voice Options
+
+When using `--provider elevenlabs`, the registry uses real `voice_id` values rather than placeholders. ElevenLabs documents `JBFqnCBsd6RMkjVDRZzb` as the `eleven_v3` quickstart voice and recommends listing account voices with `GET /v2/voices` for account-specific replacements.
+
+| Role | Voice ID | Voice |
+|------|----------|-------|
+| `warm_narrator` | `JBFqnCBsd6RMkjVDRZzb` | George |
+| `clear_narrator` | `nPczCjzI2devNBz1zQrb` | Brian |
+| `playful_child` | `Xb7hH8MSUJpSbSDYk0k2` | Alice |
+| `gentle_child` | `XrExE9yKIg1WjnnlVkGX` | Matilda |
+| `wise_mentor` | `onwK4e9ZLuTAKqWW03F9` | Daniel |
+| `mysterious_guide` | `XB0fDUnXU5powFXDhCwa` | Charlotte |
+| `gruff_creature` | `N2lVS1w4EtoT3dr4eOWO` | Callum |
+| `energetic_adventurer` | `TX3LPaxmHKxFdv7VOQHJ` | Liam |
+| `calm_teacher` | `nPczCjzI2devNBz1zQrb` | Brian |
+| `soft_bedtime` | `pFZP5JQG7iQjIQuC4Bku` | Lily |
+
+---
+
 ## Voice Selection by Story Tone
 
 The command automatically selects voices based on your chosen story tone:
