@@ -6,7 +6,7 @@ roles:
       gemini: {voice: Sulafat}
       grok: {voice: ara}
       elevenlabs:
-        voice: placeholder_warm_narrator
+        voice: JBFqnCBsd6RMkjVDRZzb
         voice_settings: {stability: 0.4, style: 0.3}
   clear_narrator:
     description: Clear neutral narrator
@@ -15,7 +15,7 @@ roles:
       gemini: {voice: Charon}
       grok: {voice: rex}
       elevenlabs:
-        voice: placeholder_clear_narrator
+        voice: nPczCjzI2devNBz1zQrb
         voice_settings: {stability: 0.45, style: 0.2}
   playful_child:
     description: Playful child voice
@@ -24,7 +24,7 @@ roles:
     providers:
       gemini: {voice: Leda}
       grok: {voice: eve}
-      elevenlabs: {voice: placeholder_playful_child}
+      elevenlabs: {voice: Xb7hH8MSUJpSbSDYk0k2}
   gentle_child:
     description: Gentle child voice
     age: child
@@ -32,46 +32,46 @@ roles:
     providers:
       gemini: {voice: Aoede}
       grok: {voice: ara}
-      elevenlabs: {voice: placeholder_gentle_child}
+      elevenlabs: {voice: XrExE9yKIg1WjnnlVkGX}
   wise_mentor:
     description: Wise mentor voice
     tone: wise
     providers:
       gemini: {voice: Rasalgethi}
       grok: {voice: leo}
-      elevenlabs: {voice: placeholder_wise_mentor}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
   mysterious_guide:
     description: Mysterious guide voice
     tone: mysterious
     providers:
       gemini: {voice: Kore}
       grok: {voice: sal}
-      elevenlabs: {voice: placeholder_mysterious_guide}
+      elevenlabs: {voice: XB0fDUnXU5powFXDhCwa}
   gruff_creature:
     description: Gruff creature voice
     tone: gruff
     providers:
       gemini: {voice: Fenrir}
       grok: {voice: leo}
-      elevenlabs: {voice: placeholder_gruff_creature}
+      elevenlabs: {voice: N2lVS1w4EtoT3dr4eOWO}
   energetic_adventurer:
     description: Energetic adventurer voice
     tone: energetic
     providers:
       gemini: {voice: Puck}
       grok: {voice: eve}
-      elevenlabs: {voice: placeholder_energetic_adventurer}
+      elevenlabs: {voice: TX3LPaxmHKxFdv7VOQHJ}
   calm_teacher:
     description: Calm teacher voice
     tone: calm
     providers:
       gemini: {voice: Achernar}
       grok: {voice: leo}
-      elevenlabs: {voice: placeholder_calm_teacher}
+      elevenlabs: {voice: nPczCjzI2devNBz1zQrb}
   soft_bedtime:
     description: Soft bedtime narrator
     tone: soft
     providers:
       gemini: {voice: Laomedeia}
       grok: {voice: ara}
-      elevenlabs: {voice: placeholder_soft_bedtime}
+      elevenlabs: {voice: pFZP5JQG7iQjIQuC4Bku}

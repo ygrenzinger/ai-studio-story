@@ -8,7 +8,7 @@ from audio_generation.voices.registry import VoiceRegistry
 PROVIDER_DEFAULT_VOICES = {
     "gemini": DEFAULT_VOICE,
     "grok": "eve",
-    "elevenlabs": "placeholder_elevenlabs_default",
+    "elevenlabs": "JBFqnCBsd6RMkjVDRZzb",
 }
 
 PROVIDER_VOICE_ALLOWLISTS = {

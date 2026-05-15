@@ -126,7 +126,7 @@ speakers:
         )
 
 
-def test_placeholder_registry_voice_fails_in_strict_mode(tmp_path):
+def test_registry_voice_resolves_in_strict_mode(tmp_path):
     script_path = tmp_path / "script.md"
     script_path.write_text(
         """---
@@ -139,11 +139,16 @@ speakers:
 **Narrator:** Hello.
 """
     )
+    provider = RecordingElevenLabsProvider()
 
-    with pytest.raises(ValueError, match="placeholder voice"):
-        _pipeline(RecordingElevenLabsProvider()).execute(
-            script_path, tmp_path / "out.mp3", delay_seconds=0, strict_voices=True
-        )
+    _pipeline(provider).execute(
+        script_path, tmp_path / "out.mp3", delay_seconds=0, strict_voices=True
+    )
+
+    assert (
+        provider.requests[0].speaker_configs["Narrator"].voice
+        == "JBFqnCBsd6RMkjVDRZzb"
+    )
 
 
 def test_alternating_script_sends_one_speaker_batches(tmp_path):
