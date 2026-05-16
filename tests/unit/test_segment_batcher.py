@@ -4,6 +4,7 @@ import pytest
 
 from audio_generation.batching.segment_batcher import SegmentBatcher
 from audio_generation.domain.models import Segment
+from audio_generation.providers.base import ProviderCapabilities
 
 
 class TestSegmentBatcher:
@@ -120,3 +121,68 @@ class TestSegmentBatcher:
         assert batches[0].segments[1].text == "Second."
         assert batches[1].segments[0].text == "Third."
         assert all(len(batch.speakers) == 1 for batch in batches)
+
+    def test_multi_speaker_capabilities_batch_two_speaker_dialogue(self, batcher: SegmentBatcher):
+        segments = [
+            Segment(speaker="Narrator", text="La porte brillait."),
+            Segment(speaker="Lina", text="Elle nous appelle ?"),
+            Segment(speaker="Narrator", text="La poignée tourna."),
+            Segment(speaker="Lina", text="J'entre."),
+        ]
+        capabilities = ProviderCapabilities(
+            True,
+            True,
+            False,
+            False,
+            False,
+            max_speakers_per_request=2,
+            max_segments_per_request=12,
+        )
+
+        batches = batcher.batch(segments, capabilities)
+
+        assert len(batches) == 1
+        assert batches[0].speakers == ["Narrator", "Lina"]
+        assert [segment.text for segment in batches[0].segments] == [
+            "La porte brillait.",
+            "Elle nous appelle ?",
+            "La poignée tourna.",
+            "J'entre.",
+        ]
+
+    def test_two_speaker_batching_splits_on_third_speaker(self, batcher: SegmentBatcher):
+        segments = [
+            Segment(speaker="Narrator", text="Setup."),
+            Segment(speaker="Emma", text="Hi."),
+            Segment(speaker="Bob", text="Hello."),
+        ]
+        capabilities = ProviderCapabilities(
+            True,
+            True,
+            False,
+            False,
+            False,
+            max_speakers_per_request=2,
+            max_segments_per_request=12,
+        )
+
+        batches = batcher.batch(segments, capabilities)
+
+        assert [batch.speakers for batch in batches] == [["Narrator", "Emma"], ["Bob"]]
+
+    def test_gemini_capabilities_keep_one_speaker_batches(self, batcher: SegmentBatcher):
+        from audio_generation.providers.gemini import GeminiProvider
+
+        segments = [
+            Segment(speaker="Narrator", text="La porte brillait."),
+            Segment(speaker="Lina", text="Elle nous appelle ?"),
+            Segment(speaker="Narrator", text="La poignée tourna."),
+        ]
+
+        batches = batcher.batch(segments, GeminiProvider.capabilities)
+
+        assert [batch.speakers for batch in batches] == [
+            ["Narrator"],
+            ["Lina"],
+            ["Narrator"],
+        ]

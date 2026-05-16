@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from audio_generation.domain.constants import GEMINI_3_1_FLASH_TTS_MODEL
 from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.domain.models import Segment, SpeakerConfig
 
@@ -48,6 +49,7 @@ speakers:
         assert script.stage_uuid == "test-uuid-123"
         assert script.chapter_ref == "chapter-1"
         assert script.locale == "en-US"
+        assert script.tts_model == GEMINI_3_1_FLASH_TTS_MODEL
         assert len(script.speaker_configs) == 2
         assert len(script.segments) == 3
 
@@ -137,6 +139,7 @@ stageUuid: "test"
         script = parser.parse(script_path)
         assert len(script.speaker_configs) == 1
         assert script.speaker_configs[0].name == "Narrator"
+        assert script.locale == "fr-FR"
 
     def test_split_by_emotions(self, parser: AudioScriptParser):
         """Test emotion splitting from text."""

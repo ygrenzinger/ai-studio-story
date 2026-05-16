@@ -226,12 +226,12 @@ Audio scripts are markdown files with YAML frontmatter:
 ---
 stageUuid: "stage-chapter1"
 chapterRef: "1-the-adventure-begins"
-locale: "en-US"
+locale: "fr-FR"
 speakers:
   - name: Narrator
-    voice: Sulafat
+    voiceRole: warm_narrator
   - name: Emma
-    voice: Leda
+    voiceRole: playful_child
 ---
 
 **Narrator:** <emotion: warm, inviting> Once upon a time, in a magical forest...

@@ -22,7 +22,7 @@ class AudioScriptParser:
     ---
     stageUuid: "stage-uuid"
     chapterRef: "chapter-ref"
-    locale: "en-US"
+    locale: "fr-FR"
     speakers:
       - name: Narrator
         voice: Sulafat
@@ -54,7 +54,7 @@ class AudioScriptParser:
         return AudioScript(
             stage_uuid=frontmatter.get("stageUuid", ""),
             chapter_ref=frontmatter.get("chapterRef", ""),
-            locale=frontmatter.get("locale", "en-US"),
+            locale=frontmatter.get("locale", "fr-FR"),
             speaker_configs=speaker_configs,
             segments=segments,
             tts_model=frontmatter.get("model", DEFAULT_TTS_MODEL),

@@ -11,8 +11,6 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover - without optiona
         SpeechConfig = _SimpleType
         VoiceConfig = _SimpleType
         PrebuiltVoiceConfig = _SimpleType
-        SpeakerVoiceConfig = _SimpleType
-        MultiSpeakerVoiceConfig = _SimpleType
 
     types = _Types()
 
@@ -22,8 +20,7 @@ from audio_generation.domain.models import SegmentBatch, SpeakerConfig
 class SpeechConfigBuilder:
     """Builds Gemini TTS speech configurations.
 
-    Supports both single-speaker and multi-speaker (max 2) configurations
-    for the Gemini TTS API.
+    Uses single-speaker configurations for Vertex AI-compatible Gemini TTS.
     """
 
     def build_single_speaker(self, speaker: SpeakerConfig) -> types.SpeechConfig:
@@ -43,34 +40,6 @@ class SpeechConfigBuilder:
             )
         )
 
-    def build_multi_speaker(self, speakers: list[SpeakerConfig]) -> types.SpeechConfig:
-        """Build TTS config for multiple speakers (max 2).
-
-        Args:
-            speakers: List of speaker configurations
-
-        Returns:
-            SpeechConfig for Gemini TTS API with multi-speaker support
-        """
-        speaker_voice_configs = []
-        for cfg in speakers:
-            speaker_voice_configs.append(
-                types.SpeakerVoiceConfig(
-                    speaker=cfg.name,
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=cfg.voice
-                        )
-                    ),
-                )
-            )
-
-        return types.SpeechConfig(
-            multi_speaker_voice_config=types.MultiSpeakerVoiceConfig(
-                speaker_voice_configs=speaker_voice_configs
-            )
-        )
-
     def build_for_batch(
         self, batch: SegmentBatch, speaker_configs_map: dict[str, SpeakerConfig]
     ) -> types.SpeechConfig:
@@ -85,6 +54,7 @@ class SpeechConfigBuilder:
         """
         if len(batch.speakers) == 1:
             return self.build_single_speaker(speaker_configs_map[batch.speakers[0]])
-        else:
-            configs = [speaker_configs_map[s] for s in batch.speakers]
-            return self.build_multi_speaker(configs)
+        raise ValueError(
+            "Gemini TTS is configured for Vertex AI-compatible single-speaker "
+            "requests; split multi-speaker dialogue before synthesis"
+        )

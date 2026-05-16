@@ -162,15 +162,15 @@ Story 2 of 3:
 
 ## Voice Configuration
 
-Based on the pack tone, automatically select appropriate voices:
+Based on the pack tone, automatically select semantic `voiceRole` values from `config/voice-map.yaml`. Prefer roles over raw provider voices so Gemini can use richer voice mapping without constraining other providers.
 
-| Tone | Narrator Voice | Character Voice Options |
+| Tone | Narrator Role | Character Role Options |
 |------|----------------|------------------------|
-| Warm & Gentle | Sulafat (Warm) | Vindemiatrix (Gentle), Enceladus (Breathy) |
-| Exciting Adventure | Fenrir (Excitable) | Puck (Upbeat), Charon (Informative) |
-| Mysterious/Magical | Enceladus (Breathy) | Zephyr (Bright), Despina (Smooth) |
-| Playful & Fun | Puck (Upbeat) | Leda (Youthful), Sadachbia (Lively) |
-| Educational/Calm | Charon (Informative) | Kore (Firm), Gacrux (Mature) |
+| Warm & Gentle | `warm_narrator`, `soft_bedtime` | `gentle_fairy`, `friendly_parent`, `breathy_ghost` |
+| Exciting Adventure | `lively_adventurer`, `clear_male_narrator` | `comic_trickster`, `bold_heroine`, `energetic_adventurer` |
+| Mysterious/Magical | `breathy_ghost`, `steady_longform_narrator` | `bright_child_narrator`, `queen_or_elder`, `gentle_fairy` |
+| Playful & Fun | `comic_trickster`, `bright_optimist` | `playful_child`, `cheerful_companion`, `lively_adventurer` |
+| Educational/Calm | `clear_narrator`, `scholarly_mentor` | `calm_teacher`, `lore_wizard`, `mature_elder_narrator` |
 
 ---
 
@@ -203,9 +203,9 @@ Once both interview phases are complete:
     ]
   },
   
-  "targetAudience": {
-    "ageRange": [5, 7],
-    "language": "en-US"
+    "targetAudience": {
+      "ageRange": [5, 7],
+      "language": "fr-FR"
   },
   
   "interview": {
@@ -234,7 +234,7 @@ Once both interview phases are complete:
       "id": "narrator",
       "name": "Character Name",
       "role": "narrator",
-      "voice": "Sulafat",
+      "voiceRole": "warm_narrator",
       "voiceStyle": "Warm, gentle storyteller",
       "description": "Description"
     }
@@ -247,7 +247,7 @@ Once both interview phases are complete:
   },
   
   "audio": {
-    "narratorVoice": "Sulafat",
+    "narratorVoiceRole": "warm_narrator",
     "defaultPace": 0.85
   }
 }

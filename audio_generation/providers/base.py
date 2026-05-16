@@ -30,6 +30,9 @@ class ProviderCapabilities:
     supports_wrapping_tags: bool
     supports_voice_settings: bool
     supports_direct_mp3_44100: bool
+    max_speakers_per_request: int = 1
+    max_segments_per_request: int = 1
+    supported_inline_tags: frozenset[str] = field(default_factory=frozenset)
 
 
 class TTSError(RuntimeError):

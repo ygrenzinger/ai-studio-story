@@ -15,7 +15,7 @@ TARGET_CHANNELS = 1  # Mono
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
 GEMINI_2_5_FLASH_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 GEMINI_3_1_FLASH_TTS_MODEL = "gemini-3.1-flash-tts-preview"
-DEFAULT_TTS_MODEL = GEMINI_2_5_FLASH_TTS_MODEL  # Gemini TTS model
+DEFAULT_TTS_MODEL = GEMINI_3_1_FLASH_TTS_MODEL  # Gemini TTS model
 
 # =============================================================================
 # Segment Processing Constants
@@ -71,7 +71,10 @@ TTS_SYSTEM_INSTRUCTION = (
     "Use it to inform your performance, but never read it aloud.\n"
     "- Each speaker has a distinct personality. Embody that character fully.\n"
     "- Use natural pronunciation matching the transcript language. "
-    "Do not anglicize non-English words."
+    "Do not anglicize non-English words.\n"
+    "- English bracketed audio tags inside the transcript, such as [whispers] "
+    "or [laughs], are performance controls. Interpret them naturally; never "
+    "read the tag text aloud."
 )
 
 # =============================================================================

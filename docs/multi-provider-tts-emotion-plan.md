@@ -751,7 +751,7 @@ Example capabilities:
 
 ```python
 GEMINI_CAPABILITIES = ProviderCapabilities(
-    max_speakers_per_request=2,
+    max_speakers_per_request=1,
     supports_prompt_director_notes=True,
     supports_inline_tags=False,
     supports_wrapping_tags=False,
@@ -890,7 +890,7 @@ Rules:
 
 | Provider | Batching strategy |
 | --- | --- |
-| Gemini | Keep current narrator plus character batching, max 2 speakers. |
+| Gemini | One speaker per request for Vertex AI compatibility. Split on speaker changes and assemble locally. |
 | ElevenLabs standard TTS | Usually one speaker per request. Split on speaker changes. Use request stitching if model supports it. |
 | ElevenLabs v3 dialogue route | If implemented later, batch multi-speaker dialogue according to that endpoint's schema. |
 | Grok TTS | One speaker per request. Split on speaker changes. |
@@ -1492,7 +1492,7 @@ Eleven non-v3 compiler avoids spoken direction prose.
 Add tests for provider-aware batching:
 
 ```text
-Gemini allows narrator plus character batches.
+Gemini splits narrator plus character dialogue into one-speaker batches for Vertex AI compatibility.
 Grok splits on each speaker change.
 Eleven standard splits on each speaker change.
 ```

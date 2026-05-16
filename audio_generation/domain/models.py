@@ -102,14 +102,15 @@ class Segment:
 
 @dataclass
 class SegmentBatch:
-    """A batch of segments for a single TTS call (max 2 speakers).
+    """A batch of segments for a single TTS call.
 
-    Gemini TTS API supports maximum 2 speakers per call. Batches are
-    structured to optimize API usage while maintaining narrative flow.
+    Batches are structured from provider capabilities. Vertex AI-compatible
+    Gemini generation uses one speaker per request and relies on local
+    concatenation to preserve dialogue flow.
 
     Attributes:
         segments: Ordered list of segments in this batch
-        speakers: Unique speaker names in this batch (max 2)
+        speakers: Unique speaker names in this batch
     """
 
     segments: list[Segment]
@@ -126,7 +127,7 @@ class AudioScript:
     Attributes:
         stage_uuid: Unique identifier for this audio stage
         chapter_ref: Reference to the source chapter
-        locale: Language/locale code (e.g., "en-US")
+        locale: Language/locale code (e.g., "fr-FR")
         speaker_configs: List of speaker voice configurations
         segments: Ordered list of content segments
         tts_model: Gemini TTS model to use
@@ -134,7 +135,7 @@ class AudioScript:
 
     stage_uuid: str
     chapter_ref: str = ""
-    locale: str = "en-US"
+    locale: str = "fr-FR"
     speaker_configs: list[SpeakerConfig] = field(default_factory=list)
     segments: list[Segment] = field(default_factory=list)
     tts_model: str = DEFAULT_TTS_MODEL

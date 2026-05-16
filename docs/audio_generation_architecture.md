@@ -179,7 +179,7 @@ audio_generation/
 | Component | Single Responsibility |
 |-----------|----------------------|
 | `AudioScriptParser` | Parse markdown with YAML frontmatter into domain objects |
-| `SegmentBatcher` | Group segments into TTS-compatible batches (max 2 speakers) |
+| `SegmentBatcher` | Group segments into provider-compatible batches; Gemini uses one speaker per request for Vertex AI compatibility |
 | `TTSClient` | Handle Gemini API calls with retry logic |
 | `SpeechConfigBuilder` | Build TTS voice configurations |
 | `TTSPromptBuilder` | Construct prompts with transcript text and emotions |

@@ -13,6 +13,7 @@ from audio_generation.domain.models import (
     SegmentBatch,
     SpeakerConfig,
 )
+from audio_generation.emotion.gemini_tags import compile_gemini_segment_text
 
 
 class TTSPromptBuilder:
@@ -30,11 +31,15 @@ class TTSPromptBuilder:
     Voice identity is handled separately by SpeechConfig voice selection.
     """
 
+    def __init__(self, *, enable_inline_tags: bool = True):
+        self._enable_inline_tags = enable_inline_tags
+
     def build(
         self,
         batch: SegmentBatch,
         speaker_configs_map: dict[str, SpeakerConfig],
         character_profiles: dict[str, CharacterProfile] | None = None,
+        locale: str | None = None,
     ) -> str:
         """Build structured TTS prompt for a segment batch.
 
@@ -56,7 +61,7 @@ class TTSPromptBuilder:
             sections.append(audio_profile)
 
         # Section 2: Director's Notes (if any performance directions present)
-        directors_notes = self._build_directors_notes(batch)
+        directors_notes = self._build_directors_notes(batch, locale)
         if directors_notes:
             sections.append(directors_notes)
 
@@ -127,7 +132,7 @@ class TTSPromptBuilder:
         header = "=== AUDIO PROFILE ==="
         return header + "\n" + "\n".join(lines)
 
-    def _build_directors_notes(self, batch: SegmentBatch) -> str:
+    def _build_directors_notes(self, batch: SegmentBatch, locale: str | None = None) -> str:
         """Build Director's Notes section from segment performance directions.
 
         Aggregates emotion markers per speaker and formats them as
@@ -143,6 +148,15 @@ class TTSPromptBuilder:
         """
         notes: list[str] = []
         seen: set[tuple[str, str]] = set()
+
+        if _is_french_locale(locale):
+            notes.extend(
+                [
+                    "Language: French from France.",
+                    "Use clear, natural articulation and a child-friendly pace.",
+                    "Preserve French pronunciation for names and places.",
+                ]
+            )
 
         for segment in batch.segments:
             if not segment.emotion and not segment.direction.raw:
@@ -201,7 +215,16 @@ class TTSPromptBuilder:
         lines: list[str] = []
 
         for segment in batch.segments:
-            lines.append(f"{segment.speaker}: {segment.text}")
+            text = (
+                compile_gemini_segment_text(segment)
+                if self._enable_inline_tags
+                else segment.text
+            )
+            lines.append(f"{segment.speaker}: {text}")
 
         header = "=== TRANSCRIPT ==="
         return header + "\n" + "\n".join(lines)
+
+
+def _is_french_locale(locale: str | None) -> bool:
+    return bool(locale and locale.lower().startswith("fr"))

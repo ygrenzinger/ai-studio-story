@@ -426,7 +426,8 @@ class AudioGenerationPipeline:
         return self._parser.parse(file_path)
 
     def _batch_segments(self, script: AudioScript) -> list[SegmentBatch]:
-        return self._batcher.batch(script.segments)
+        capabilities = getattr(self._provider, "capabilities", None)
+        return self._batcher.batch(script.segments, capabilities)
 
     def _resolve_script_voices(
         self, script: AudioScript, voice_override: str | None = None, *, strict: bool = False

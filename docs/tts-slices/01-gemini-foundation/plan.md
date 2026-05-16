@@ -465,7 +465,7 @@ No network calls are made.
 
 ### User Value
 
-The pipeline can batch differently per provider. Gemini keeps max-2-speaker batching, while later providers can force one speaker per request.
+The pipeline can batch differently per provider. Gemini uses one-speaker batching for Vertex AI compatibility, while future providers can declare richer batching if their API supports it.
 
 ### Changes
 
@@ -480,14 +480,14 @@ class ProviderAwareSegmentBatcher:
 For Gemini:
 
 ```text
-Keep current narrator plus character batching behavior.
-Respect capabilities.max_speakers_per_request = 2.
+Split on speaker changes.
+Respect capabilities.max_speakers_per_request = 1.
 ```
 
 ### Tests
 
 ```text
-Gemini batching matches current expected behavior.
+Gemini batching produces one-speaker requests.
 One-speaker capability splits on speaker changes.
 No batch exceeds provider max speakers.
 ```

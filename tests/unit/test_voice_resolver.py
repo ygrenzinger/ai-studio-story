@@ -24,6 +24,19 @@ def test_known_role_resolves_for_gemini():
     assert resolved.source == "registry.roles.warm_narrator.providers.gemini.voice"
 
 
+def test_gemini_voice_map_uses_allowed_voices():
+    registry = VoiceRegistry.load()
+
+    gemini_voices = {
+        role.providers["gemini"].voice
+        for role in registry.roles.values()
+        if "gemini" in role.providers
+    }
+
+    assert gemini_voices <= PROVIDER_VOICE_ALLOWLISTS["gemini"]
+    assert len(gemini_voices) == 30
+
+
 def test_grok_voice_map_uses_known_current_voices():
     registry = VoiceRegistry.load()
     expected_roles = {

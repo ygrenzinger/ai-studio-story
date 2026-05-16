@@ -6,27 +6,55 @@ speakers:
   - name: Narrateur
     voiceRole: warm_narrator
   - name: Lina
-    voiceRole: playful_child
+    voiceRole: bright_child_narrator
   - name: Professeur Bulle
-    voiceRole: wise_mentor
+    voiceRole: scholarly_mentor
 ---
 
-**Narrateur:** <emotion: warm, curious> Ce matin-la, Lina entra dans une salle qu'elle n'avait jamais vue a l'ecole. Sur la porte, une pancarte brillait doucement : Le petit laboratoire des mysteres.
+**Narrateur:** <emotion: warm, curious, slow> Ce matin-là, Lina suivit un petit couloir qu'elle ne connaissait pas encore. Au bout, une porte bleue brillait doucement, comme si elle gardait un secret.
 
-**Lina:** <emotion: whispering, excited> Waouh... On dirait une cuisine de magicien !
+**Lina:** <emotion: whispering, curious> Le petit laboratoire des mystères... C'est vraiment une salle de classe, ça ?
 
-**Narrateur:** <emotion: playful> Sur les etageres, il y avait des fioles colorees, des poudres rangees dans de petits pots, et meme un citron pose a cote d'un verre d'eau.
+**Narrateur:** <emotion: mysterious, playful> Derrière la porte, il n'y avait ni chaudron, ni baguette magique. Il y avait des fioles bien rangées, des lunettes de protection, un citron jaune, une cuillère de bicarbonate, et un ballon rouge qui attendait sagement sur la table.
 
-**Professeur Bulle:** <emotion: reassuring, cheerful> Bonjour Lina ! Ici, pas de magie... enfin, presque. Ici, on decouvre la chimie.
+**Professeur Bulle:** <emotion: warm, excited> Bonjour, Lina ! Bienvenue dans le laboratoire où les choses ordinaires deviennent extraordinaires.
 
-**Lina:** <emotion: curious> La chimie ? C'est quand ca fait boum ?
+**Lina:** <emotion: excited, curious> On va faire de la magie ?
 
-**Professeur Bulle:** <emotion: amused, gentle> Parfois, dans les films. Mais la vraie chimie, c'est surtout comprendre comment les choses se transforment. Comme quand le chocolat fond, quand le pain gonfle, ou quand une bulle apparait dans un verre.
+**Professeur Bulle:** <emotion: playful, gentle> Presque. Ici, la magie s'appelle la chimie. Elle explique pourquoi le pain gonfle, pourquoi le chocolat fond, et pourquoi certaines bulles apparaissent sans qu'on les voie arriver.
 
-**Narrateur:** <emotion: mysterious, slow> Le professeur posa devant Lina trois objets : un citron, une cuillere de bicarbonate, et un petit ballon rouge.
+**Lina:** <emotion: surprised> Des bulles invisibles ? Elles se cachent où ?
 
-**Lina:** <emotion: surprised> On va fabriquer une fusee ?
+**Professeur Bulle:** <emotion: calm, curious> Dans les matières. Parfois, quand deux ingrédients se rencontrent, ils fabriquent un gaz. Ce gaz pousse, cherche une sortie, et peut même gonfler un ballon.
 
-**Professeur Bulle:** <emotion: playful> Pas encore. Aujourd'hui, nous allons reveiller une bulle invisible.
+**Narrateur:** <emotion: warm, slow> Lina enfila ses lunettes de protection. Elles étaient un peu trop grandes et glissèrent sur son nez, mais son sourire, lui, tenait très bien en place.
 
-**Narrateur:** <emotion: warm, dramatic> Lina ouvrit grand les yeux. Elle ne le savait pas encore, mais elle allait decouvrir que la chimie se cachait partout... meme dans son gouter.
+**Lina:** <emotion: giggles, excited> Alors le ballon va se gonfler tout seul ? Sans souffler dedans ?
+
+**Professeur Bulle:** <emotion: serious, gentle> Exactement. Mais dans un vrai laboratoire, on commence toujours par trois règles : on observe, on ne goûte jamais, et on demande avant de toucher.
+
+**Lina:** <emotion: firm, playful> Observer, ne pas goûter, demander avant de toucher. Promis, Professeur Bulle !
+
+**Professeur Bulle:** <emotion: excited> Parfait. Première mission : réveiller une bulle invisible avec du citron et du bicarbonate.
+
+**Narrateur:** <emotion: mysterious, warm> Le professeur versa quelques gouttes de citron dans un petit flacon. Puis il ajouta doucement une pincée de poudre blanche.
+
+**Lina:** <emotion: whispering, nervous> Ça pétille... On dirait que le flacon chuchote.
+
+**Professeur Bulle:** <emotion: happy, calm> Ce pétillement, c'est le gaz qui se forme. Il s'appelle le dioxyde de carbone. C'est le même gaz qui fait des bulles dans certaines boissons.
+
+**Lina:** <emotion: surprised, slow> Donc... une bulle, ce n'est pas juste de l'air qui fait coucou ?
+
+**Professeur Bulle:** <emotion: laughs, playful> Pas toujours. Une bulle, c'est souvent un petit message : quelque chose est en train de se transformer.
+
+**Narrateur:** <emotion: warm, dramatic> Lina regarda le ballon rouge se lever lentement au-dessus du flacon. Il gonflait, tout rond, comme s'il respirait un secret.
+
+**Lina:** <emotion: excited, loud> Ça marche ! La chimie a gonflé le ballon !
+
+**Professeur Bulle:** <emotion: warm, serious> La chimie l'a aidé, oui. Et toi, tu viens de faire ta première observation de scientifique.
+
+**Narrateur:** <emotion: warm, slow> Lina ne voyait plus le laboratoire comme une cuisine de magicien. Elle y voyait quelque chose d'encore mieux : un endroit où l'on pouvait poser des questions, essayer avec prudence, et comprendre les petits miracles du quotidien.
+
+**Lina:** <emotion: curious, happy> Professeur Bulle... est-ce que la prochaine bulle pourra nous raconter une autre histoire ?
+
+**Professeur Bulle:** <emotion: mysterious, playful> Si tu écoutes bien, Lina, la chimie raconte toujours quelque chose.

@@ -1,8 +1,8 @@
 # Voice Selection Guide for KidStory
 
-## Gemini 2.5 TTS Voice Options
+## Gemini 3.1 TTS Voice Options
 
-The `/kidstory` command uses Google's Gemini 2.5 TTS for high-quality, expressive audio generation. This guide helps you understand the available voices and how they're used in story generation.
+The `/kidstory` command uses Google's Gemini 3.1 Flash TTS by default for high-quality, expressive French story narration. This guide helps you understand the available voices and how they're used in story generation.
 
 ---
 
@@ -85,31 +85,31 @@ When using `--provider elevenlabs`, the registry uses real `voice_id` values rat
 
 ## Voice Selection by Story Tone
 
-The command automatically selects voices based on your chosen story tone:
+The command should select semantic `voiceRole` values based on your chosen story tone. The registry maps those roles to Gemini voices, plus provider-specific equivalents for Grok and ElevenLabs.
 
 ### Warm & Gentle
-- **Narrator:** Sulafat (Warm)
-- **Characters:** Vindemiatrix (Gentle), Enceladus (Breathy)
+- **Narrator roles:** `warm_narrator`, `soft_bedtime`
+- **Character roles:** `gentle_fairy`, `friendly_parent`, `breathy_ghost`
 - **Best for:** Bedtime stories, comfort tales, reassuring narratives
 
 ### Exciting & Adventurous
-- **Narrator:** Fenrir (Excitable)
-- **Characters:** Puck (Upbeat), Charon (Informative)
+- **Narrator roles:** `lively_adventurer`, `clear_male_narrator`
+- **Character roles:** `comic_trickster`, `bold_heroine`, `energetic_adventurer`
 - **Best for:** Action stories, quests, discovery adventures
 
 ### Mysterious & Magical
-- **Narrator:** Enceladus (Breathy)
-- **Characters:** Zephyr (Bright), Despina (Smooth)
+- **Narrator roles:** `breathy_ghost`, `steady_longform_narrator`
+- **Character roles:** `bright_child_narrator`, `queen_or_elder`, `gentle_fairy`
 - **Best for:** Fantasy tales, fairy stories, magical journeys
 
 ### Playful & Fun
-- **Narrator:** Puck (Upbeat)
-- **Characters:** Leda (Youthful), Sadachbia (Lively)
+- **Narrator roles:** `comic_trickster`, `bright_optimist`
+- **Character roles:** `playful_child`, `cheerful_companion`, `lively_adventurer`
 - **Best for:** Comedy, silly stories, animal adventures
 
 ### Educational & Calm
-- **Narrator:** Charon (Informative)
-- **Characters:** Kore (Firm), Gacrux (Mature)
+- **Narrator roles:** `clear_narrator`, `scholarly_mentor`
+- **Character roles:** `calm_teacher`, `lore_wizard`, `mature_elder_narrator`
 - **Best for:** Learning content, science exploration, history tales
 
 ---
@@ -119,30 +119,25 @@ The command automatically selects voices based on your chosen story tone:
 Common story characters and suggested voices:
 
 ### Young Protagonist
-- **Female:** Leda (Youthful) or Kore (Firm)
-- **Male:** Puck (Upbeat) or Achird (Friendly)
+- `playful_child`, `gentle_child`, `bright_child_narrator`, `firm_heroine`, `breezy_young_hero`
 
 ### Wise Mentor
-- **Female:** Gacrux (Mature) or Vindemiatrix (Gentle)
-- **Male:** Charon (Informative) or Sadaltager (Knowledgeable)
+- `mature_elder_narrator`, `scholarly_mentor`, `lore_wizard`, `documentary_mentor`
 
 ### Playful Sidekick
-- **Female:** Laomedeia (Upbeat) or Aoede (Breezy)
-- **Male:** Puck (Upbeat) or Sadachbia (Lively)
+- `comic_trickster`, `cheerful_companion`, `lively_adventurer`, `breezy_young_hero`
 
 ### Mysterious Guide
-- **Female:** Zephyr (Bright) or Despina (Smooth)
-- **Male:** Enceladus (Breathy) or Algieba (Smooth)
+- `breathy_ghost`, `queen_or_elder`, `elegant_mentor`, `mysterious_guide`
 
 ### Gentle Parent/Guardian
-- **Female:** Sulafat (Warm) or Achernar (Soft)
-- **Male:** Umbriel (Easy-going) or Schedar (Even)
+- `warm_narrator`, `soft_bedtime`, `friendly_parent`, `casual_adult_friend`
 
 ---
 
 ## Multi-Speaker Configuration
 
-The TTS system now supports **unlimited speakers** through per-segment generation. Each segment is generated with at most 2 speakers (typically Narrator + one character), then combined with 300ms pauses.
+The pipeline generates one speaker per request for Gemini to stay compatible with Vertex AI, then assembles narrator + character exchanges locally. Write rich dialogue in the script, but do not rely on Gemini multi-speaker request payloads.
 
 ### New Audio Script Format
 
@@ -152,14 +147,14 @@ Speaker configuration is now in the YAML frontmatter with voice selection:
 ---
 stageUuid: "stage-entering-forest"
 chapterRef: "02-entering-forest"
-locale: "en-US"
+locale: "fr-FR"
 speakers:
   - name: Narrator
-    voice: Sulafat
+    voiceRole: warm_narrator
   - name: Emma
-    voice: Leda
+    voiceRole: playful_child
   - name: Dragon
-    voice: Fenrir
+    voiceRole: gruff_creature
 ---
 ```
 
@@ -182,6 +177,8 @@ Instead of separate Director's Notes, use **inline emotional markers** for preci
 | Pace | rushed, slow, hesitant, deliberate |
 | Feeling | happy, sad, scared, excited, nervous, angry, calm, mysterious |
 | Quality | trembling, firm, gentle, harsh, playful, serious, warm, cold |
+
+For Gemini 3.1, supported descriptors are automatically compiled into safe English audio tags such as `[whispers]`, `[excited]`, `[sighs]`, `[laughs]`, and `[very slow]`. Keep scripts provider-neutral with `<emotion: ...>` markers; the provider compiler decides the final syntax.
 
 ### Examples
 
@@ -208,7 +205,7 @@ When no emotion marker is present, the selected voice provides the baseline tone
 ```yaml
 speakers:
   - name: Thorin
-    voice: Algenib
+    voiceRole: gravelly_villain
 ```
 
 ```markdown
@@ -265,16 +262,16 @@ Gemini TTS supports 24 languages for story generation:
 
 Use these archetypes when choosing voices for speakers:
 
-| Character Type | Suggested Voices |
-|----------------|------------------|
-| Young Child (5-8) | Leda (F), Puck (M) |
-| Brave Young Hero | Kore (F), Achird (M) |
-| Wise Mentor/Elder | Gacrux (F), Charon (M) |
-| Playful Sidekick | Laomedeia (F), Sadachbia (M) |
-| Mysterious Being | Zephyr (F), Enceladus (M) |
-| Friendly Monster | Fenrir (M), Algenib (M) |
-| Warm Parent | Sulafat (F), Umbriel (M) |
-| Story Narrator | Sulafat (F), Charon (M) |
+| Character Type | Suggested Roles |
+|----------------|-----------------|
+| Young Child (5-8) | `playful_child`, `gentle_child`, `bright_child_narrator` |
+| Brave Young Hero | `firm_heroine`, `bold_heroine`, `breezy_young_hero` |
+| Wise Mentor/Elder | `mature_elder_narrator`, `scholarly_mentor`, `lore_wizard` |
+| Playful Sidekick | `comic_trickster`, `cheerful_companion`, `lively_adventurer` |
+| Mysterious Being | `breathy_ghost`, `gentle_fairy`, `queen_or_elder` |
+| Friendly Monster | `gruff_creature`, `gravelly_villain` |
+| Warm Parent | `warm_narrator`, `friendly_parent`, `casual_adult_friend` |
+| Story Narrator | `warm_narrator`, `clear_narrator`, `clear_male_narrator`, `steady_longform_narrator` |
 
 ---
 
@@ -294,7 +291,7 @@ Use these archetypes when choosing voices for speakers:
 
 7. **Choose voices carefully** - The voice selection determines the character's baseline sound and personality
 
-8. **Keep segments reasonable** - Avoid monologues over 500 words; break with narrator interjections
+8. **Keep segments reasonable** - Target 300-800 French words per generated clip and split long scenes at natural boundaries
 
 ---
 
@@ -315,7 +312,7 @@ python generate_audio.py script.md -o output.mp3 --voice Puck
 
 The tool automatically:
 - Parses segments with emotion markers
-- Batches Narrator + Character pairs (max 2 speakers per API call)
+- Generates one speaker per request for Vertex AI-compatible Gemini output
 - Generates audio in parallel (up to 5 concurrent calls)
 - Combines segments with 300ms pauses and normalized silence
 - Outputs mono 44100Hz MP3 without ID3 tags

@@ -134,15 +134,17 @@ audio-scripts/
 
 ## Voice Configuration
 
-Based on the story tone, automatically select appropriate voices:
+Based on the story tone, automatically select semantic `voiceRole` values from `config/voice-map.yaml`. Prefer roles over raw provider voices so Gemini can use its full voice set while other providers keep their own mappings.
 
-| Tone | Narrator Voice | Character Voice Options |
+| Tone | Narrator Role | Character Role Options |
 |------|----------------|------------------------|
-| Warm & Gentle | Sulafat (Warm) | Vindemiatrix (Gentle), Enceladus (Breathy) |
-| Exciting Adventure | Fenrir (Excitable) | Puck (Upbeat), Charon (Informative) |
-| Mysterious/Magical | Enceladus (Breathy) | Zephyr (Bright), Despina (Smooth) |
-| Playful & Fun | Puck (Upbeat) | Leda (Youthful), Sadachbia (Lively) |
-| Educational/Calm | Charon (Informative) | Kore (Firm), Gacrux (Mature) |
+| Warm & Gentle | `warm_narrator`, `soft_bedtime` | `gentle_fairy`, `friendly_parent`, `breathy_ghost` |
+| Exciting Adventure | `lively_adventurer`, `clear_male_narrator` | `comic_trickster`, `bold_heroine`, `energetic_adventurer` |
+| Mysterious/Magical | `breathy_ghost`, `steady_longform_narrator` | `bright_child_narrator`, `queen_or_elder`, `gentle_fairy` |
+| Playful & Fun | `comic_trickster`, `bright_optimist` | `playful_child`, `cheerful_companion`, `lively_adventurer` |
+| Educational/Calm | `clear_narrator`, `scholarly_mentor` | `calm_teacher`, `lore_wizard`, `mature_elder_narrator` |
+
+For French narration quality, default to `locale: "fr-FR"`, Gemini 3.1 TTS, and narrator + character dialogue scenes where that improves clarity and engagement. The pipeline stays Vertex AI-compatible by generating one speaker per request and assembling dialogue locally.
 
 ## After Interview: Generate Outline
 
@@ -189,7 +191,7 @@ For each story, create:
 1. **metadata.json** - Story metadata and interview answers
 2. **outline.md** - Approved story outline
 3. **chapters/*.md** - Individual chapter files with full narrative
-4. **characters/*.json** - Character voice configurations for Gemini TTS
+4. **characters/*.json** - Character voice profiles and role guidance for TTS
 5. **audio-scripts/*.md** - TTS-ready scripts with director's notes
 6. **assets/images/*.prompt.md** - AI image generation prompts
 7. **story.json** - Lunii format story structure
@@ -242,18 +244,18 @@ Flag any content that may need parental review:
 
 ## Audio Script Format
 
-For each stage node, generate a TTS-ready script using the **new format** with inline emotional markers:
+For each stage node, generate a TTS-ready script using the provider-neutral format with semantic voice roles and inline emotional markers:
 
 ```markdown
 ---
 stageUuid: "stage-cover-{story-slug}" (for cover) or "stage-{chapter-slug}" (for chapters)
 chapterRef: "{chapter-number}-{chapter-slug}"
-locale: "{language-code}"
+locale: "fr-FR"
 speakers:
   - name: Narrator
-    voice: {voice-name}
+    voiceRole: warm_narrator
   - name: {Character}
-    voice: {voice-name}
+    voiceRole: playful_child
 ---
 
 **Narrator:** <emotion: warm, inviting> {Narration text with emotional guidance inline}
@@ -275,8 +277,11 @@ Use inline `<emotion:>` markers to guide voice performance:
 **Common Emotion Descriptors:**
 - **Volume:** whispered, soft, loud, shouting
 - **Pace:** rushed, slow, hesitant, deliberate
-- **Feeling:** happy, sad, scared, excited, nervous, angry, calm, mysterious
-- **Quality:** trembling, firm, gentle, harsh, playful, serious, warm, cold
+- **Feeling:** happy, sad, scared, excited, nervous, angry, calm, mysterious, curious, surprised
+- **Quality:** trembling, firm, gentle, playful, serious, warm, hushed
+- **Vocal events:** laughs, giggles, sighs
+
+Gemini 3.1 automatically compiles supported descriptors into safe English audio tags like `[whispers]`, `[excited]`, `[sighs]`, and `[very slow]`. Keep writing provider-neutral `<emotion:>` descriptors; do not hand-code provider-specific syntax unless testing a specific provider.
 
 **Examples:**
 ```
@@ -294,38 +299,39 @@ Use inline `<emotion:>` markers to guide voice performance:
 
 ### Character Voice Selection Guide
 
-When choosing voices, use these archetypes as starting points:
+When choosing voices, use these `voiceRole` archetypes as starting points:
 
 **Young Child (5-8 years):**
-- Suggested voices: Leda (F), Puck (M)
+- Suggested roles: `playful_child`, `gentle_child`, `bright_child_narrator`
 
 **Brave Young Hero (8-12 years):**
-- Suggested voices: Kore (F), Achird (M)
+- Suggested roles: `firm_heroine`, `bold_heroine`, `breezy_young_hero`, `friendly_parent`
 
 **Wise Mentor/Elder:**
-- Suggested voices: Gacrux (F), Charon (M), Sadaltager (M)
+- Suggested roles: `mature_elder_narrator`, `scholarly_mentor`, `lore_wizard`, `documentary_mentor`
 
 **Playful Sidekick/Animal Friend:**
-- Suggested voices: Laomedeia (F), Puck (M), Sadachbia (M)
+- Suggested roles: `comic_trickster`, `cheerful_companion`, `lively_adventurer`
 
 **Mysterious/Magical Being:**
-- Suggested voices: Zephyr (F), Enceladus (M)
+- Suggested roles: `breathy_ghost`, `gentle_fairy`, `queen_or_elder`, `mysterious_guide`
 
 **Friendly Monster/Creature:**
-- Suggested voices: Fenrir (M), Algenib (M)
+- Suggested roles: `gruff_creature`, `gravelly_villain`, `energetic_adventurer`
 
 **Warm Parent/Guardian:**
-- Suggested voices: Sulafat (F), Vindemiatrix (F), Umbriel (M)
+- Suggested roles: `warm_narrator`, `friendly_parent`, `gentle_fairy`, `casual_adult_friend`
 
 **Story Narrator:**
-- Suggested voices: Sulafat (F), Charon (M)
+- Suggested roles: `warm_narrator`, `clear_narrator`, `clear_male_narrator`, `steady_longform_narrator`, `soft_bedtime`
 
 ### Audio Segment Length Guidelines
 
 To ensure optimal TTS quality:
-- Keep individual character speeches under 500 words
-- Break long monologues with narrator interjections
-- Maximum chapter transcript: 5000 characters
+- Target 300-800 French words per generated clip when possible
+- Prefer short narrator + character exchanges over long monologues
+- Keep dialogue readable as short speaker turns; Gemini generation runs one speaker per request for Vertex AI compatibility
+- Break long chapters at natural scene boundaries before audio generation
 
 If a chapter exceeds limits:
 1. Split into multiple chapters, OR

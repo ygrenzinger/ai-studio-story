@@ -168,6 +168,41 @@ class TestTTSPromptBuilder:
         assert "Make Narrator sound nervous and whispering, with a slow pace." in prompt
         assert "<emotion:" not in prompt
 
+    def test_gemini_inline_tags_compile_for_supported_directions(
+        self, builder: TTSPromptBuilder, speaker_configs_map
+    ):
+        batch = SegmentBatch(
+            segments=[
+                Segment(
+                    speaker="Emma",
+                    text="Je crois que la porte nous écoute.",
+                    emotion="whispered, excited, slow, sighs",
+                ),
+            ],
+            speakers=["Emma"],
+        )
+        from audio_generation.emotion.normalizer import normalize_performance_direction
+
+        batch.segments[0].direction = normalize_performance_direction(batch.segments[0].emotion)
+
+        prompt = builder.build(batch, speaker_configs_map)
+        transcript = prompt.split("=== TRANSCRIPT ===")[1]
+
+        assert "Emma: [whispers] [excited] [sighs] [very slow] Je crois" in transcript
+
+    def test_french_locale_adds_quality_notes(
+        self, builder: TTSPromptBuilder, speaker_configs_map
+    ):
+        batch = SegmentBatch(
+            segments=[Segment(speaker="Narrator", text="Bonjour.")],
+            speakers=["Narrator"],
+        )
+
+        prompt = builder.build(batch, speaker_configs_map, locale="fr-FR")
+
+        assert "Language: French from France." in prompt
+        assert "child-friendly pace" in prompt
+
     def test_no_emotions_omits_directors_notes(
         self, builder: TTSPromptBuilder, speaker_configs_map
     ):

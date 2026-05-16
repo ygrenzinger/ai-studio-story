@@ -170,7 +170,7 @@ ai-studio-story/
 │   ├── orchestrator.py            #   8-stage pipeline coordinator
 │   ├── domain/                    #   Models and constants
 │   ├── parsing/                   #   Markdown + YAML script parser
-│   ├── batching/                  #   Segment batcher (max 2 speakers/batch)
+│   ├── batching/                  #   Provider-compatible segment batching
 │   ├── tts/                       #   Gemini TTS client, config, prompts
 │   ├── audio/                     #   Processing, effects, concatenation, export
 │   ├── verification/              #   MP3 format validation

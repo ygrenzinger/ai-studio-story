@@ -12,7 +12,7 @@ roles:
     description: Clear neutral narrator
     tone: clear
     providers:
-      gemini: {voice: Charon}
+      gemini: {voice: Erinome}
       grok: {voice: rex}
       elevenlabs:
         voice: nPczCjzI2devNBz1zQrb
@@ -72,6 +72,194 @@ roles:
     description: Soft bedtime narrator
     tone: soft
     providers:
-      gemini: {voice: Laomedeia}
+      gemini: {voice: Achernar}
       grok: {voice: ara}
       elevenlabs: {voice: pFZP5JQG7iQjIQuC4Bku}
+  clear_male_narrator:
+    description: Clear male narrator for French audiobook delivery
+    tone: clear
+    gender: male
+    providers:
+      gemini: {voice: Iapetus}
+      grok: {voice: rex}
+      elevenlabs:
+        voice: nPczCjzI2devNBz1zQrb
+        voice_settings: {stability: 0.45, style: 0.2}
+  steady_longform_narrator:
+    description: Even narrator for stable long-form chapters
+    tone: even
+    providers:
+      gemini: {voice: Schedar}
+      grok: {voice: rex}
+      elevenlabs:
+        voice: nPczCjzI2devNBz1zQrb
+        voice_settings: {stability: 0.5, style: 0.15}
+  mature_elder_narrator:
+    description: Mature elder narrator for fairy tales and historical stories
+    tone: mature
+    providers:
+      gemini: {voice: Gacrux}
+      grok: {voice: sal}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
+  gentle_fairy:
+    description: Gentle magical character or soft narrator
+    tone: gentle
+    providers:
+      gemini: {voice: Vindemiatrix}
+      grok: {voice: ara}
+      elevenlabs: {voice: XrExE9yKIg1WjnnlVkGX}
+  bright_child_narrator:
+    description: Bright youthful narrator for optimistic children's stories
+    age: child
+    tone: bright
+    providers:
+      gemini: {voice: Zephyr}
+      grok: {voice: eve}
+      elevenlabs: {voice: Xb7hH8MSUJpSbSDYk0k2}
+  breezy_young_hero:
+    description: Breezy young hero or light adventure narrator
+    age: youth
+    tone: breezy
+    providers:
+      gemini: {voice: Aoede}
+      grok: {voice: eve}
+      elevenlabs: {voice: Xb7hH8MSUJpSbSDYk0k2}
+  cheerful_companion:
+    description: Upbeat companion or comic relief character
+    tone: upbeat
+    providers:
+      gemini: {voice: Laomedeia}
+      grok: {voice: eve}
+      elevenlabs: {voice: TX3LPaxmHKxFdv7VOQHJ}
+  bright_optimist:
+    description: Bright optimistic heroine or energetic narrator
+    tone: bright
+    providers:
+      gemini: {voice: Autonoe}
+      grok: {voice: eve}
+      elevenlabs: {voice: Xb7hH8MSUJpSbSDYk0k2}
+  relaxed_friend:
+    description: Easy-going relaxed friend or casual narrator
+    tone: relaxed
+    providers:
+      gemini: {voice: Callirrhoe}
+      grok: {voice: ara}
+      elevenlabs: {voice: JBFqnCBsd6RMkjVDRZzb}
+  elegant_mentor:
+    description: Smooth elegant mentor, queen, or refined narrator
+    tone: smooth
+    providers:
+      gemini: {voice: Algieba}
+      grok: {voice: leo}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
+  queen_or_elder:
+    description: Smooth female authority, queen, or elder character
+    tone: smooth
+    gender: female
+    providers:
+      gemini: {voice: Despina}
+      grok: {voice: sal}
+      elevenlabs: {voice: XB0fDUnXU5powFXDhCwa}
+  firm_heroine:
+    description: Firm determined heroine or serious narrator
+    tone: firm
+    gender: female
+    providers:
+      gemini: {voice: Kore}
+      grok: {voice: sal}
+      elevenlabs: {voice: XB0fDUnXU5powFXDhCwa}
+  bold_heroine:
+    description: Forward bold heroine or energetic presenter
+    tone: bold
+    gender: female
+    providers:
+      gemini: {voice: Pulcherrima}
+      grok: {voice: eve}
+      elevenlabs: {voice: TX3LPaxmHKxFdv7VOQHJ}
+  comic_trickster:
+    description: Upbeat trickster or playful magical creature
+    tone: playful
+    providers:
+      gemini: {voice: Puck}
+      grok: {voice: eve}
+      elevenlabs: {voice: TX3LPaxmHKxFdv7VOQHJ}
+  lively_adventurer:
+    description: Lively adventurous narrator or animated character
+    tone: lively
+    providers:
+      gemini: {voice: Sadachbia}
+      grok: {voice: eve}
+      elevenlabs: {voice: TX3LPaxmHKxFdv7VOQHJ}
+  friendly_parent:
+    description: Friendly parent, guide, or approachable narrator
+    tone: friendly
+    providers:
+      gemini: {voice: Achird}
+      grok: {voice: ara}
+      elevenlabs: {voice: JBFqnCBsd6RMkjVDRZzb}
+  casual_modern_teen:
+    description: Casual modern teenager or everyday friend
+    age: teen
+    tone: casual
+    providers:
+      gemini: {voice: Zubenelgenubi}
+      grok: {voice: eve}
+      elevenlabs: {voice: Xb7hH8MSUJpSbSDYk0k2}
+  casual_adult_friend:
+    description: Easy-going adult friend or conversational narrator
+    tone: casual
+    providers:
+      gemini: {voice: Umbriel}
+      grok: {voice: ara}
+      elevenlabs: {voice: JBFqnCBsd6RMkjVDRZzb}
+  scholarly_mentor:
+    description: Informative scholar, mentor, or educational narrator
+    tone: informative
+    providers:
+      gemini: {voice: Charon}
+      grok: {voice: leo}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
+  lore_wizard:
+    description: Knowledgeable historian, professor, or lore wizard
+    tone: knowledgeable
+    providers:
+      gemini: {voice: Sadaltager}
+      grok: {voice: leo}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
+  documentary_mentor:
+    description: Informative documentary-style mentor or narrator
+    tone: informative
+    providers:
+      gemini: {voice: Rasalgethi}
+      grok: {voice: leo}
+      elevenlabs: {voice: onwK4e9ZLuTAKqWW03F9}
+  guardian_authority:
+    description: Firm guardian, judge, or dramatic authority figure
+    tone: firm
+    gender: male
+    providers:
+      gemini: {voice: Orus}
+      grok: {voice: rex}
+      elevenlabs: {voice: N2lVS1w4EtoT3dr4eOWO}
+  king_or_commander:
+    description: Firm king, commander, or serious authority narrator
+    tone: firm
+    gender: male
+    providers:
+      gemini: {voice: Alnilam}
+      grok: {voice: rex}
+      elevenlabs: {voice: N2lVS1w4EtoT3dr4eOWO}
+  gravelly_villain:
+    description: Gravelly villain, old sailor, monster, or dark narrator
+    tone: gravelly
+    providers:
+      gemini: {voice: Algenib}
+      grok: {voice: sal}
+      elevenlabs: {voice: N2lVS1w4EtoT3dr4eOWO}
+  breathy_ghost:
+    description: Breathy ghost, tired character, or fragile mysterious voice
+    tone: breathy
+    providers:
+      gemini: {voice: Enceladus}
+      grok: {voice: sal}
+      elevenlabs: {voice: XB0fDUnXU5powFXDhCwa}
