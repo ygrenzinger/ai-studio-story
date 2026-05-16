@@ -6,7 +6,10 @@ import os
 import sys
 from pathlib import Path
 
-from audio_generation.domain.constants import AVAILABLE_VOICES
+from audio_generation.domain.constants import (
+    AVAILABLE_VOICES,
+    GEMINI_3_1_FLASH_TTS_MODEL,
+)
 from audio_generation.orchestrator import AudioGenerationPipeline
 from audio_generation.parsing.script_parser import AudioScriptParser
 from audio_generation.progress.progress_manager import ProgressManager
@@ -21,21 +24,27 @@ def get_tts_config() -> dict:
     """Get TTS configuration from environment.
 
     Returns:
-        Dict with 'project' and 'location' keys for Vertex AI.
+        Dict with Vertex AI or Gemini API authentication settings.
 
     Raises:
         SystemExit: If no authentication is configured.
     """
     project = os.environ.get("GOOGLE_CLOUD_PROJECT")
     location = os.environ.get("GOOGLE_CLOUD_REGION", "us-central1")
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 
     if project:
         return {"project": project, "location": location}
+    if api_key:
+        return {"api_key": api_key}
 
     logging.error(
         "No TTS authentication configured.\n"
-        "Set GOOGLE_CLOUD_PROJECT to your Vertex AI project ID.\n"
-        "Example: export GOOGLE_CLOUD_PROJECT=your-project-id"
+        "Set GOOGLE_CLOUD_PROJECT for Vertex AI, or GEMINI_API_KEY/GOOGLE_API_KEY "
+        "for the Gemini API.\n"
+        "Examples:\n"
+        "  export GOOGLE_CLOUD_PROJECT=your-project-id\n"
+        "  export GEMINI_API_KEY=your-api-key"
     )
     sys.exit(1)
 
@@ -98,12 +107,14 @@ Examples:
   python -m audio_generation.cli script.md -o output.mp3 --resume
 
 Prerequisites:
-   1. Google Cloud project with Vertex AI enabled
+   1. Google Cloud project with Vertex AI enabled or a Gemini API key
    2. FFmpeg installed (required by pydub)
 
 Environment Variables:
-   GOOGLE_CLOUD_PROJECT  Required. Vertex AI project ID.
+   GOOGLE_CLOUD_PROJECT  Vertex AI project ID.
    GOOGLE_CLOUD_REGION   Optional. Vertex AI region (default: us-central1).
+   GEMINI_API_KEY         Gemini API key fallback when no project is set.
+   GOOGLE_API_KEY         Alternative Gemini API key variable.
 
 Output Format:
   - MP3 (MPEG Audio Layer III)
@@ -136,7 +147,7 @@ Output Format:
     )
     parser.add_argument(
         "--model",
-        help="Override TTS model (e.g., gemini-2.5-pro-preview-tts)",
+        help=f"Override TTS model (e.g., {GEMINI_3_1_FLASH_TTS_MODEL})",
     )
     parser.add_argument(
         "--debug",
@@ -198,10 +209,13 @@ Output Format:
         tts_config = {}
         if args.provider == "gemini":
             tts_config = get_tts_config()
-            logging.info(
-                f"Using Vertex AI (project={tts_config['project']}, "
-                f"location={tts_config['location']})"
-            )
+            if "project" in tts_config:
+                logging.info(
+                    f"Using Vertex AI (project={tts_config['project']}, "
+                    f"location={tts_config['location']})"
+                )
+            else:
+                logging.info("Using Gemini API")
         elif args.provider == "grok":
             logging.info("Using Grok TTS")
         else:

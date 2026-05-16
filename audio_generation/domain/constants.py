@@ -13,7 +13,9 @@ TARGET_CHANNELS = 1  # Mono
 # =============================================================================
 
 DEFAULT_VOICE = "Sulafat"  # Warm voice for narrators
-DEFAULT_TTS_MODEL = "gemini-2.5-flash-preview-tts"  # Gemini TTS model
+GEMINI_2_5_FLASH_TTS_MODEL = "gemini-2.5-flash-preview-tts"
+GEMINI_3_1_FLASH_TTS_MODEL = "gemini-3.1-flash-tts-preview"
+DEFAULT_TTS_MODEL = GEMINI_2_5_FLASH_TTS_MODEL  # Gemini TTS model
 
 # =============================================================================
 # Segment Processing Constants

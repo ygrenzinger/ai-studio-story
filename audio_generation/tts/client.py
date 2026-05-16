@@ -1,4 +1,4 @@
-"""TTS client wrapper for Vertex AI with retry logic."""
+"""TTS client wrapper for Gemini TTS with retry logic."""
 
 import logging
 import time
@@ -21,8 +21,9 @@ from audio_generation.domain.constants import MAX_RETRIES
 class TTSClient:
     """Wrapper for Gemini TTS API with retry logic.
 
-    Uses Vertex AI authentication. Handles API calls with automatic retry
-    on failure, exponential backoff, and proper error handling.
+    Uses Vertex AI or Gemini Developer API authentication. Handles API calls
+    with automatic retry on failure, exponential backoff, and proper error
+    handling.
     """
 
     def __init__(
@@ -30,23 +31,33 @@ class TTSClient:
         model: str,
         max_retries: int = MAX_RETRIES,
         *,
-        project: str,
+        project: str | None = None,
         location: str | None = None,
+        api_key: str | None = None,
     ):
         """Initialize TTS client.
 
         Args:
             model: TTS model name
             max_retries: Maximum retry attempts per request
-            project: Google Cloud project ID
+            project: Google Cloud project ID for Vertex AI
             location: Google Cloud region (default: us-central1)
+            api_key: Gemini Developer API key
         """
         if genai is None:
             raise RuntimeError("Google GenAI SDK is not installed")
-        self._client = genai.Client(
-            vertexai=True, project=project, location=location
-        )
-        self._backend = "Vertex AI"
+        if project:
+            self._client = genai.Client(
+                vertexai=True, project=project, location=location
+            )
+            self._backend = "Vertex AI"
+        elif api_key:
+            self._client = genai.Client(api_key=api_key)
+            self._backend = "Gemini API"
+        else:
+            raise ValueError(
+                "Gemini TTS requires GOOGLE_CLOUD_PROJECT or GEMINI_API_KEY"
+            )
         self._model = model
         self._max_retries = max_retries
 

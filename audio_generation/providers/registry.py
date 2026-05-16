@@ -14,6 +14,7 @@ def create_provider(
     model: str | None = None,
     project: str | None = None,
     location: str | None = None,
+    api_key: str | None = None,
 ) -> TTSProvider:
     """Create a configured TTS provider by name."""
 
@@ -24,11 +25,14 @@ def create_provider(
         return GrokProvider()
     if provider_name != "gemini":
         raise ValueError(f"Unknown TTS provider: {name}")
-    if not project:
-        raise ValueError("Gemini provider requires a Google Cloud project")
+    if not project and not api_key:
+        raise ValueError(
+            "Gemini provider requires GOOGLE_CLOUD_PROJECT or GEMINI_API_KEY"
+        )
     client = TTSClient(
         model=model or DEFAULT_TTS_MODEL,
         project=project,
         location=location,
+        api_key=api_key,
     )
     return GeminiProvider(client)
