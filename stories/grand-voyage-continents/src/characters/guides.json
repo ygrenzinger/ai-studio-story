@@ -1,0 +1,34 @@
+{
+  "guides": [
+    {
+      "name": "Amara",
+      "continent": "Afrique",
+      "voice": "Leda",
+      "description": "Guide naturaliste chaleureuse, vive et protectrice."
+    },
+    {
+      "name": "Luca",
+      "continent": "Europe",
+      "voice": "Achird",
+      "description": "Petit cartographe joyeux, passionné de villes, langues et monuments."
+    },
+    {
+      "name": "Mei",
+      "continent": "Asie",
+      "voice": "Despina",
+      "description": "Guide inventive et attentive, qui relie traditions, paysages et découvertes."
+    },
+    {
+      "name": "Sami",
+      "continent": "Amérique",
+      "voice": "Achird",
+      "description": "Condor voyageur, calme et enthousiaste, qui connaît les grands paysages du continent américain."
+    },
+    {
+      "name": "Tala",
+      "continent": "Océanie",
+      "voice": "Sulafat",
+      "description": "Tortue marine sage, douce et patiente, liée aux récifs et aux îles."
+    }
+  ]
+}

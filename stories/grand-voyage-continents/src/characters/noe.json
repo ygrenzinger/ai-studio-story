@@ -1,0 +1,25 @@
+{
+  "name": "Noë",
+  "role": "Protagoniste principal",
+  "age": 8,
+  "gender": "unspecified",
+  "personality": [
+    "Curieux",
+    "Respectueux",
+    "Observateur",
+    "Enthousiaste",
+    "Émerveillé par le monde"
+  ],
+  "voice": {
+    "name": "Puck",
+    "characteristic": "Upbeat"
+  },
+  "description": "Noë est un enfant explorateur de 8 ans. Grâce à une boussole magique, Noë visite les continents avec des guides bienveillants et apprend à observer les paysages, les cultures, les langues et la nature avec respect.",
+  "typical_lines": [
+    "Wow, c'est immense !",
+    "Comment vivent les gens ici ?",
+    "Je veux bien comprendre.",
+    "Je n'avais jamais imaginé ça !",
+    "Je le note dans mon carnet des continents."
+  ]
+}

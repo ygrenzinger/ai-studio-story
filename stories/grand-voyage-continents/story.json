@@ -1,0 +1,889 @@
+{
+  "format": "v1",
+  "title": "Le Grand Voyage des Continents",
+  "description": "Noë découvre les continents grâce à une boussole magique. L'enfant choisit d'abord un continent, puis chaque pays devient une histoire séparée d'environ 8 minutes, guidée par le guide du continent.",
+  "version": 1,
+  "nightModeAvailable": false,
+  "stageNodes": [
+    {
+      "uuid": "stage-cover-grand-voyage-continents",
+      "squareOne": true,
+      "name": "Couverture",
+      "type": "cover",
+      "image": "cover.bmp",
+      "audio": "cover-welcome.mp3",
+      "okTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": true,
+        "home": false,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-hub-menu",
+      "name": "Menu Hub — Choix du continent",
+      "type": "menu.questionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "hub-menu.bmp",
+      "audio": "hub-menu.mp3",
+      "okTransition": {
+        "actionNode": "action-menu-choice",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-option-afrique",
+      "name": "Option Menu — Afrique",
+      "type": "menu.optionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "option-afrique.bmp",
+      "audio": "option-afrique.mp3",
+      "okTransition": {
+        "actionNode": "action-to-01-01-egypte",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-europe",
+      "name": "Option Menu — Europe",
+      "type": "menu.optionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "option-europe.bmp",
+      "audio": "option-europe.mp3",
+      "okTransition": {
+        "actionNode": "action-to-02-01-espagne",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-asie",
+      "name": "Option Menu — Asie",
+      "type": "menu.optionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "option-asie.bmp",
+      "audio": "option-asie.mp3",
+      "okTransition": {
+        "actionNode": "action-to-03-01-chine",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-amerique",
+      "name": "Option Menu — Amérique",
+      "type": "menu.optionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "option-amerique.bmp",
+      "audio": "option-amerique.mp3",
+      "okTransition": {
+        "actionNode": "action-to-04-01-canada",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-option-oceanie",
+      "name": "Option Menu — Océanie",
+      "type": "menu.optionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": "option-oceanie.bmp",
+      "audio": "option-oceanie.mp3",
+      "okTransition": {
+        "actionNode": "action-to-05-01-australie",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": true,
+        "ok": true,
+        "home": true,
+        "pause": false,
+        "autoplay": false
+      }
+    },
+    {
+      "uuid": "stage-story-01-egypte",
+      "name": "Histoire 1 — L'Égypte et le Fleuve Roi",
+      "type": "story",
+      "groupId": "stage-story-01-egypte",
+      "image": "story-01-egypte.bmp",
+      "audio": "story-01-egypte.mp3",
+      "okTransition": {
+        "actionNode": "action-to-01-02-maroc",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-02-maroc",
+      "name": "Histoire 2 — Le Maroc aux Mille Couleurs",
+      "type": "story",
+      "groupId": "stage-story-02-maroc",
+      "image": "story-02-maroc.bmp",
+      "audio": "story-02-maroc.mp3",
+      "okTransition": {
+        "actionNode": "action-to-01-03-nigeria",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-03-nigeria",
+      "name": "Histoire 3 — Le Nigeria qui Danse",
+      "type": "story",
+      "groupId": "stage-story-03-nigeria",
+      "image": "story-03-nigeria.bmp",
+      "audio": "story-03-nigeria.mp3",
+      "okTransition": {
+        "actionNode": "action-to-01-04-afrique-du-sud",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-04-afrique-du-sud",
+      "name": "Histoire 4 — L'Afrique du Sud Arc-en-Ciel",
+      "type": "story",
+      "groupId": "stage-story-04-afrique-du-sud",
+      "image": "story-04-afrique-du-sud.bmp",
+      "audio": "story-04-afrique-du-sud.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-05-espagne",
+      "name": "Histoire 5 — L'Espagne en Musique",
+      "type": "story",
+      "groupId": "stage-story-05-espagne",
+      "image": "story-05-espagne.bmp",
+      "audio": "story-05-espagne.mp3",
+      "okTransition": {
+        "actionNode": "action-to-02-02-italie",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-06-italie",
+      "name": "Histoire 6 — L'Italie des Pierres et des Canaux",
+      "type": "story",
+      "groupId": "stage-story-06-italie",
+      "image": "story-06-italie.bmp",
+      "audio": "story-06-italie.mp3",
+      "okTransition": {
+        "actionNode": "action-to-02-03-allemagne",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-07-allemagne",
+      "name": "Histoire 7 — L'Allemagne des Forêts et des Idées",
+      "type": "story",
+      "groupId": "stage-story-07-allemagne",
+      "image": "story-07-allemagne.bmp",
+      "audio": "story-07-allemagne.mp3",
+      "okTransition": {
+        "actionNode": "action-to-02-04-royaume-uni",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-08-royaume-uni",
+      "name": "Histoire 8 — Le Royaume-Uni des Îles et des Histoires",
+      "type": "story",
+      "groupId": "stage-story-08-royaume-uni",
+      "image": "story-08-royaume-uni.bmp",
+      "audio": "story-08-royaume-uni.mp3",
+      "okTransition": {
+        "actionNode": "action-to-02-05-russie",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-09-russie",
+      "name": "Histoire 9 — La Russie aux Grands Espaces",
+      "type": "story",
+      "groupId": "stage-story-09-russie",
+      "image": "story-09-russie.bmp",
+      "audio": "story-09-russie.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-10-chine",
+      "name": "Histoire 10 — La Chine et le Long Mur",
+      "type": "story",
+      "groupId": "stage-story-10-chine",
+      "image": "story-10-chine.bmp",
+      "audio": "story-10-chine.mp3",
+      "okTransition": {
+        "actionNode": "action-to-03-02-inde",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-11-inde",
+      "name": "Histoire 11 — L'Inde aux Mille Couleurs",
+      "type": "story",
+      "groupId": "stage-story-11-inde",
+      "image": "story-11-inde.bmp",
+      "audio": "story-11-inde.mp3",
+      "okTransition": {
+        "actionNode": "action-to-03-03-japon",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-12-japon",
+      "name": "Histoire 12 — Le Japon entre Cerisiers et Trains Rapides",
+      "type": "story",
+      "groupId": "stage-story-12-japon",
+      "image": "story-12-japon.bmp",
+      "audio": "story-12-japon.mp3",
+      "okTransition": {
+        "actionNode": "action-to-03-04-indonesie",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-13-indonesie",
+      "name": "Histoire 13 — L'Indonésie des Îles et des Volcans",
+      "type": "story",
+      "groupId": "stage-story-13-indonesie",
+      "image": "story-13-indonesie.bmp",
+      "audio": "story-13-indonesie.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-14-canada",
+      "name": "Histoire 14 — Le Canada des Lacs et des Forêts",
+      "type": "story",
+      "groupId": "stage-story-14-canada",
+      "image": "story-14-canada.bmp",
+      "audio": "story-14-canada.mp3",
+      "okTransition": {
+        "actionNode": "action-to-04-02-etats-unis",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-15-etats-unis",
+      "name": "Histoire 15 — Les États-Unis des Villes et des Canyons",
+      "type": "story",
+      "groupId": "stage-story-15-etats-unis",
+      "image": "story-15-etats-unis.bmp",
+      "audio": "story-15-etats-unis.mp3",
+      "okTransition": {
+        "actionNode": "action-to-04-03-mexique",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-16-mexique",
+      "name": "Histoire 16 — Le Mexique des Couleurs et des Histoires",
+      "type": "story",
+      "groupId": "stage-story-16-mexique",
+      "image": "story-16-mexique.bmp",
+      "audio": "story-16-mexique.mp3",
+      "okTransition": {
+        "actionNode": "action-to-04-04-bresil",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-17-bresil",
+      "name": "Histoire 17 — Le Brésil de la Forêt et de la Musique",
+      "type": "story",
+      "groupId": "stage-story-17-bresil",
+      "image": "story-17-bresil.bmp",
+      "audio": "story-17-bresil.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-18-australie",
+      "name": "Histoire 18 — L'Australie du Désert Rouge et du Récif",
+      "type": "story",
+      "groupId": "stage-story-18-australie",
+      "image": "story-18-australie.bmp",
+      "audio": "story-18-australie.mp3",
+      "okTransition": {
+        "actionNode": "action-to-05-02-nouvelle-zelande",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-19-nouvelle-zelande",
+      "name": "Histoire 19 — La Nouvelle-Zélande des Montagnes et du Kiwi",
+      "type": "story",
+      "groupId": "stage-story-19-nouvelle-zelande",
+      "image": "story-19-nouvelle-zelande.bmp",
+      "audio": "story-19-nouvelle-zelande.mp3",
+      "okTransition": {
+        "actionNode": "action-to-05-03-fidji",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-20-fidji",
+      "name": "Histoire 20 — Les Fidji des Lagons Bleus",
+      "type": "story",
+      "groupId": "stage-story-20-fidji",
+      "image": "story-20-fidji.bmp",
+      "audio": "story-20-fidji.mp3",
+      "okTransition": {
+        "actionNode": "action-to-05-04-papouasie-nouvelle-guinee",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-story-21-papouasie-nouvelle-guinee",
+      "name": "Histoire 21 — La Papouasie-Nouvelle-Guinée aux Oiseaux de Paradis",
+      "type": "story",
+      "groupId": "stage-story-21-papouasie-nouvelle-guinee",
+      "image": "story-21-papouasie-nouvelle-guinee.bmp",
+      "audio": "story-21-papouasie-nouvelle-guinee.mp3",
+      "okTransition": {
+        "actionNode": "action-back-to-hub",
+        "optionIndex": 0
+      },
+      "homeTransition": {
+        "actionNode": "action-to-hub",
+        "optionIndex": 0
+      },
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": true,
+        "pause": true,
+        "autoplay": true
+      }
+    },
+    {
+      "uuid": "stage-hub-welcome-back",
+      "name": "Retour au Hub",
+      "type": "menu.questionstage",
+      "groupId": "menu-grand-voyage-continents",
+      "image": null,
+      "audio": "hub-welcome-back.mp3",
+      "okTransition": {
+        "actionNode": "action-menu-choice",
+        "optionIndex": 0
+      },
+      "homeTransition": null,
+      "controlSettings": {
+        "wheel": false,
+        "ok": false,
+        "home": false,
+        "pause": false,
+        "autoplay": true
+      }
+    }
+  ],
+  "actionNodes": [
+    {
+      "id": "action-to-hub",
+      "name": "Vers le Menu",
+      "type": "menu.questionaction",
+      "groupId": "menu-grand-voyage-continents",
+      "options": [
+        "stage-hub-menu"
+      ]
+    },
+    {
+      "id": "action-menu-choice",
+      "name": "Choix du Continent",
+      "type": "menu.optionsaction",
+      "groupId": "menu-grand-voyage-continents",
+      "options": [
+        "stage-option-afrique",
+        "stage-option-europe",
+        "stage-option-asie",
+        "stage-option-amerique",
+        "stage-option-oceanie"
+      ]
+    },
+    {
+      "id": "action-to-01-01-egypte",
+      "name": "Vers Histoire 1 — Égypte",
+      "type": "story.storyaction",
+      "groupId": "stage-story-01-egypte",
+      "options": [
+        "stage-story-01-egypte"
+      ]
+    },
+    {
+      "id": "action-to-01-02-maroc",
+      "name": "Vers Histoire 2 — Maroc",
+      "type": "story.storyaction",
+      "groupId": "stage-story-02-maroc",
+      "options": [
+        "stage-story-02-maroc"
+      ]
+    },
+    {
+      "id": "action-to-01-03-nigeria",
+      "name": "Vers Histoire 3 — Nigeria",
+      "type": "story.storyaction",
+      "groupId": "stage-story-03-nigeria",
+      "options": [
+        "stage-story-03-nigeria"
+      ]
+    },
+    {
+      "id": "action-to-01-04-afrique-du-sud",
+      "name": "Vers Histoire 4 — Afrique du Sud",
+      "type": "story.storyaction",
+      "groupId": "stage-story-04-afrique-du-sud",
+      "options": [
+        "stage-story-04-afrique-du-sud"
+      ]
+    },
+    {
+      "id": "action-to-02-01-espagne",
+      "name": "Vers Histoire 5 — Espagne",
+      "type": "story.storyaction",
+      "groupId": "stage-story-05-espagne",
+      "options": [
+        "stage-story-05-espagne"
+      ]
+    },
+    {
+      "id": "action-to-02-02-italie",
+      "name": "Vers Histoire 6 — Italie",
+      "type": "story.storyaction",
+      "groupId": "stage-story-06-italie",
+      "options": [
+        "stage-story-06-italie"
+      ]
+    },
+    {
+      "id": "action-to-02-03-allemagne",
+      "name": "Vers Histoire 7 — Allemagne",
+      "type": "story.storyaction",
+      "groupId": "stage-story-07-allemagne",
+      "options": [
+        "stage-story-07-allemagne"
+      ]
+    },
+    {
+      "id": "action-to-02-04-royaume-uni",
+      "name": "Vers Histoire 8 — Royaume-Uni",
+      "type": "story.storyaction",
+      "groupId": "stage-story-08-royaume-uni",
+      "options": [
+        "stage-story-08-royaume-uni"
+      ]
+    },
+    {
+      "id": "action-to-02-05-russie",
+      "name": "Vers Histoire 9 — Russie",
+      "type": "story.storyaction",
+      "groupId": "stage-story-09-russie",
+      "options": [
+        "stage-story-09-russie"
+      ]
+    },
+    {
+      "id": "action-to-03-01-chine",
+      "name": "Vers Histoire 10 — Chine",
+      "type": "story.storyaction",
+      "groupId": "stage-story-10-chine",
+      "options": [
+        "stage-story-10-chine"
+      ]
+    },
+    {
+      "id": "action-to-03-02-inde",
+      "name": "Vers Histoire 11 — Inde",
+      "type": "story.storyaction",
+      "groupId": "stage-story-11-inde",
+      "options": [
+        "stage-story-11-inde"
+      ]
+    },
+    {
+      "id": "action-to-03-03-japon",
+      "name": "Vers Histoire 12 — Japon",
+      "type": "story.storyaction",
+      "groupId": "stage-story-12-japon",
+      "options": [
+        "stage-story-12-japon"
+      ]
+    },
+    {
+      "id": "action-to-03-04-indonesie",
+      "name": "Vers Histoire 13 — Indonésie",
+      "type": "story.storyaction",
+      "groupId": "stage-story-13-indonesie",
+      "options": [
+        "stage-story-13-indonesie"
+      ]
+    },
+    {
+      "id": "action-to-04-01-canada",
+      "name": "Vers Histoire 14 — Canada",
+      "type": "story.storyaction",
+      "groupId": "stage-story-14-canada",
+      "options": [
+        "stage-story-14-canada"
+      ]
+    },
+    {
+      "id": "action-to-04-02-etats-unis",
+      "name": "Vers Histoire 15 — États-Unis",
+      "type": "story.storyaction",
+      "groupId": "stage-story-15-etats-unis",
+      "options": [
+        "stage-story-15-etats-unis"
+      ]
+    },
+    {
+      "id": "action-to-04-03-mexique",
+      "name": "Vers Histoire 16 — Mexique",
+      "type": "story.storyaction",
+      "groupId": "stage-story-16-mexique",
+      "options": [
+        "stage-story-16-mexique"
+      ]
+    },
+    {
+      "id": "action-to-04-04-bresil",
+      "name": "Vers Histoire 17 — Brésil",
+      "type": "story.storyaction",
+      "groupId": "stage-story-17-bresil",
+      "options": [
+        "stage-story-17-bresil"
+      ]
+    },
+    {
+      "id": "action-to-05-01-australie",
+      "name": "Vers Histoire 18 — Australie",
+      "type": "story.storyaction",
+      "groupId": "stage-story-18-australie",
+      "options": [
+        "stage-story-18-australie"
+      ]
+    },
+    {
+      "id": "action-to-05-02-nouvelle-zelande",
+      "name": "Vers Histoire 19 — Nouvelle-Zélande",
+      "type": "story.storyaction",
+      "groupId": "stage-story-19-nouvelle-zelande",
+      "options": [
+        "stage-story-19-nouvelle-zelande"
+      ]
+    },
+    {
+      "id": "action-to-05-03-fidji",
+      "name": "Vers Histoire 20 — Fidji",
+      "type": "story.storyaction",
+      "groupId": "stage-story-20-fidji",
+      "options": [
+        "stage-story-20-fidji"
+      ]
+    },
+    {
+      "id": "action-to-05-04-papouasie-nouvelle-guinee",
+      "name": "Vers Histoire 21 — Papouasie-Nouvelle-Guinée",
+      "type": "story.storyaction",
+      "groupId": "stage-story-21-papouasie-nouvelle-guinee",
+      "options": [
+        "stage-story-21-papouasie-nouvelle-guinee"
+      ]
+    },
+    {
+      "id": "action-back-to-hub",
+      "name": "Retour au Hub",
+      "type": "menu.questionaction",
+      "groupId": "menu-grand-voyage-continents",
+      "options": [
+        "stage-hub-welcome-back"
+      ]
+    }
+  ]
+}

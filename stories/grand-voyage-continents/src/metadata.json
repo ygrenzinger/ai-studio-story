@@ -1,0 +1,153 @@
+{
+  "type": "pack",
+  "title": "Le Grand Voyage des Continents",
+  "slug": "grand-voyage-continents",
+  "description": "Noë découvre les continents grâce à une boussole magique. L'enfant choisit d'abord un continent, puis chaque pays devient une histoire séparée d'environ 8 minutes, guidée par le guide du continent.",
+  "version": 1,
+  "language": "fr-FR",
+  "targetAge": {
+    "min": 7,
+    "max": 8
+  },
+  "totalDuration": "3h10-3h25",
+  "storiesCount": 21,
+  "createdDate": "2026-05-16",
+  "modified": "2026-05-17",
+  "status": "ready_for_export",
+  "tone": "educational_curious",
+  "themes": [
+    "géographie",
+    "continents",
+    "pays du monde",
+    "cultures",
+    "nature",
+    "voyage"
+  ],
+  "educationalGoals": [
+    "Identifier les cinq continents explorés dans le pack",
+    "Découvrir plusieurs pays importants sans les présenter comme une liste exhaustive",
+    "Associer chaque pays à des paysages, monuments, langues, cultures ou éléments naturels",
+    "Développer la curiosité, le respect et l'émerveillement face à la diversité du monde",
+    "Comprendre que les cultures et les lieux changent selon les régions tout en restant reliés par des besoins humains communs"
+  ],
+  "approach": "Pack interactif avec un hub très court. L'enfant choisit un continent, puis écoute les histoires pays associées à ce continent. Chaque pays est une histoire autonome d'environ 8 minutes, sans mission, avec une structure contemplative et pédagogique.",
+  "storyPattern": "hub",
+  "nightModeAvailable": false,
+  "mainCharacters": [
+    {
+      "name": "Noë",
+      "role": "Protagoniste",
+      "age": 8,
+      "description": "Enfant explorateur curieux, respectueux et attentif"
+    },
+    {
+      "name": "Sami",
+      "role": "Guide de l'Amérique",
+      "description": "Condor voyageur, calme et enthousiaste, qui connaît les grands paysages du continent américain"
+    }
+  ],
+  "continents": [
+    {
+      "id": "01-afrique",
+      "title": "Les Lumières d'Afrique",
+      "continent": "Afrique",
+      "guide": "Amara",
+      "countries": ["Égypte", "Maroc", "Nigeria", "Afrique du Sud"],
+      "duration": "34-36 min",
+      "status": "complete"
+    },
+    {
+      "id": "02-europe",
+      "title": "Les Chemins d'Europe",
+      "continent": "Europe",
+      "guide": "Luca",
+      "countries": ["Espagne", "Italie", "Allemagne", "Royaume-Uni", "Russie"],
+      "duration": "42-44 min",
+      "status": "complete"
+    },
+    {
+      "id": "03-asie",
+      "title": "Les Jardins d'Asie",
+      "continent": "Asie",
+      "guide": "Mei",
+      "countries": ["Chine", "Inde", "Japon", "Indonésie"],
+      "duration": "34-36 min",
+      "status": "complete"
+    },
+    {
+      "id": "04-amerique",
+      "title": "Les Horizons d'Amérique",
+      "continent": "Amérique",
+      "guide": "Sami",
+      "countries": ["Canada", "États-Unis", "Mexique", "Brésil"],
+      "duration": "34-36 min",
+      "status": "complete"
+    },
+    {
+      "id": "05-oceanie",
+      "title": "Les Îles d'Océanie",
+      "continent": "Océanie",
+      "guide": "Tala",
+      "countries": ["Australie", "Nouvelle-Zélande", "Fidji", "Papouasie-Nouvelle-Guinée"],
+      "duration": "34-36 min",
+      "status": "complete"
+    }
+  ],
+  "stories": [
+    { "id": "01-01-egypte", "title": "L'Égypte et le Fleuve Roi", "continent": "Afrique", "country": "Égypte", "guide": "Amara", "duration": "7-9 min", "status": "complete" },
+    { "id": "01-02-maroc", "title": "Le Maroc aux Mille Couleurs", "continent": "Afrique", "country": "Maroc", "guide": "Amara", "duration": "7-9 min", "status": "complete" },
+    { "id": "01-03-nigeria", "title": "Le Nigeria qui Danse", "continent": "Afrique", "country": "Nigeria", "guide": "Amara", "duration": "7-9 min", "status": "complete" },
+    { "id": "01-04-afrique-du-sud", "title": "L'Afrique du Sud Arc-en-Ciel", "continent": "Afrique", "country": "Afrique du Sud", "guide": "Amara", "duration": "7-9 min", "status": "complete" },
+    { "id": "02-01-espagne", "title": "L'Espagne en Musique", "continent": "Europe", "country": "Espagne", "guide": "Luca", "duration": "7-9 min", "status": "complete" },
+    { "id": "02-02-italie", "title": "L'Italie des Pierres et des Canaux", "continent": "Europe", "country": "Italie", "guide": "Luca", "duration": "7-9 min", "status": "complete" },
+    { "id": "02-03-allemagne", "title": "L'Allemagne des Forêts et des Idées", "continent": "Europe", "country": "Allemagne", "guide": "Luca", "duration": "7-9 min", "status": "complete" },
+    { "id": "02-04-royaume-uni", "title": "Le Royaume-Uni des Îles et des Histoires", "continent": "Europe", "country": "Royaume-Uni", "guide": "Luca", "duration": "7-9 min", "status": "complete" },
+    { "id": "02-05-russie", "title": "La Russie aux Grands Espaces", "continent": "Europe", "country": "Russie", "guide": "Luca", "duration": "7-9 min", "status": "complete" },
+    { "id": "03-01-chine", "title": "La Chine et le Long Mur", "continent": "Asie", "country": "Chine", "guide": "Mei", "duration": "7-9 min", "status": "complete" },
+    { "id": "03-02-inde", "title": "L'Inde aux Mille Couleurs", "continent": "Asie", "country": "Inde", "guide": "Mei", "duration": "7-9 min", "status": "complete" },
+    { "id": "03-03-japon", "title": "Le Japon entre Cerisiers et Trains Rapides", "continent": "Asie", "country": "Japon", "guide": "Mei", "duration": "7-9 min", "status": "complete" },
+    { "id": "03-04-indonesie", "title": "L'Indonésie des Îles et des Volcans", "continent": "Asie", "country": "Indonésie", "guide": "Mei", "duration": "7-9 min", "status": "complete" },
+    { "id": "04-01-canada", "title": "Le Canada des Lacs et des Forêts", "continent": "Amérique", "country": "Canada", "guide": "Sami", "duration": "7-9 min", "status": "complete" },
+    { "id": "04-02-etats-unis", "title": "Les États-Unis des Villes et des Canyons", "continent": "Amérique", "country": "États-Unis", "guide": "Sami", "duration": "7-9 min", "status": "complete" },
+    { "id": "04-03-mexique", "title": "Le Mexique des Couleurs et des Histoires", "continent": "Amérique", "country": "Mexique", "guide": "Sami", "duration": "7-9 min", "status": "complete" },
+    { "id": "04-04-bresil", "title": "Le Brésil de la Forêt et de la Musique", "continent": "Amérique", "country": "Brésil", "guide": "Sami", "duration": "7-9 min", "status": "complete" },
+    { "id": "05-01-australie", "title": "L'Australie du Désert Rouge et du Récif", "continent": "Océanie", "country": "Australie", "guide": "Tala", "duration": "7-9 min", "status": "complete" },
+    { "id": "05-02-nouvelle-zelande", "title": "La Nouvelle-Zélande des Montagnes et du Kiwi", "continent": "Océanie", "country": "Nouvelle-Zélande", "guide": "Tala", "duration": "7-9 min", "status": "complete" },
+    { "id": "05-03-fidji", "title": "Les Fidji des Lagons Bleus", "continent": "Océanie", "country": "Fidji", "guide": "Tala", "duration": "7-9 min", "status": "complete" },
+    { "id": "05-04-papouasie-nouvelle-guinee", "title": "La Papouasie-Nouvelle-Guinée aux Oiseaux de Paradis", "continent": "Océanie", "country": "Papouasie-Nouvelle-Guinée", "guide": "Tala", "duration": "7-9 min", "status": "complete" }
+  ],
+  "contentWarnings": {
+    "violence": "Aucune",
+    "scary": "Aucun élément effrayant",
+    "separation": "Noë voyage toujours accompagné par un guide bienveillant",
+    "notes": "Contenu adapté aux 7-8 ans. Les pays sont présentés comme des exemples à découvrir, sans classement ni stéréotypes. Les cultures autochtones sont évoquées avec respect et sans appropriation."
+  },
+  "generation": {
+    "hubComplete": true,
+    "storiesTotal": 21,
+    "storiesComplete": 21,
+    "storiesProgress": {
+      "01-01-egypte": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "01-02-maroc": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "01-03-nigeria": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "01-04-afrique-du-sud": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "02-01-espagne": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "02-02-italie": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "02-03-allemagne": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "02-04-royaume-uni": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "02-05-russie": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "03-01-chine": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "03-02-inde": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "03-03-japon": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "03-04-indonesie": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "04-01-canada": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "04-02-etats-unis": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "04-03-mexique": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "04-04-bresil": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "05-01-australie": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "05-02-nouvelle-zelande": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "05-03-fidji": { "chapters": 1, "chaptersComplete": 1, "status": "complete" },
+      "05-04-papouasie-nouvelle-guinee": { "chapters": 1, "chaptersComplete": 1, "status": "complete" }
+    }
+  }
+}
