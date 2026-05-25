@@ -1,7 +1,7 @@
 ---
 description: Generate pixel art cover images for story chapters using python tool
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: openai/gpt-5.5
 temperature: 0.1
 tools:
   write: false
@@ -25,7 +25,7 @@ You are a specialized cover generation agent for the KidStory system. Your role 
 ## Constraints
 
 - You are **read-only** for source files (story markdown, metadata)
-- You can only create/modify image output files in `assets/images/`
+- You can only create/modify image output files in the caller-specified output directory, normally `assets/`
 - You must use `uv run python generate_cover.py` to run the script
 - Do not modify story markdown files or metadata
 
@@ -39,7 +39,7 @@ When invoked, follow these steps:
 
 Determine the story or pack path from the provided arguments:
 - Single story: `./stories/{story-slug}/`
-- Story pack: `./stories/{pack-slug}/` (contains `hub/` and `stories/*/`)
+- Story pack: `./stories/{pack-slug}/` (contains `src/hub/` and `src/stories/*/`)
 
 Read the `metadata.json` to determine if this is a `story` or `pack` type.
 
@@ -58,10 +58,10 @@ Identify all chapters that need cover images:
 ### Step 3: Determine Output Paths
 
 Map each chapter to its output path:
-- Story cover: `assets/images/cover.bmp`
-- Chapter covers: `assets/images/{chapter-name}.bmp`
+- Story cover: `assets/cover.bmp`
+- Chapter/story covers: `assets/{chapter-name}.bmp`
 
-Ensure the `assets/images/` directory exists.
+Ensure the caller-specified output directory, normally `assets/`, exists.
 
 ### Step 4: Check Existing Image Files
 
@@ -133,9 +133,9 @@ Skipped (existing):     Z
 Failed:                 W
 
 Generated files:
-- assets/images/cover.bmp (12.5 KB)
-- assets/images/chapter1.bmp (11.8 KB)
-- assets/images/chapter2.bmp (13.2 KB)
+- assets/cover.bmp (12.5 KB)
+- assets/chapter1.bmp (11.8 KB)
+- assets/chapter2.bmp (13.2 KB)
 
 Failed files (if any):
 - chapter3.bmp: API error - rate limit exceeded
@@ -167,30 +167,30 @@ stories/{story-slug}/
 ├── metadata.json
 ├── story.md
 └── assets/
-    └── images/
-        ├── cover.bmp           # Main story cover (Generated)
-        ├── chapter1.bmp        # Chapter 1 cover (Generated)
-        └── chapter2.bmp        # Chapter 2 cover (Generated)
+    ├── cover.bmp               # Main story cover (Generated)
+    ├── chapter1.bmp            # Chapter 1 cover (Generated)
+    └── chapter2.bmp            # Chapter 2 cover (Generated)
 ```
 
 ### Story Pack
 ```
 stories/{pack-slug}/
 ├── metadata.json
-├── hub/
-│   └── hub.md                  # Hub description
-├── stories/
-│   ├── {story-1}/
-│   │   ├── metadata.json
-│   │   └── story.md
-│   └── {story-2}/
-│       ├── metadata.json
-│       └── story.md
+├── src/
+│   ├── hub/
+│   │   └── menu.md             # Hub description/script
+│   └── stories/
+│       ├── {story-1}/
+│       │   ├── chapter.md
+│       │   └── audio-script.md
+│       └── {story-2}/
+│           ├── chapter.md
+│           └── audio-script.md
 └── assets/
-    └── images/
-        ├── hub-cover.bmp       # Hub cover (Generated)
-        ├── story1-cover.bmp    # Story 1 cover (Generated)
-        └── story2-cover.bmp    # Story 2 cover (Generated)
+    ├── cover.bmp               # Pack cover (Generated)
+    ├── hub-menu.bmp            # Hub cover/menu image (Generated)
+    ├── option-{name}.bmp       # Option images (Generated)
+    └── story-{nn}-{name}.bmp   # Story images (Generated)
 ```
 
 ---

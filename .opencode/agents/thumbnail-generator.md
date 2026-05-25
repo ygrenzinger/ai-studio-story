@@ -1,7 +1,7 @@
 ---
 description: Generate 300x300 PNG thumbnail images for stories and packs using python tool
 mode: subagent
-model: anthropic/claude-sonnet-4-20250514
+model: openai/gpt-5.5
 temperature: 0.1
 tools:
   write: false
