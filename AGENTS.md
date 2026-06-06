@@ -7,7 +7,16 @@ Always use `uv` to run Python scripts. Use `context7` MCP for library docs.
 - `uv run python generate_audio.py` - generate MP3 audio from audio-scripts
 - `uv run python generate_cover.py` - generate pixel art BMP covers
 - `uv run python generate_thumbnail.py` - generate 300x300 PNG story thumbnails
+- `uv run python export_story.py stories/{name}` - export to Lunii-ready ZIP
 - `uv run pytest` - run tests
+
+## Package architecture
+
+- `audio_generation/` - audio parsing, provider selection, TTS synthesis, processing, and MP3 verification
+- `image_generation/` - Gemini image generation plus cover BMP and thumbnail PNG processing
+- `story_export/` - story graph validation, deterministic UUID conversion, asset manifests, and ZIP export
+
+Root scripts are backward-compatible wrappers around these packages.
 
 ## Story structure
 

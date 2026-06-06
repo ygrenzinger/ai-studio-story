@@ -12,13 +12,18 @@ dependencies = [
     "PyYAML>=6.0",
 ]
 
+[project.scripts]
+kidstory-audio = "audio_generation.cli:main"
+kidstory-cover = "image_generation.cli_cover:main"
+kidstory-thumbnail = "image_generation.cli_thumbnail:main"
+kidstory-export = "story_export.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-only-include = ["generate_cover.py", "generate_audio.py"]
+packages = ["audio_generation", "image_generation", "story_export"]
 
 [dependency-groups]
 dev = [

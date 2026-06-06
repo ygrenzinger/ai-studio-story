@@ -19,7 +19,7 @@ You are a specialized audio generation agent for the KidStory system. Your role 
 ## Constraints
 
 - You are **read-only** for source files (audio-scripts)
-- You can only create/modify audio output files in `assets/audio/`
+- You can only create/modify audio output files in the caller-specified output directory, normally `assets/`
 - You must use `uv run python generate_audio.py` to run the script
 - Do not modify audio-script markdown files
 
@@ -33,7 +33,7 @@ When invoked, follow these steps:
 
 Determine the story or pack path from the provided arguments:
 - Single story: `./stories/{story-slug}/audio-scripts/`
-- Story pack: `./stories/{pack-slug}/` (contains `hub/` and `stories/*/audio-scripts/`)
+- Story pack: `./stories/{pack-slug}/` (contains `src/hub/` and `src/stories/*/audio-script.md`)
 
 Read the `metadata.json` to determine if this is a `story` or `pack` type.
 
@@ -48,8 +48,8 @@ Find all audio-script markdown files:
 
 **For Story Packs:**
 ```
-./stories/{pack-slug}/hub/*.md              # Hub scripts (cover, menu, welcome-back, goodbye)
-./stories/{pack-slug}/stories/*/audio-scripts/*.md  # Per-story scripts
+./stories/{pack-slug}/src/hub/*.md                  # Hub scripts (cover, menu, welcome-back, options)
+./stories/{pack-slug}/src/stories/*/audio-script.md # Per-story scripts
 ```
 
 List all discovered files and report the count.
@@ -57,10 +57,10 @@ List all discovered files and report the count.
 ### Step 3: Determine Output Paths
 
 Map each audio script to its output path:
-- Input: `audio-scripts/{stage-uuid}.md`
-- Output: `assets/audio/{stage-uuid}.mp3`
+- Input: caller-provided `.md` script path
+- Output: caller-provided `assets/{stage-uuid}.mp3` path matching `story.json`
 
-Ensure the `assets/audio/` directory exists.
+Ensure the caller-specified output directory, normally `assets/`, exists.
 
 ### Step 4: Check Existing Audio Files
 
@@ -132,9 +132,9 @@ Skipped (existing):      Z
 Failed:                  W
 
 Generated files:
-- assets/audio/stage-intro.mp3 (45.2 KB)
-- assets/audio/stage-chapter1.mp3 (128.7 KB)
-- assets/audio/stage-chapter2.mp3 (156.3 KB)
+- assets/stage-intro.mp3 (45.2 KB)
+- assets/stage-chapter1.mp3 (128.7 KB)
+- assets/stage-chapter2.mp3 (156.3 KB)
 
 Failed files (if any):
 - stage-chapter3.md: API error - invalid speaker voice
@@ -185,35 +185,32 @@ stories/{story-slug}/
 │   ├── stage-ch1.md
 │   └── stage-ending.md
 └── assets/
-    └── audio/
-        ├── stage-cover.mp3     # Generated
-        ├── stage-ch1.mp3       # Generated
-        └── stage-ending.mp3    # Generated
+    ├── stage-cover.mp3         # Generated
+    ├── stage-ch1.mp3           # Generated
+    └── stage-ending.mp3        # Generated
 ```
 
 ### Story Pack
 ```
 stories/{pack-slug}/
 ├── metadata.json
-├── hub/
-│   ├── cover.md                # Hub audio scripts
-│   ├── menu.md
-│   ├── welcome-back.md
-│   └── goodbye.md
-├── stories/
-│   ├── {story-1}/
-│   │   └── audio-scripts/
-│   │       ├── stage-ch1.md
-│   │       └── stage-ending.md
-│   └── {story-2}/
-│       └── audio-scripts/
-│           └── ...
+├── src/
+│   ├── hub/
+│   │   ├── cover-welcome.md     # Hub audio scripts
+│   │   ├── menu.md
+│   │   ├── option-{name}.md
+│   │   └── welcome-back.md
+│   └── stories/
+│       ├── {story-1}/
+│       │   └── audio-script.md
+│       └── {story-2}/
+│           └── audio-script.md
 └── assets/
-    └── audio/
-        ├── hub-cover.mp3       # Hub audio
-        ├── hub-menu.mp3
-        ├── story1-ch1.mp3      # Story audio
-        └── ...
+    ├── cover-welcome.mp3       # Hub audio
+    ├── hub-menu.mp3
+    ├── option-{name}.mp3
+    ├── hub-welcome-back.mp3
+    └── story-{nn}-{name}.mp3   # Story audio
 ```
 
 ---
