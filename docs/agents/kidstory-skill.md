@@ -33,11 +33,15 @@ French. Otherwise ask for language during the interview.
 
 Every `/kidstory*` command starts in plan mode. Do not create, edit, delete,
 export, generate assets, or change `story.json` until the user has confirmed the
-plan, except for read-only inspection and listing existing stories.
+plan. Separately, do not load existing story content unless the user explicitly
+asks for content inspection or approves a specific inspection request. Keep
+context small by default.
 
 Plan mode rules:
 
-1. Read the relevant instructions and inspect only what is needed.
+1. Read the relevant instructions and inspect only what is needed. For existing
+   stories, do not read story content unless the user explicitly asks or approves
+   inspection.
 2. Ask a short, staged interview before acting. Do not dump every possible
    question at once; ask the next 3-6 highest-impact questions.
 3. Convert any command arguments into a draft brief, not final approval. For
@@ -48,7 +52,41 @@ Plan mode rules:
 5. Stop and ask for explicit confirmation such as "Proceed", "Approve", or
    requested changes.
 6. Only after confirmation may you write files, change graph structure, run full
-   build/export, or generate assets.
+   build/export, or generate assets. Reading existing story content still
+   requires an explicit content-inspection request or approval.
+
+### Context-Safe Story Inspection
+
+Avoid filling the context with existing stories. Existing story content under
+`stories/{slug}/` is opt-in only.
+
+Allowed without explicit content-inspection approval:
+
+- list story directories under `stories/`
+- read `src/metadata.json` to show title, type, status, progress, language, and
+  other short administrative fields
+- read a root `metadata.json` only when `src/metadata.json` is absent
+- run narrow shell commands that list paths or file counts, without printing file
+  contents
+
+Forbidden unless the user explicitly asks for it or approves inspection:
+
+- `story.json`
+- `src/outline.md`
+- `src/chapters/**`
+- `src/stories/**`
+- `src/hub/**`
+- `src/characters/**`
+- generated assets and exported ZIP contents
+- broad reads such as dumping all files in a story directory
+
+When a workflow targets an existing story, first summarize what can be known from
+metadata and ask for permission before reading content, for example:
+
+> I can inspect `{slug}` to prepare an edit/continue/export plan. May I read its
+> source files and `story.json`?
+
+If the user declines, proceed only from metadata and user-provided details.
 
 Exception: if the user explicitly says `quick mode`, `use defaults`, or
 `no questions`, ask at most one confirmation question summarizing the defaults
@@ -62,13 +100,15 @@ and then proceed after approval. Never treat a normal imperative request like
   user, present the outline/implementation plan, then create only after approval.
 - `/kidstory pack [theme]`: start plan mode for a hub/menu pack, interview the
   user, present the pack/story plan, then create only after approval.
-- `/kidstory continue [slug]`: inspect current files, summarize gaps, propose a
-  resume plan, and continue only after approval.
-- `/kidstory edit [slug]`: inspect current files, preview impact, propose an edit
-  plan, and make edits only after approval. Ask explicit confirmation before
-  destructive or cascading changes.
-- `/kidstory export [slug]`: inspect validation/export readiness, summarize the
-  build/export plan, and run export only after approval.
+- `/kidstory continue [slug]`: read metadata only, ask permission to inspect
+  content, summarize gaps after approval, propose a resume plan, and continue
+  only after approval.
+- `/kidstory edit [slug]`: read metadata only, ask permission to inspect content,
+  preview impact after approval, propose an edit plan, and make edits only after
+  approval. Ask explicit confirmation before destructive or cascading changes.
+- `/kidstory export [slug]`: read metadata only, ask permission before validation
+  or source inspection, summarize the build/export plan, and run export only
+  after approval.
 
 ## Story Layout
 
@@ -272,13 +312,17 @@ Menu/group rules:
 ## Continue Workflow
 
 When continuing, do not re-ask answered questions unless the user wants to
-change direction.
+change direction. To preserve context, do not read existing story content until
+the user approves inspection.
 
 1. Locate `stories/{slug}/`.
-2. Read `src/metadata.json`, `src/outline.md`, `story.json`, and existing source
-   folders.
-3. Summarize title, type, status, current progress, and missing pieces.
-4. Resume from the first incomplete phase:
+2. Read only minimal metadata, preferably `src/metadata.json`.
+3. Ask permission to inspect content files needed to find gaps.
+4. After approval, read only the necessary subset of `src/outline.md`,
+   `story.json`, and existing source folders. Prefer targeted reads over dumping
+   whole directories.
+5. Summarize title, type, status, current progress, and missing pieces.
+6. Resume from the first incomplete phase:
    - outline not approved
    - missing chapters
    - missing hub scripts
@@ -286,12 +330,14 @@ change direction.
    - missing characters
    - missing or invalid `story.json`
    - dry build failures
-5. Update metadata status/progress and modified timestamp after meaningful work.
-6. Run a dry build after source or graph changes.
+7. Update metadata status/progress and modified timestamp after meaningful work.
+8. Run a dry build after source or graph changes.
 
 ## Edit Workflow
 
-For edits, inspect first, preview impact, then change only the requested scope.
+For edits, start from metadata and user-provided details. Do not inspect story
+content until the user approves it. After approval, inspect only the files needed
+for the requested edit, preview impact, then change only the requested scope.
 
 Common edit types:
 
