@@ -29,19 +29,46 @@ French. Otherwise ask for language during the interview.
 
 ## Command Behavior
 
+### Mandatory Plan/Interview Gate
+
+Every `/kidstory*` command starts in plan mode. Do not create, edit, delete,
+export, generate assets, or change `story.json` until the user has confirmed the
+plan, except for read-only inspection and listing existing stories.
+
+Plan mode rules:
+
+1. Read the relevant instructions and inspect only what is needed.
+2. Ask a short, staged interview before acting. Do not dump every possible
+   question at once; ask the next 3-6 highest-impact questions.
+3. Convert any command arguments into a draft brief, not final approval. For
+   example, `pack dinosaurs` means the tentative theme is dinosaurs; still ask
+   for age, language, story count, tone, and creation mode.
+4. Present a concise plan with: proposed slug, files to create/change, story or
+   pack structure, graph pattern, validation command, and any assumptions.
+5. Stop and ask for explicit confirmation such as "Proceed", "Approve", or
+   requested changes.
+6. Only after confirmation may you write files, change graph structure, run full
+   build/export, or generate assets.
+
+Exception: if the user explicitly says `quick mode`, `use defaults`, or
+`no questions`, ask at most one confirmation question summarizing the defaults
+and then proceed after approval. Never treat a normal imperative request like
+"create a pack" as approval to skip the interview.
+
 - `/kidstory` with no arguments: list entries under `stories/`, show title,
   type, status, and progress from `src/metadata.json`, then ask whether to
   create, continue, edit, or export.
-- `/kidstory new [topic]`: create a single story through the interview and
-  generation workflow below.
-- `/kidstory pack [theme]`: create a hub/menu story pack through the pack
-  workflow below.
-- `/kidstory continue [slug]`: inspect current files and resume from the first
-  incomplete source, graph, or validation gap.
-- `/kidstory edit [slug]`: inspect current files, make requested edits, and run
-  a dry build if graph, scripts, images, audio, or exportability changed.
-- `/kidstory export [slug]`: run `uv run python build_story.py stories/{slug}`
-  and report the phase summary and ZIP path.
+- `/kidstory new [topic]`: start plan mode for a new single story, interview the
+  user, present the outline/implementation plan, then create only after approval.
+- `/kidstory pack [theme]`: start plan mode for a hub/menu pack, interview the
+  user, present the pack/story plan, then create only after approval.
+- `/kidstory continue [slug]`: inspect current files, summarize gaps, propose a
+  resume plan, and continue only after approval.
+- `/kidstory edit [slug]`: inspect current files, preview impact, propose an edit
+  plan, and make edits only after approval. Ask explicit confirmation before
+  destructive or cascading changes.
+- `/kidstory export [slug]`: inspect validation/export readiness, summarize the
+  build/export plan, and run export only after approval.
 
 ## Story Layout
 
@@ -101,12 +128,15 @@ Gather:
 
 After the interview:
 
-1. Create `stories/{slug}/src/metadata.json`.
-2. Create `stories/{slug}/src/outline.md`.
-3. Present the outline for approval and iterate until accepted.
-4. Generate chapters according to creation mode.
-5. Generate character files, audio scripts, and `story.json`.
-6. Run `uv run python build_story.py --dry-run stories/{slug}`.
+1. Present a concise creation plan and proposed outline for approval before any
+   file writes.
+2. After approval, create `stories/{slug}/src/metadata.json`.
+3. Create `stories/{slug}/src/outline.md`.
+4. Present the outline for approval and iterate until accepted if the outline was
+   not already approved in plan mode.
+5. Generate chapters according to creation mode.
+6. Generate character files, audio scripts, and `story.json`.
+7. Run `uv run python build_story.py --dry-run stories/{slug}`.
 
 Age guidance:
 
@@ -140,6 +170,10 @@ Per-story interview:
 - length
 - special educational or interactive element
 - story pattern
+
+After the two-phase interview, present a concise pack plan for approval before
+any file writes. Include the proposed slug, story list, hub/menu behavior,
+characters, files to create, graph pattern, and dry-run command.
 
 After approval, generate:
 

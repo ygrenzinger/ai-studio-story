@@ -8,7 +8,11 @@ Read and follow `docs/agents/kidstory-skill.md`, especially:
 
 Arguments: $ARGUMENTS
 
-Resolve the target slug under `stories/`, then run:
+Start in plan mode. Resolve the target slug under `stories/`, inspect export
+readiness with read-only checks as needed, summarize what build/export will do,
+and stop for explicit user approval before running the full build.
+
+After approval, run:
 
 ```bash
 uv run python build_story.py stories/{slug}

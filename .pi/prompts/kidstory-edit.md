@@ -10,9 +10,14 @@ Read and follow `docs/agents/kidstory-skill.md`, especially:
 
 Arguments: $ARGUMENTS
 
-Find the target story or pack under `stories/`, inspect its `src/` files and
-`story.json`, then make only the requested edits. Preview impact before
-destructive or cascading changes.
+Start in plan/interview mode. Find the target story or pack under `stories/`,
+inspect its `src/` files and `story.json`, ask focused clarification questions
+when the requested edit is ambiguous, then present a concise edit plan with
+files to change, graph impact, validation command, and risks. Stop and wait for
+explicit user approval before writing files.
+
+After approval, make only the requested edits. Preview impact before destructive
+or cascading changes.
 
 Run a dry build when edits affect story graph, audio scripts, images, or
 exportability:
