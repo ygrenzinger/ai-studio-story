@@ -7,6 +7,7 @@ Always use `uv` to run Python scripts. Use `context7` MCP for library docs.
 - `uv run python generate_audio.py` - generate MP3 audio from audio-scripts
 - `uv run python generate_cover.py` - generate pixel art BMP covers
 - `uv run python generate_thumbnail.py` - generate 300x300 PNG story thumbnails
+- `uv run python build_story.py stories/{name}` - validate, generate missing assets, and export
 - `uv run python export_story.py stories/{name}` - export to Lunii-ready ZIP
 - `uv run pytest` - run tests
 
@@ -33,16 +34,26 @@ Each story lives in `stories/{name}/` with:
 
 ## Commands
 
-Use `/kidstory` commands for story workflows:
+Use Pi-compatible `/kidstory` commands for story workflows:
 - `/kidstory-new` - create a new story
 - `/kidstory-edit` - edit an existing story or pack
 - `/kidstory-continue` - continue incomplete work
 - `/kidstory-pack` - create a pack of related stories
 - `/kidstory-export` - export to Lunii-ready ZIP
 
-## Subagents
+The Pi prompt templates live in `.pi/prompts/`. Shared agent instructions live in
+`docs/agents/kidstory-skill.md`.
 
-When generating audio, cover, or thumbnail assets, delegate to the appropriate subagent via the Task tool:
-- audio-generator: converts audio-script .md files into MP3 audio files
-- cover-generator: converts chapter descriptions into pixel art BMP cover images
-- thumbnail-generator: generates 300x300 PNG thumbnails for stories and packs
+OpenCode command and subagent prompts are also available in `.opencode/` for
+backward compatibility with the previous workflow.
+
+## Asset generation by agent environment
+
+Agents may write story source files directly. Do not delegate cover, thumbnail,
+or audio generation to subagents by default in Pi/generic agent workflows. Use
+`uv run python build_story.py stories/{name}` so validation, resumable asset
+generation, verification, and ZIP export stay deterministic and testable.
+
+When running the legacy OpenCode `.opencode/commands/kidstory-export.md`
+workflow, follow its restored subagent instructions for `audio-generator`,
+`cover-generator`, and `thumbnail-generator`.

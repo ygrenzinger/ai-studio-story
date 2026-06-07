@@ -16,6 +16,7 @@ dependencies = [
 kidstory-audio = "audio_generation.cli:main"
 kidstory-cover = "image_generation.cli_cover:main"
 kidstory-thumbnail = "image_generation.cli_thumbnail:main"
+kidstory-build = "story_export.pipeline_cli:main"
 kidstory-export = "story_export.cli:main"
 
 [build-system]
